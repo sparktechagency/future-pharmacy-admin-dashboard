@@ -149,6 +149,7 @@ export default function UserProfilePage() {
       }
 
       const result = await updateProfile(formData).unwrap();
+      console.log("update profile", result)
 
       if (result.success) {
         toast.success(result.message || 'Profile updated successfully');
@@ -310,11 +311,7 @@ export default function UserProfilePage() {
               <div className="grid grid-cols-3 gap-x-16 gap-y-6 flex-1">
                 <div>
                   <div className="text-sm text-gray-500 mb-1">First Name</div>
-                  <div className="text-base font-medium text-gray-900">{profileData?.first_name || 'N/A'}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">Last Name</div>
-                  <div className="text-base font-medium text-gray-900">{profileData?.last_name || 'N/A'}</div>
+                  <div className="text-base font-medium text-gray-900">{profileData?.fullName || 'N/A'}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500 mb-1">Role</div>

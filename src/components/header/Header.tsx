@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Bell, ChevronDown } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useGetMyProfileQuery } from '../../features/profile/profileApi';
+import { baseURL } from '../../utils/BaseURL';
 
 export default function Header() {
   const unreadCount = 1; // Example unread count
@@ -12,6 +14,8 @@ export default function Header() {
   const userRole = "Admin";
   const userImage = "https://api.dicebear.com/7.x/avataaars/svg?seed=Jane";
   const router = useRouter();
+  const { data: profileResponse, isLoading, refetch } = useGetMyProfileQuery({});
+  const profileData = profileResponse?.data;
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -80,7 +84,7 @@ export default function Header() {
               className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-2 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <Avatar className="h-10 w-10">
-                <AvatarImage src={userImage} alt={userName} />
+                <AvatarImage src={baseURL + "/" + profileData?.profile} alt={userName} />
                 <AvatarFallback className="bg-blue-100 text-blue-600 font-semibold">
                   {userName
                     .split(" ")
@@ -91,9 +95,9 @@ export default function Header() {
               </Avatar>
               <div className="flex flex-col items-start">
                 <span className="text-sm font-semibold text-gray-900">
-                  {userName}
+                  {profileData?.fullName}
                 </span>
-                <span className="text-xs text-gray-500">{userRole}</span>
+                <span className="text-xs text-gray-500">{profileData?.role}</span>
               </div>
               <ChevronDown
                 className={`h-4 w-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''
