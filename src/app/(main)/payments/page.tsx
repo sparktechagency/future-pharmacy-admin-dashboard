@@ -261,17 +261,7 @@ export default function TransactionsList() {
                 className="pl-10"
               />
             </div>
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Date Range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Dates</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-              </SelectContent>
-            </Select>
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Status: All" />

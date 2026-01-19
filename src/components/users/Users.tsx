@@ -139,10 +139,13 @@ export default function UserManagement() {
 
   const { data, isLoading, refetch } = useGetAllUsersQuery({});
 
+
   const { data: userDetailsData, isLoading: userDetailsLoading } = useViewUserDetailsQuery(
     selectedUserId || '',
     { skip: !selectedUserId }
   );
+
+
   const [updateBlockAndUnblock, { isLoading: isUpdating }] = useUpdateBlockAndUnblockMutation();
 
   // Format date to readable format
@@ -401,7 +404,7 @@ export default function UserManagement() {
                             disabled={isUpdating}
                           >
                             <Image
-                              src={user.isActive ? "/icons/users/block.png" : "/icons/users/block.png"}
+                              src={user.isActive ? "/icons/users/block.png" : "/icons/users/ok.png"}
                               alt={user.isActive ? "block icon" : "unblock icon"}
                               width={20}
                               height={20}
@@ -481,9 +484,9 @@ export default function UserManagement() {
                 {/* User Profile Header */}
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                    {userDetailsData.data.profile ? (
-                      <Image
-                        src={baseURL + "/" + userDetailsData.data.profile}
+                    {userDetailsData?.data?.profile ? (
+                      <img
+                        src={baseURL + "/" + userDetailsData?.data?.profile}
                         alt="Profile"
                         width={64}
                         height={64}

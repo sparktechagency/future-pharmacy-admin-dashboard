@@ -210,7 +210,7 @@ const ViewDetailsDialog = ({ type, data, children }: ViewDetailsDialogProps) => 
               <div className="flex items-center gap-4">
                 {(data as Pharmacy).logo && (
                   <div className="w-20 h-20 rounded-lg overflow-hidden border">
-                    <Image
+                    <img
                       src={`${baseURL}/${(data as Pharmacy).logo}`}
                       alt={(data as Pharmacy).name}
                       width={80}
@@ -543,7 +543,7 @@ const PharmacyTab = () => {
                             className="p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors"
                             title="View details"
                           >
-                            <Image
+                            <img
                               src="/icons/users/view.png"
                               alt="view details"
                               width={20}
@@ -675,7 +675,7 @@ const DriverTab = () => {
                             className="p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors"
                             title="View details"
                           >
-                            <Image
+                            <img
                               src="/icons/users/view.png"
                               alt="view details"
                               width={20}
@@ -802,7 +802,7 @@ const InvestorTab = () => {
                             className="p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors"
                             title="View details"
                           >
-                            <Image
+                            <img
                               src="/icons/users/view.png"
                               alt="view details"
                               width={20}
@@ -936,7 +936,7 @@ const OtherTab = () => {
                             className="p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors"
                             title="View details"
                           >
-                            <Image
+                            <img
                               src="/icons/users/view.png"
                               alt="view details"
                               width={20}

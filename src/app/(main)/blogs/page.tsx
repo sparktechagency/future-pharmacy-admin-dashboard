@@ -32,7 +32,6 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { format, parse } from 'date-fns';
 import { Bold, Calendar as CalendarIcon, Edit, Italic, List, ListOrdered, Loader2, Trash2, Upload } from 'lucide-react';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import {
@@ -256,7 +255,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={`transition-all duration-300 ${isHovered ? 'blur-sm' : ''}`}>
-        <Image
+        <img
           src={getImageUrl(blog.image) || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400'}
           alt={blog.title}
           height={1000}
@@ -417,7 +416,7 @@ export default function BlogManagementApp() {
         if (imageFile) {
           const formData = new FormData();
           formData.append('title', title.trim());
-          formData.append('date', format(date,'MM--dd-yyyy'));
+          formData.append('date', format(date, 'MM--dd-yyyy'));
           formData.append('description', description.trim());
           formData.append('image', imageFile);
 
@@ -609,7 +608,7 @@ export default function BlogManagementApp() {
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
                 {imagePreview ? (
                   <div className="space-y-4">
-                    <Image
+                    <img
                       src={imagePreview}
                       alt="Preview"
                       width={1000}

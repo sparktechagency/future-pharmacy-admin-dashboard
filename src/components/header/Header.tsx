@@ -64,7 +64,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           {/* Notification Bell */}
           <div className="relative">
-            <button onClick={() => router.push("/notifications")} className="relative flex cursor-pointer h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors">
+            <button onClick={() => router.push("/notifications")} className="relative flex cursor-pointer h-14 w-14 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors">
               <Bell className="h-6 w-6 text-gray-700" />
               {unreadCount > 0 && (
                 <Badge

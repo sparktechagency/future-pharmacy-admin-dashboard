@@ -584,7 +584,7 @@ export default function PrescriptionTransferRequests() {
                       </td> */}
                       <td className="px-6 py-4">
                         <button
-                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                          className="p-1 hover:bg-gray-100 rounded cursor-pointer transition-colors"
                           onClick={() => handleViewDetails(item.originalData)}
                           title="View details"
                         >

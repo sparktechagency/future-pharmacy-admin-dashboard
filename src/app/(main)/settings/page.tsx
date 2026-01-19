@@ -14,13 +14,10 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon, Shield, User } from 'lucide-react';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
-
 import toast from 'react-hot-toast';
 import { useGetMyProfileQuery, useResetPasswordProfileMutation, useTwoStepVerificationMutation, useUpdateProfileMutation } from "../../../features/profile/profileApi";
 import { baseURL } from '../../../utils/BaseURL';
-
 
 // Helper function to format relative time
 const getRelativeTime = (timestamp: string) => {
@@ -51,7 +48,8 @@ export default function UserProfilePage() {
   const profileData = profileResponse?.data;
 
   const [editFormData, setEditFormData] = useState({
-    fullName: '',
+    first_name: '',
+    last_name: '',
     profile: null as File | null,
     location: '',
     dateOfBirth: '' as string | Date
@@ -80,7 +78,8 @@ export default function UserProfilePage() {
       }
 
       setEditFormData({
-        fullName: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim(),
+        first_name: profileData.first_name || '',
+        last_name: profileData.last_name || '',
         profile: null,
         location: profileData.location || '',
         dateOfBirth: dobDate
@@ -131,7 +130,8 @@ export default function UserProfilePage() {
   const handleSaveChanges = async () => {
     try {
       const formData = new FormData();
-      formData.append('fullName', editFormData.fullName);
+      formData.append('first_name', editFormData.first_name);
+      formData.append('last_name', editFormData.last_name);
       if (editFormData.profile) {
         formData.append('profile', editFormData.profile);
       }
@@ -242,19 +242,50 @@ export default function UserProfilePage() {
     }
   };
 
+  const getProfileImageUrl = (profilePath: string) => {
+    if (!profilePath) return '';
+
+    // If it's already a full URL, return as is
+    if (profilePath.startsWith('http')) return profilePath;
+
+    // Convert Windows path to URL path
+    const normalizedPath = profilePath.replace(/\\/g, '/');
+    // Remove 'uploads' prefix if it exists in the path
+
+    // Return the full URL
+    return `${baseURL}/${normalizedPath}`;
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setEditFormData({ ...editFormData, profile: file });
 
       // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      if (previewImage) {
+        URL.revokeObjectURL(previewImage);
+      }
+      const previewUrl = URL.createObjectURL(file);
+      setPreviewImage(previewUrl);
     }
   };
+
+  const handleDialogClose = () => {
+    setIsEditDialogOpen(false);
+    if (previewImage) {
+      URL.revokeObjectURL(previewImage);
+      setPreviewImage(null);
+    }
+  };
+
+  // Cleanup preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (previewImage && previewImage.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImage);
+      }
+    };
+  }, [previewImage]);
 
   // Clear password errors when user starts typing
   useEffect(() => {
@@ -277,16 +308,9 @@ export default function UserProfilePage() {
     );
   }
 
-  // if (!profileData) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-screen">
-  //       <div className="text-lg">Failed to load profile</div>
-  //     </div>
-  //   );
-  // }
-
   // Get profile image URL
-  const profileImageUrl = profileData?.profile;
+  const profileImageUrl = getProfileImageUrl(profileData?.profile || '');
+  console.log("Profile Image URL:", profileImageUrl);
 
   return (
     <div className="">
@@ -296,22 +320,32 @@ export default function UserProfilePage() {
           <div className="flex items-start justify-between">
             <div className="flex gap-6">
               {/* Profile Image */}
-              <div className="w-32 h-32 rounded-full overflow-hidden shrink-0">
-                <Image
-                  src={baseURL + "/" + profileImageUrl}
-                  alt="Profile"
-                  width={128}
-                  height={128}
-                  className="w-full h-full object-cover"
-
-                />
+              <div className="w-32 h-32 rounded-full overflow-hidden shrink-0 relative">
+                {profileImageUrl ? (
+                  <img
+                    src={profileImageUrl}
+                    alt="Profile"
+                    // fill
+                    className="object-cover h-full"
+                  // sizes="128px"
+                  // priority
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <User className="w-16 h-16 text-gray-400" />
+                  </div>
+                )}
               </div>
 
               {/* Profile Info Grid */}
               <div className="grid grid-cols-3 gap-x-16 gap-y-6 flex-1">
                 <div>
                   <div className="text-sm text-gray-500 mb-1">First Name</div>
-                  <div className="text-base font-medium text-gray-900">{profileData?.fullName || 'N/A'}</div>
+                  <div className="text-base font-medium text-gray-900">{profileData?.first_name || 'N/A'}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">Last Name</div>
+                  <div className="text-base font-medium text-gray-900">{profileData?.last_name || 'N/A'}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500 mb-1">Role</div>
@@ -427,7 +461,7 @@ export default function UserProfilePage() {
       </div>
 
       {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog open={isEditDialogOpen} onOpenChange={handleDialogClose}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-semibold">Edit Profile</DialogTitle>
@@ -438,18 +472,32 @@ export default function UserProfilePage() {
           </div>
 
           <div className="space-y-4">
-            {/* Full Name */}
-            <div>
-              <Label htmlFor="fullName" className="text-sm font-medium mb-2 block">
-                Full Name
-              </Label>
-              <Input
-                id="fullName"
-                value={editFormData.fullName}
-                onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
-                className="w-full"
-                placeholder="Enter your full name"
-              />
+            {/* First Name and Last Name in a row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="firstName" className="text-sm font-medium mb-2 block">
+                  First Name
+                </Label>
+                <Input
+                  id="firstName"
+                  value={editFormData.first_name}
+                  onChange={(e) => setEditFormData({ ...editFormData, first_name: e.target.value })}
+                  className="w-full"
+                  placeholder="Enter your first name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="lastName" className="text-sm font-medium mb-2 block">
+                  Last Name
+                </Label>
+                <Input
+                  id="lastName"
+                  value={editFormData.last_name}
+                  onChange={(e) => setEditFormData({ ...editFormData, last_name: e.target.value })}
+                  className="w-full"
+                  placeholder="Enter your last name"
+                />
+              </div>
             </div>
 
             {/* Profile Picture with Preview */}
@@ -457,17 +505,33 @@ export default function UserProfilePage() {
               <Label htmlFor="profile" className="text-sm font-medium mb-2 block">
                 Profile Picture
               </Label>
-              {previewImage && (
-                <div className="mb-3">
-                  <Image
-                    src={previewImage}
-                    alt="Preview"
-                    width={100}
-                    height={100}
-                    className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+
+              {/* Show current image if no preview */}
+              {!previewImage && profileImageUrl && (
+                <div className="mb-3 relative w-24 h-24">
+                  <img
+                    src={profileImageUrl}
+                    alt="Current Profile"
+                    // fill
+                    className="rounded-full h-full  border-2 border-gray-200"
+                  // sizes="96px"
                   />
                 </div>
               )}
+
+              {/* Show preview if exists */}
+              {previewImage && (
+                <div className="mb-3 relative w-24 h-24">
+                  <img
+                    src={previewImage}
+                    alt="Preview"
+                    // fill
+                    className="rounded-full h-full object-cover border-2 border-gray-200"
+                  // sizes="96px"
+                  />
+                </div>
+              )}
+
               <Input
                 id="profile"
                 type="file"
@@ -547,10 +611,7 @@ export default function UserProfilePage() {
           <div className="flex justify-end gap-3 mt-6">
             <Button
               variant="outline"
-              onClick={() => {
-                setIsEditDialogOpen(false);
-                setPreviewImage(null);
-              }}
+              onClick={handleDialogClose}
               className="px-6"
               disabled={isUpdatingProfile}
             >

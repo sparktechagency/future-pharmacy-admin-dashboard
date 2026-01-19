@@ -202,8 +202,6 @@ export default function RefillPrescriptionRequests() {
     });
   }, [apiData, searchQuery, statusFilter, dateRange]);
 
-  console.log("filteredData", filteredData)
-
 
   // Paginate data
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -499,17 +497,7 @@ export default function RefillPrescriptionRequests() {
                 className="pl-10 bg-gray-50 border-gray-200"
               />
             </div>
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200">
-                <SelectValue placeholder="Date Range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Dates</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-              </SelectContent>
-            </Select>
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Status: All" />
