@@ -3,7 +3,7 @@
 import { Underline } from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
-import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdFormatListBulleted } from "react-icons/md";
 import { VscListOrdered } from "react-icons/vsc";
 
@@ -60,65 +60,6 @@ const TipTapEditor = ({
     return words.length;
   }, []);
 
-  // Function to truncate content to 1000 words
-  const truncateTo1000Words = useCallback((html: string) => {
-    if (!html) return "";
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const plainText = tempDiv.textContent || tempDiv.innerText || "";
-    const words = plainText.trim().split(/\s+/);
-    if (words.length <= 1000) return html;
-
-    // Reconstruct HTML with only first 1000 words
-    let truncatedHtml = "";
-    let wordCount = 0;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-
-    const processNode = (node: Node) => {
-      if (wordCount >= 1000) return;
-
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = node.textContent || "";
-        const wordsInText = text
-          .trim()
-          .split(/\s+/)
-          .filter((w: string) => w.length > 0);
-
-        let accumulatedText = "";
-        for (const word of wordsInText) {
-          if (wordCount >= 1000) break;
-          accumulatedText += (accumulatedText ? " " : "") + word;
-          wordCount++;
-        }
-
-        if (accumulatedText) {
-          truncatedHtml += accumulatedText;
-        }
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const element = node as Element;
-        const tagName = element.tagName.toLowerCase();
-        const outerTagOpen = `<${tagName}${
-          element.getAttribute("class")
-            ? ` class="${element.getAttribute("class")}"`
-            : ""
-        }${
-          element.getAttribute("style")
-            ? ` style="${element.getAttribute("style")}"`
-            : ""
-        }>`;
-        const outerTagClose = `</${tagName}>`;
-
-        truncatedHtml += outerTagOpen;
-        Array.from(node.childNodes).forEach((child) => processNode(child));
-        truncatedHtml += outerTagClose;
-      }
-    };
-
-    Array.from(doc.body.childNodes).forEach((child) => processNode(child));
-    return truncatedHtml;
-  }, []);
-
   // Memoize extensions to prevent duplicate extension warnings
   const extensions = useMemo(
     () => [
@@ -168,17 +109,6 @@ const TipTapEditor = ({
       if (handlePreferredQualifications) {
         handlePreferredQualifications(html);
       }
-
-      // Handle word limit
-      if (words > 1000) {
-        isUpdatingContent.current = true;
-        const truncatedHtml = truncateTo1000Words(html);
-        editor.commands.setContent(truncatedHtml);
-        console.warn(
-          "Word limit of 1000 exceeded. Content has been truncated."
-        );
-        isUpdatingContent.current = false;
-      }
     },
     editorProps: {
       attributes: {
@@ -186,48 +116,6 @@ const TipTapEditor = ({
         style: height
           ? `height: ${height}; min-height: ${height}; max-height: ${height}; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap;`
           : `min-height: ${minHeight}; max-height: ${maxHeight}; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap;`,
-      },
-      handlePaste: (view, event) => {
-        const html = event.clipboardData?.getData("text/html");
-        const text = event.clipboardData?.getData("text/plain");
-
-        if (html || text) {
-          const currentWordCount = editor ? countWords(editor.getHTML()) : 0;
-          const pastedWordCount =
-            countWords(html || "") + countWords(text || "");
-
-          if (currentWordCount + pastedWordCount > 1000) {
-            event.preventDefault();
-            console.warn(
-              `Pasting this content would exceed the 1000 word limit. You have ${
-                1000 - currentWordCount
-              } words remaining.`
-            );
-            return true;
-          }
-        }
-        return false;
-      },
-      handleDrop: (view, event) => {
-        const html = event.dataTransfer?.getData("text/html");
-        const text = event.dataTransfer?.getData("text/plain");
-
-        if (html || text) {
-          const currentWordCount = editor ? countWords(editor.getHTML()) : 0;
-          const droppedWordCount =
-            countWords(html || "") + countWords(text || "");
-
-          if (currentWordCount + droppedWordCount > 1000) {
-            event.preventDefault();
-            console.warn(
-              `Dropping this content would exceed the 1000 word limit. You have ${
-                1000 - droppedWordCount
-              } words remaining.`
-            );
-            return true;
-          }
-        }
-        return false;
       },
     },
     // Add onSelectionUpdate to track cursor position
@@ -249,8 +137,6 @@ const TipTapEditor = ({
       editorInitialized.current = true;
     }
   }, [editor, localDescription]);
-
-  // Remove this useEffect since callbacks are now called directly in onUpdate
 
   // Handle reset trigger
   useEffect(() => {
@@ -278,10 +164,6 @@ const TipTapEditor = ({
       updateClasses();
     }
   }, [editor]);
-
-  // Auto-save draft
-
-  // Initialize form with initial values when editing
 
   return (
     <>
@@ -332,12 +214,6 @@ const TipTapEditor = ({
         .word-count-indicator {
           transition: color 0.2s ease-in-out;
         }
-        .word-count-warning {
-          color: #f59e0b;
-        }
-        .word-count-error {
-          color: #ef4444;
-        }
       `}</style>
 
       <div className={`  transition-colors duration-200  text-gray-900 `}>
@@ -347,16 +223,8 @@ const TipTapEditor = ({
           {/* Description Editor */}
           <div className="mb-4  ">
             <div className="flex justify-between items-center mb-2 px-1 sm:px-2">
-              <div
-                className={`text-xs sm:text-sm font-medium word-count-indicator ${
-                  wordCount > 900
-                    ? "word-count-error"
-                    : wordCount > 800
-                    ? "word-count-warning"
-                    : "text-gray-600"
-                }`}
-              >
-                {wordCount}/1000 words
+              <div className={`text-xs sm:text-sm font-medium word-count-indicator text-gray-600`}>
+                {wordCount} words
               </div>
             </div>
             <div
@@ -377,22 +245,20 @@ const TipTapEditor = ({
                 <button
                   type="button"
                   onClick={() => editor?.chain().focus().toggleBold().run()}
-                  className={`px-2 sm:px-4 py-1 sm:py-2 cursor-pointer rounded text-sm sm:text-base flex-shrink-0 ${
-                    editor?.isActive("bold")
+                  className={`px-2 sm:px-4 py-1 sm:py-2 cursor-pointer rounded text-sm sm:text-base flex-shrink-0 ${editor?.isActive("bold")
                       ? "bg-blue-700 text-white"
                       : "hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <strong>B</strong>
                 </button>
                 <button
                   type="button"
                   onClick={() => editor?.chain().focus().toggleItalic().run()}
-                  className={`px-2 sm:px-[18px] py-1 sm:py-2 cursor-pointer rounded text-sm sm:text-base flex-shrink-0 ${
-                    editor?.isActive("italic")
+                  className={`px-2 sm:px-[18px] py-1 sm:py-2 cursor-pointer rounded text-sm sm:text-base flex-shrink-0 ${editor?.isActive("italic")
                       ? "bg-blue-700 text-white"
                       : "hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <em>I</em>
                 </button>
@@ -401,11 +267,10 @@ const TipTapEditor = ({
                   onClick={() =>
                     editor?.chain().focus().toggleUnderline().run()
                   }
-                  className={`px-2 sm:px-4 py-1 sm:py-2 cursor-pointer rounded text-sm sm:text-base flex-shrink-0 ${
-                    editor?.isActive("underline")
+                  className={`px-2 sm:px-4 py-1 sm:py-2 cursor-pointer rounded text-sm sm:text-base flex-shrink-0 ${editor?.isActive("underline")
                       ? "bg-blue-700 text-white"
                       : "hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <u>U</u>
                 </button>
@@ -414,11 +279,10 @@ const TipTapEditor = ({
                   onClick={() =>
                     editor?.chain().focus().toggleBulletList().run()
                   }
-                  className={`px-2 sm:px-3 py-1 sm:py-2 cursor-pointer rounded flex-shrink-0 ${
-                    editor?.isActive("bulletList")
+                  className={`px-2 sm:px-3 py-1 sm:py-2 cursor-pointer rounded flex-shrink-0 ${editor?.isActive("bulletList")
                       ? "bg-blue-700 text-white"
                       : "hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <MdFormatListBulleted size={16} className="sm:w-5 sm:h-5" />
                 </button>
@@ -427,11 +291,10 @@ const TipTapEditor = ({
                   onClick={() =>
                     editor?.chain().focus().toggleOrderedList().run()
                   }
-                  className={`px-2 sm:px-3 py-1 sm:py-2 cursor-pointer rounded flex-shrink-0 ${
-                    editor?.isActive("orderedList")
+                  className={`px-2 sm:px-3 py-1 sm:py-2 cursor-pointer rounded flex-shrink-0 ${editor?.isActive("orderedList")
                       ? "bg-blue-700 text-white"
                       : "hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <VscListOrdered size={16} className="sm:w-5 sm:h-5" />
                 </button>
@@ -445,11 +308,11 @@ const TipTapEditor = ({
                   style={
                     height
                       ? {
-                          height,
-                          minHeight: height,
-                          maxHeight: height,
-                          overflowX: "hidden",
-                        }
+                        height,
+                        minHeight: height,
+                        maxHeight: height,
+                        overflowX: "hidden",
+                      }
                       : { minHeight, maxHeight, overflowX: "hidden" }
                   }
                 />
@@ -459,11 +322,11 @@ const TipTapEditor = ({
                   style={
                     height
                       ? {
-                          height,
-                          minHeight: height,
-                          maxHeight: height,
-                          overflowX: "hidden",
-                        }
+                        height,
+                        minHeight: height,
+                        maxHeight: height,
+                        overflowX: "hidden",
+                      }
                       : { minHeight, maxHeight, overflowX: "hidden" }
                   }
                 />

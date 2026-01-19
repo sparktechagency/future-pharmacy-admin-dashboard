@@ -51,6 +51,7 @@ export default function UserProfilePage() {
     first_name: '',
     last_name: '',
     profile: null as File | null,
+    phone: '',
     location: '',
     dateOfBirth: '' as string | Date
   });
@@ -81,6 +82,7 @@ export default function UserProfilePage() {
         first_name: profileData.first_name || '',
         last_name: profileData.last_name || '',
         profile: null,
+        phone: profileData.phone || '',
         location: profileData.location || '',
         dateOfBirth: dobDate
       });
@@ -135,6 +137,7 @@ export default function UserProfilePage() {
       if (editFormData.profile) {
         formData.append('profile', editFormData.profile);
       }
+      formData.append('phone', editFormData.phone);
       formData.append('location', editFormData.location);
 
       // Format date to ISO string if it's a Date object
@@ -325,10 +328,7 @@ export default function UserProfilePage() {
                   <img
                     src={profileImageUrl}
                     alt="Profile"
-                    // fill
                     className="object-cover h-full"
-                  // sizes="128px"
-                  // priority
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -512,9 +512,7 @@ export default function UserProfilePage() {
                   <img
                     src={profileImageUrl}
                     alt="Current Profile"
-                    // fill
-                    className="rounded-full h-full  border-2 border-gray-200"
-                  // sizes="96px"
+                    className="rounded-full h-full border-2 border-gray-200"
                   />
                 </div>
               )}
@@ -525,9 +523,7 @@ export default function UserProfilePage() {
                   <img
                     src={previewImage}
                     alt="Preview"
-                    // fill
                     className="rounded-full h-full object-cover border-2 border-gray-200"
-                  // sizes="96px"
                   />
                 </div>
               )}
@@ -540,6 +536,20 @@ export default function UserProfilePage() {
                 className="w-full"
               />
               <p className="text-xs text-gray-500 mt-1">Upload a new profile picture (optional)</p>
+            </div>
+
+            {/* Phone Number */}
+            <div>
+              <Label htmlFor="phone" className="text-sm font-medium mb-2 block">
+                Phone Number
+              </Label>
+              <Input
+                id="phone"
+                value={editFormData.phone}
+                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                className="w-full"
+                placeholder="e.g., +1234567890"
+              />
             </div>
 
             {/* Location and Date of Birth Row */}
@@ -605,25 +615,25 @@ export default function UserProfilePage() {
                 </Popover>
               </div>
             </div>
-          </div>
 
-          {/* Dialog Footer Buttons */}
-          <div className="flex justify-end gap-3 mt-6">
-            <Button
-              variant="outline"
-              onClick={handleDialogClose}
-              className="px-6"
-              disabled={isUpdatingProfile}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSaveChanges}
-              className="text-white px-6"
-              disabled={isUpdatingProfile}
-            >
-              {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
-            </Button>
+            {/* Dialog Footer Buttons */}
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={handleDialogClose}
+                className="px-6"
+                disabled={isUpdatingProfile}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveChanges}
+                className="text-white px-6"
+                disabled={isUpdatingProfile}
+              >
+                {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
