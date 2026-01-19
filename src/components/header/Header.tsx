@@ -16,6 +16,7 @@ export default function Header() {
   const router = useRouter();
   const { data: profileResponse, isLoading, refetch } = useGetMyProfileQuery({});
   const profileData = profileResponse?.data;
+  console.log("Profile Data:", profileData);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -95,7 +96,7 @@ export default function Header() {
               </Avatar>
               <div className="flex flex-col items-start">
                 <span className="text-sm font-semibold text-gray-900">
-                  {profileData?.fullName}
+                  {profileData?.first_name} {profileData?.last_name}
                 </span>
                 <span className="text-xs text-gray-500">{profileData?.role}</span>
               </div>
