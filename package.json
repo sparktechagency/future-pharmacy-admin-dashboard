@@ -60,6 +60,7 @@
     "turbopack": "^0.0.1",
     "xlsx": "^0.18.5",
     "zod": "^4.1.5"
+    
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
