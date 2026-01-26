@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const blogApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createBlog: builder.mutation({
@@ -11,7 +10,6 @@ export const blogApi = baseApi.injectEndpoints({
       }),
     }),
 
-
     getAllBlogs: builder.query({
       query: () => ({
         url: "/blog",
@@ -19,14 +17,12 @@ export const blogApi = baseApi.injectEndpoints({
       }),
     }),
 
-
     blogLike: builder.mutation({
       query: (id) => ({
         url: `/blog/blog-likes/${id}`,
         method: "POST",
       }),
     }),
-
 
     getSingleBlog: builder.query({
       query: (id) => ({
@@ -36,13 +32,26 @@ export const blogApi = baseApi.injectEndpoints({
     }),
 
     updateBlog: builder.mutation({
-      query: ({ data, id }) => ({
-        url: `/blog/${id}`,
-        method: "PATCH",
-        body: data
-      }),
-    }),
+      query: ({ data, id }) => {
+        // Check if data is FormData or regular object
+        const isFormData = data instanceof FormData;
 
+        return {
+          url: `/blog/${id}`,
+          method: "PATCH",
+          headers: isFormData
+            ? {
+              // FormData will set its own Content-Type with boundary
+              // Don't set Content-Type here for FormData
+            }
+            : {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+          body: isFormData ? data : JSON.stringify(data)
+        };
+      },
+    }),
 
     deleteBlog: builder.mutation({
       query: (id) => ({
@@ -53,7 +62,6 @@ export const blogApi = baseApi.injectEndpoints({
   }),
 });
 
-// Export hooks
 export const {
   useCreateBlogMutation,
   useGetAllBlogsQuery,
