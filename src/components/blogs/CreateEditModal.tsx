@@ -62,6 +62,7 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [hasExistingImage, setHasExistingImage] = useState(false); // Track if blog has existing image
 
   useEffect(() => {
     if (currentBlog && isOpen) {
@@ -75,8 +76,12 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
         imageUrl = currentBlog.image.startsWith('http')
           ? currentBlog.image
           : `${baseURL}/${currentBlog.image.replace(/\\/g, '/')}`;
+        setHasExistingImage(true);
+      } else {
+        setHasExistingImage(false);
       }
       setImagePreview(imageUrl);
+      setImageFile(null); // Reset new image file
     } else {
       resetForm();
     }
@@ -88,19 +93,23 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
     setDescription('');
     setImageFile(null);
     setImagePreview(null);
+    setHasExistingImage(false);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    // Add safety check for files
+    if (!e.target.files || e.target.files.length === 0) {
+      return;
+    }
+
+    const file = e.target.files[0];
+    console.log("image file here:", file);
     if (file) {
       if (!file.type.startsWith('image/')) {
         toast.error('Please upload an image file');
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
-        return;
-      }
+
 
       setImageFile(file);
       const reader = new FileReader();
@@ -111,33 +120,55 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
     }
   };
 
+  const handleRemoveImage = () => {
+    setImageFile(null);
+
+    // If editing and has existing image, restore it
+    if (currentBlog?.image) {
+      const imageUrl = currentBlog.image.startsWith('http')
+        ? currentBlog.image
+        : `${baseURL}/${currentBlog.image.replace(/\\/g, '/')}`;
+      setImagePreview(imageUrl);
+      setHasExistingImage(true);
+    } else {
+      setImagePreview(null);
+      setHasExistingImage(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!title.trim() || !date || !description.trim()) {
       toast.error('Please fill in all required fields');
       return;
     }
 
+    // For new blogs, image is required
+    if (!currentBlog && !imageFile) {
+      toast.error('Please upload an image for new blog');
+      return;
+    }
+
+    // For editing, either need new image or existing image
+    if (currentBlog && !imageFile && !hasExistingImage) {
+      toast.error('Please upload an image');
+      return;
+    }
+
     try {
       const formattedDate = format(date, 'MM--dd-yyyy');
 
+      console.log("imageFile :", imageFile);
+
       if (currentBlog) {
-        // সবসময় FormData ব্যবহার করুন
+        // Update existing blog
+        console.log("update blog here :");
         const formData = new FormData();
         formData.append('title', title.trim());
         formData.append('date', formattedDate);
         formData.append('description', description.trim());
-
-        // নতুন ইমেজ থাকলে append করুন
         if (imageFile) {
           formData.append('image', imageFile);
-        } else {
-          // পুরানো ইমেজ থাকলে তার পাথ পাঠান (যদি backend চায়)
-          // এই লাইনটি আপনার backend requirement অনুযায়ী পরিবর্তন করুন
-          if (currentBlog.image) {
-            formData.append('existingImage', currentBlog.image);
-          }
         }
-
         await updateBlog({
           data: formData,
           id: currentBlog._id
@@ -145,16 +176,12 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
 
         toast.success('Blog updated successfully!');
       } else {
-        if (!imageFile) {
-          toast.error('Please upload an image for new blog');
-          return;
-        }
-
+        // Create new blog
         const formData = new FormData();
         formData.append('title', title.trim());
         formData.append('date', formattedDate);
         formData.append('description', description.trim());
-        formData.append('image', imageFile);
+        formData.append('image', imageFile!);
 
         await createBlog(formData).unwrap();
         toast.success('Blog created successfully!');
@@ -215,7 +242,11 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
 
           <div className="space-y-2">
             <Label>Description *</Label>
-            <TiptapEditor content={description} onChange={setDescription} />
+            <TiptapEditor
+              content={description}
+              onChange={setDescription}
+              isEditing={!!currentBlog}
+            />
             <p className="text-sm text-gray-500">
               Use the toolbar to format your text with bold, italic, bullet lists, and numbered lists.
             </p>
@@ -244,12 +275,7 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => {
-                        setImageFile(null);
-                        setImagePreview(currentBlog?.image ?
-                          `${baseURL}/${currentBlog.image.replace(/\\/g, '/')}` :
-                          null);
-                      }}
+                      onClick={handleRemoveImage}
                     >
                       Remove Image
                     </Button>
@@ -278,8 +304,11 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
                 onChange={handleImageUpload}
               />
             </div>
-            {currentBlog && !imageFile && (
+            {currentBlog && !imageFile && hasExistingImage && (
               <p className="text-sm text-green-600">✓ Keeping existing image</p>
+            )}
+            {imageFile && (
+              <p className="text-sm text-blue-600">✓ New image selected</p>
             )}
           </div>
         </div>
@@ -297,7 +326,8 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
               !description.trim() ||
               isCreating ||
               isUpdating ||
-              (!currentBlog && !imageFile)
+              (!currentBlog && !imageFile) ||
+              (currentBlog && !imageFile && !hasExistingImage)
             }
           >
             {(isCreating || isUpdating) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

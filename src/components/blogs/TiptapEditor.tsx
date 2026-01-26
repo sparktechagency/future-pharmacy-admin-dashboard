@@ -29,8 +29,9 @@ interface TiptapEditorProps {
 const cleanHtmlContent = (htmlContent: string): string => {
   if (!htmlContent) return htmlContent;
 
-  // Remove data-original-src attributes if they exist
-  return htmlContent.replace(/data-original-src="[^"]+"/g, '');
+  // Just return the content as-is for editing
+  // The backend should handle any cleaning
+  return htmlContent;
 };
 
 export default function TiptapEditor({ content, onChange, isEditing }: TiptapEditorProps) {
