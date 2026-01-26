@@ -254,36 +254,36 @@ const PrescriptionRequestsTable = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-6 py-4">
+              <div className="space-y-4 md:space-y-6 py-2 md:py-4">
                 {/* Patient & Delivery Info */}
-                <div className="bg-white rounded-lg border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Patient & Delivery Information</h3>
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Patient & Delivery Information</h3>
                   </div>
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     {/* Patient Information */}
                     <div className="space-y-4">
                       <div>
-                        <h3 className="text-md font-medium text-purple-600 mb-3">Patient Information</h3>
+                        <h3 className="text-sm md:text-md font-medium text-purple-600 mb-3 border-b border-purple-100 pb-1">Patient Information</h3>
                         <div className="space-y-3">
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">Name:</span>
-                            <span className="text-gray-900">{selectedRequest.order.legalName}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Name:</span>
+                            <span className="text-gray-900 break-words">{selectedRequest.order.legalName}</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">Phone:</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Phone:</span>
                             <span className="text-gray-900">{selectedRequest.order.phone}</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">Email:</span>
-                            <span className="text-gray-900">{selectedRequest.order.email}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Email:</span>
+                            <span className="text-gray-900 break-all">{selectedRequest.order.email}</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">DOB:</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">DOB:</span>
                             <span className="text-gray-900">{formatDate(selectedRequest.order.dateOfBirth)}</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">User Type:</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">User Type:</span>
                             <span className="text-gray-900">
                               {selectedRequest.order.typeUser === 'registered' ? 'Registered User' : 'Guest'}
                             </span>
@@ -295,26 +295,26 @@ const PrescriptionRequestsTable = () => {
                     {/* Delivery Information */}
                     <div className="space-y-4">
                       <div>
-                        <h3 className="text-md font-medium text-purple-600 mb-3">Delivery Information</h3>
+                        <h3 className="text-sm md:text-md font-medium text-purple-600 mb-3 border-b border-purple-100 pb-1">Delivery Information</h3>
                         <div className="space-y-3">
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">Pickup:</span>
-                            <span className="text-gray-900">{selectedRequest.order.pickupAddress}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Pickup:</span>
+                            <span className="text-gray-900 break-words">{selectedRequest.order.pickupAddress}</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">Delivery:</span>
-                            <span className="text-gray-900">{selectedRequest.order.deliveryAddress}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Delivery:</span>
+                            <span className="text-gray-900 break-words">{selectedRequest.order.deliveryAddress}</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">Date:</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Date:</span>
                             <span className="text-gray-900">{formatDate(selectedRequest.order.deliveryDate)}</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">Time:</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Time:</span>
                             <span className="text-gray-900">{formatTime(selectedRequest.order.deliveryTime)}</span>
                           </div>
-                          <div className="flex items-start">
-                            <span className="font-medium text-gray-700 min-w-24">Amount:</span>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Amount:</span>
                             <span className="text-gray-900 font-semibold">${selectedRequest.order.amount.toFixed(2)}</span>
                           </div>
                         </div>
@@ -324,28 +324,28 @@ const PrescriptionRequestsTable = () => {
                 </div>
 
                 {/* Order Details */}
-                <div className="bg-white rounded-lg border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Order Details</h3>
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Order Details</h3>
                   </div>
-                  <div className="p-6">
+                  <div className="p-4 md:p-6">
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <h4 className="text-sm font-medium text-gray-500 mb-2">Order Information</h4>
+                          <h4 className="text-xs md:text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">Order Information</h4>
                           <div className="space-y-3">
-                            <div className="flex items-start">
-                              <span className="font-medium text-gray-700 min-w-32">Order ID:</span>
-                              <span className="text-gray-900 font-mono">{selectedRequest.order._id}</span>
+                            <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                              <span className="font-medium text-gray-700 sm:min-w-32">Order ID:</span>
+                              <span className="text-gray-900 font-mono break-all">{selectedRequest.order._id}</span>
                             </div>
-                            <div className="flex items-start">
-                              <span className="font-medium text-gray-700 min-w-32">Created:</span>
+                            <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                              <span className="font-medium text-gray-700 sm:min-w-32">Created:</span>
                               <span className="text-gray-900">
                                 {formatDate(selectedRequest.order.createdAt)} at {formatTime(selectedRequest.order.createdAt.split('T')[1].slice(0, 5))}
                               </span>
                             </div>
-                            <div className="flex items-start">
-                              <span className="font-medium text-gray-700 min-w-32">Last Updated:</span>
+                            <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                              <span className="font-medium text-gray-700 sm:min-w-32">Last Updated:</span>
                               <span className="text-gray-900">
                                 {formatDate(selectedRequest.order.updatedAt)} at {formatTime(selectedRequest.order.updatedAt.split('T')[1].slice(0, 5))}
                               </span>
@@ -353,10 +353,10 @@ const PrescriptionRequestsTable = () => {
                           </div>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-gray-500 mb-2">Status Information</h4>
+                          <h4 className="text-xs md:text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">Status Information</h4>
                           <div className="space-y-3">
-                            <div className="flex items-start">
-                              <span className="font-medium text-gray-700 min-w-32">Status:</span>
+                            <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                              <span className="font-medium text-gray-700 sm:min-w-32">Status:</span>
                               <Badge
                                 className={
                                   selectedRequest.order.status === 'completed'
@@ -369,14 +369,14 @@ const PrescriptionRequestsTable = () => {
                                 {selectedRequest.order.status.charAt(0).toUpperCase() + selectedRequest.order.status.slice(1)}
                               </Badge>
                             </div>
-                            <div className="flex items-start">
-                              <span className="font-medium text-gray-700 min-w-32">User ID:</span>
-                              <span className="text-gray-900">
+                            <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                              <span className="font-medium text-gray-700 sm:min-w-32">User ID:</span>
+                              <span className="text-gray-900 break-all">
                                 {selectedRequest.order.userId || 'Guest User'}
                               </span>
                             </div>
-                            <div className="flex items-start">
-                              <span className="font-medium text-gray-700 min-w-32">Deleted:</span>
+                            <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                              <span className="font-medium text-gray-700 sm:min-w-32">Deleted:</span>
                               <span className="text-gray-900">
                                 {selectedRequest.order.isDeleted ? 'Yes' : 'No'}
                               </span>
@@ -395,48 +395,48 @@ const PrescriptionRequestsTable = () => {
 
       <div className="">
         {/* Filters Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-lg md:text-xl font-semibold text-gray-900">
                 All Prescription Requests
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-xs md:text-sm text-gray-600 mt-1">
                 Showing {filteredRequests.length} of {transformedData.length} requests
               </p>
             </div>
-            <div className="flex gap-5">
+            <div className="flex gap-3 md:gap-5 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportCSV}
               >
-                <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={28} height={28} />
+                <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={24} height={24} className="w-6 h-6" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportDocs}
               >
-                <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={28} height={28} />
+                <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={24} height={24} className="w-6 h-6" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportPDF}
               >
-                <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={28} height={28} className='w-8 h-8' />
+                <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={24} height={24} className='w-6 h-6' />
               </Button>
             </div>
           </div>
 
           <div className="pb-4">
-            <div className="flex items-center justify-between gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
               {/* Search Input */}
-              <div className="relative w-full">
+              <div className="relative w-full lg:col-span-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   type="text"
@@ -472,7 +472,7 @@ const PrescriptionRequestsTable = () => {
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="whitespace-nowrap"
+                className="w-full sm:w-auto"
               >
                 Reset Filters
               </Button>
@@ -484,29 +484,26 @@ const PrescriptionRequestsTable = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-y border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                     Request ID
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                     Patient Name
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                     Pharmacy Name
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                     Type(man)
                   </th>
 
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                     Delivery Date/Time
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                     Status
                   </th>
-                  {/* <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Status
-                  </th> */}
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                  <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
                     Action
                   </th>
                 </tr>
@@ -515,68 +512,61 @@ const PrescriptionRequestsTable = () => {
                 {paginatedRequests.length > 0 ? (
                   paginatedRequests.map((request) => (
                     <tr key={request.order._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-900 font-mono">
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-mono">
                         #{request.id}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                         <div>
                           <div className="font-medium">{request.patientName}</div>
-                          <div className="text-xs text-gray-500">{request.order.email}</div>
+                          <div className="text-[10px] md:text-xs text-gray-500 line-clamp-1">{request.order.email}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                         <div>
-                          <div>{request.pharmacyName}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="line-clamp-1">{request.pharmacyName}</div>
+                          <div className="text-[10px] md:text-xs text-gray-500">
                             {request.order.typeUser === 'registered' ? 'Registered' : 'Guest'}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                         <div>
                           <div>{request.order.typeUser ? "Yes" : "No"}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div>
-                          <div>{formatDate(request.order.deliveryDate)}</div>
-                          <div className="text-xs text-gray-500">{formatTime(request.order.deliveryTime)}</div>
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
+                        <div className="flex flex-col">
+                          <span>{formatDate(request.order.deliveryDate)}</span>
+                          <span className="text-[10px] md:text-xs text-gray-500">{formatTime(request.order.deliveryTime)}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div>
-                          <div>{request.order.status}</div>
-                        </div>
-                      </td>
-                      {/* <td className="px-6 py-4">
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                         <Badge
-                          className={
-                            request.order.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
-                              : request.order.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-red-100 text-red-800'
-                          }
+                          variant="outline"
+                          className={`capitalize text-[10px] md:text-xs font-medium px-2 py-0.5 whitespace-nowrap ${request.order.status === 'completed'
+                            ? 'bg-green-50 text-green-700 border-green-200'
+                            : request.order.status === 'pending'
+                              ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                              : 'bg-red-50 text-red-700 border-red-200'
+                            }`}
                         >
-                          {request.order.status.charAt(0).toUpperCase() + request.order.status.slice(1)}
+                          {request.order.status}
                         </Badge>
-                      </td> */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleViewDetails(request)}
-                            className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors"
-                            title="View details"
-                          >
-                            <Image src="/icons/users/view.png" alt="view details" width={20} height={20} />
-                          </button>
-                        </div>
+                      </td>
+                      <td className="px-2 md:px-6 py-4">
+                        <button
+                          onClick={() => handleViewDetails(request)}
+                          className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors flex items-center justify-center shrink-0"
+                          title="View details"
+                        >
+                          <Image src="/icons/users/view.png" alt="view details" width={18} height={18} />
+                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                       {transformedData.length === 0 ? (
                         'No prescription requests found.'
                       ) : (
@@ -591,44 +581,49 @@ const PrescriptionRequestsTable = () => {
 
           {/* Pagination */}
           {filteredRequests.length > 0 && (
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-600">
+            <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs md:text-sm text-gray-600 order-2 sm:order-1 text-center sm:text-left">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredRequests.length)} of {filteredRequests.length} entries
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
                 <Button
                   variant="ghost"
+                  size="sm"
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="text-gray-600 hover:bg-gray-100"
+                  className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
                 >
                   Prev
                 </Button>
 
-                {getPageNumbers().map((page, index) => (
-                  <React.Fragment key={index}>
-                    {page === '...' ? (
-                      <span className="px-3 py-2 text-gray-600">...</span>
-                    ) : (
-                      <Button
-                        variant={currentPage === page ? "default" : "ghost"}
-                        onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                        className={
-                          currentPage === page
-                            ? "bg-purple-600 text-white hover:bg-purple-700"
+                <div className="flex items-center gap-1">
+                  {getPageNumbers().map((page, index) => (
+                    <React.Fragment key={index}>
+                      {page === '...' ? (
+                        <span className="px-1 md:px-2 text-gray-600 text-xs md:text-sm">...</span>
+                      ) : (
+                        <Button
+                          variant={currentPage === page ? "default" : "ghost"}
+                          size="sm"
+                          onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                          className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
+                            ? "bg-purple-600 text-white hover:bg-purple-700 font-bold"
                             : "text-gray-600 hover:bg-gray-100"
-                        }
-                      >
-                        {String(page).padStart(2, '0')}
-                      </Button>
-                    )}
-                  </React.Fragment>
-                ))}
+                            }`}
+                        >
+                          {String(page).padStart(2, '0')}
+                        </Button>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+
                 <Button
                   variant="ghost"
+                  size="sm"
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="text-gray-600 hover:bg-gray-100"
+                  className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
                 >
                   Next
                 </Button>

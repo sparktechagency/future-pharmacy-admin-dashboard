@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { format, parse } from 'date-fns';
 import { CalendarIcon, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useCreateBlogMutation, useUpdateBlogMutation } from '../../features/blog/blogApi';
@@ -174,9 +175,16 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
       onSuccess();
       resetForm();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save error:', error);
-      toast.error(error?.data?.message || error?.message || 'Failed to save blog');
+      let errorMessage = 'Failed to save blog';
+
+      if (error && typeof error === 'object') {
+        const err = error as { data?: { message?: string }; message?: string };
+        errorMessage = err.data?.message || err.message || errorMessage;
+      }
+
+      toast.error(errorMessage);
     }
   };
 
@@ -242,7 +250,7 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
               {imagePreview ? (
                 <div className="space-y-4">
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Preview"
                     width={1000}

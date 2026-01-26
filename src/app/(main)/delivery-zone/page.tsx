@@ -192,38 +192,32 @@ const DeliveryZoneTable = () => {
     <div className="flex flex-col gap-5">
       <div className="">
         {/* Filters Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-900">
-              All Delivery Zones
-            </h1>
-          </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 md:p-6 border-b border-gray-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <h1 className="text-lg md:text-xl font-semibold text-gray-900">
+                All Delivery Zones
+              </h1>
+              <Button
+                variant="outline"
+                className="h-auto w-full sm:w-auto bg-[#9c4a8f] py-2.5 px-4 hover:bg-[#9c4a8f] border-[#9c4a8f] text-white flex items-center justify-center gap-2"
+                onClick={handleAddZone}
+                disabled={isCreating}
+              >
+                <Plus className="w-4 h-4" />
+                Add Delivery Zone
+              </Button>
+            </div>
 
-          <div className='pb-3 flex justify-between'>
-            <div className='w-full'></div>
-            <Button
-              variant="outline"
-              className="h-auto w-auto bg-purple-600 py-2.5 px-4 hover:bg-purple-700 border-purple-600 text-white flex items-center gap-2"
-              onClick={handleAddZone}
-              disabled={isCreating}
-            >
-              <Plus className="w-4 h-4" />
-              Add Delivery Zone
-            </Button>
-          </div>
-
-          <div className="pb-4">
-            <div className="flex items-center justify-between gap-5">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder="Search by email or zip code"
-                  value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white border-gray-300"
-                />
-              </div>
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                type="text"
+                placeholder="Search by email or zip code..."
+                value={searchQuery}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-gray-50 border-gray-200 w-full"
+              />
             </div>
           </div>
 
@@ -248,60 +242,52 @@ const DeliveryZoneTable = () => {
 
           {/* Table */}
           {!isLoading && !isError && (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-y border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Email
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Zip Code
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Created At
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                      Actions
-                    </th>
+            <div className="overflow-x-auto no-scrollbar">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Email Address</th>
+                    <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Zip Code</th>
+                    <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Created</th>
+                    <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-100 bg-white">
                   {filteredZones.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
+                      <td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500 italic">
                         {searchQuery ? 'No delivery zones found matching your search' : 'No delivery zones available'}
                       </td>
                     </tr>
                   ) : (
                     filteredZones.map((zone) => (
-                      <tr key={zone._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-gray-900">
+                      <tr key={zone._id} className="hover:bg-purple-50/30 transition-colors group">
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-medium break-all max-w-[150px] md:max-w-none">
                           {zone.email}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600 font-mono">
                           {zone.zipCode}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                          {zone.createdAt ? formatDate(zone.createdAt) : 'N/A'}
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 whitespace-nowrap">
+                          {zone.createdAt ? formatDate(zone.createdAt).split(',')[0] : 'N/A'}
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
+                        <td className="px-4 md:px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-1 md:gap-2">
                             <button
                               onClick={() => handleViewDetails(zone)}
-                              className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors"
+                              className="p-2 hover:bg-purple-100 text-gray-400 hover:text-purple-600 rounded-lg transition-all"
                               title="View details"
                             >
-                              <Eye className="w-5 h-5 text-gray-600" />
+                              <Eye className="w-4 h-4 md:w-5 md:h-5" />
                             </button>
 
                             <button
                               onClick={() => handleDeleteZone(zone)}
-                              className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors"
+                              className="p-2 hover:bg-red-100 text-gray-400 hover:text-red-600 rounded-lg transition-all"
                               title="Delete zone"
                               disabled={isDeleting}
                             >
-                              <Trash2 className="w-5 h-5 text-red-600" />
+                              <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
                             </button>
                           </div>
                         </td>
@@ -317,26 +303,26 @@ const DeliveryZoneTable = () => {
 
       {/* Add Delivery Zone Modal */}
       {isAddDialogOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-purple-100 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Add New Delivery Zone
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900">
+                New Delivery Zone
               </h3>
               <button
                 onClick={handleCloseAddDialog}
-                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+                className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-50 transition-colors"
                 disabled={isCreating}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                    Email Address *
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                    Email Address
                   </Label>
                   <Input
                     id="email"
@@ -344,18 +330,18 @@ const DeliveryZoneTable = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`mt-1 ${formErrors.email ? 'border-red-500' : ''}`}
-                    placeholder="Enter email address"
+                    className={`h-11 bg-gray-50 border-gray-200 focus:bg-white transition-all ${formErrors.email ? 'border-red-500 bg-red-50' : ''}`}
+                    placeholder="e.g. zone@pharmacy.com"
                     disabled={isCreating}
                   />
                   {formErrors.email && (
-                    <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+                    <p className="text-[10px] md:text-xs font-bold text-red-500 uppercase tracking-wider">{formErrors.email}</p>
                   )}
                 </div>
 
-                <div>
-                  <Label htmlFor="zipCode" className="text-sm font-medium text-gray-700">
-                    Zip Code *
+                <div className="space-y-1.5">
+                  <Label htmlFor="zipCode" className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                    Zip Code
                   </Label>
                   <Input
                     id="zipCode"
@@ -363,37 +349,38 @@ const DeliveryZoneTable = () => {
                     type="text"
                     value={formData.zipCode}
                     onChange={handleInputChange}
-                    className={`mt-1 ${formErrors.zipCode ? 'border-red-500' : ''}`}
-                    placeholder="Enter zip code"
+                    className={`h-11 bg-gray-50 border-gray-200 focus:bg-white transition-all ${formErrors.zipCode ? 'border-red-500 bg-red-50' : ''}`}
+                    placeholder="e.g. 12345"
                     disabled={isCreating}
                   />
                   {formErrors.zipCode && (
-                    <p className="mt-1 text-sm text-red-600">{formErrors.zipCode}</p>
+                    <p className="text-[10px] md:text-xs font-bold text-red-500 uppercase tracking-wider">{formErrors.zipCode}</p>
                   )}
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 mt-8">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 mt-8">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="ghost"
                   onClick={handleCloseAddDialog}
                   disabled={isCreating}
+                  className="order-2 sm:order-1 font-semibold text-gray-500"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="order-1 sm:order-2 bg-[#9c4a8f] hover:bg-[#9c4a8f] text-white font-bold shadow-lg shadow-purple-200 transition-all active:scale-95"
                   disabled={isCreating}
                 >
                   {isCreating ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating...
-                    </>
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Creating...</span>
+                    </div>
                   ) : (
-                    'Create Delivery Zone'
+                    'Create Zone'
                   )}
                 </Button>
               </div>
@@ -404,37 +391,45 @@ const DeliveryZoneTable = () => {
 
       {/* Delete Confirmation Dialog */}
       {isDeleteDialogOpen && zoneToDelete && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Delete Delivery Zone
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete the delivery zone for <strong>{zoneToDelete.email}</strong> with zip code <strong>{zoneToDelete.zipCode}</strong>? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 md:p-8 max-w-sm w-full shadow-2xl border border-red-100 animate-in fade-in zoom-in duration-200">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+                <Trash2 className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">
+                Delete Zone?
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Are you sure you want to delete the zone for <span className="font-bold text-gray-700">{zoneToDelete.email}</span> ({zoneToDelete.zipCode})? This cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 mt-8">
               <Button
-                variant="outline"
+                variant="ghost"
                 onClick={() => {
                   setIsDeleteDialogOpen(false);
                   setZoneToDelete(null);
                 }}
                 disabled={isDeleting}
+                className="flex-1 font-semibold text-gray-500"
               >
-                Cancel
+                No, Keep it
               </Button>
               <Button
                 variant="destructive"
                 onClick={confirmDelete}
                 disabled={isDeleting}
+                className="flex-1 font-bold shadow-lg shadow-red-100"
               >
                 {isDeleting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Deleting...
-                  </>
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Deleting...</span>
+                  </div>
                 ) : (
-                  'Delete'
+                  'Yes, Delete'
                 )}
               </Button>
             </div>
@@ -444,52 +439,50 @@ const DeliveryZoneTable = () => {
 
       {/* View Details Dialog */}
       {isViewDialogOpen && selectedZone && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Delivery Zone Details
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 md:p-8 max-w-2xl w-full shadow-2xl border border-purple-100 animate-in fade-in zoom-in duration-200 overflow-hidden">
+            <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 border-l-4 border-purple-600 pl-4">
+                Zone Details
               </h3>
               <button
                 onClick={() => setIsViewDialogOpen(false)}
-                className="text-gray-500 hover:text-gray-700 p-1 rounded-xl px-3 cursor-pointer hover:bg-gray-100"
+                className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-50 transition-colors"
               >
-                ✕
+                <X className="w-6 h-6" />
               </button>
             </div>
 
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Email</p>
-                  <p className="font-medium text-gray-900">{selectedZone.email}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white transition-all group">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400">Email Address</p>
+                  <p className="text-sm md:text-base font-semibold text-gray-900 break-all">{selectedZone.email}</p>
                 </div>
 
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Zip Code</p>
-                  <p className="font-medium text-gray-900">{selectedZone.zipCode}</p>
+                <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white transition-all group">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400">Zip Code</p>
+                  <p className="text-sm md:text-base font-semibold text-gray-900 font-mono italic">{selectedZone.zipCode}</p>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Created At</p>
-                  <p className="font-medium text-gray-900">
+                <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white transition-all group">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400">Created At</p>
+                  <p className="text-sm md:text-base font-semibold text-gray-900">
                     {selectedZone.createdAt ? formatDate(selectedZone.createdAt) : 'N/A'}
                   </p>
                 </div>
 
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Updated At</p>
-                  <p className="font-medium text-gray-900">
+                <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white transition-all group">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400">Updated At</p>
+                  <p className="text-sm md:text-base font-semibold text-gray-900">
                     {selectedZone.updatedAt ? formatDate(selectedZone.updatedAt) : 'N/A'}
                   </p>
                 </div>
               </div>
 
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Zone ID</p>
-                <p className="font-medium text-gray-900 text-sm break-all">{selectedZone._id}</p>
+              <div className="p-4 rounded-xl bg-gray-50/50 border border-gray-100 shadow-inner">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Zone ID Reference</p>
+                <p className="text-[11px] md:text-xs font-mono text-gray-500 break-all leading-relaxed">{selectedZone._id}</p>
               </div>
             </div>
 
@@ -497,6 +490,7 @@ const DeliveryZoneTable = () => {
               <Button
                 variant="outline"
                 onClick={() => setIsViewDialogOpen(false)}
+                className="px-8 font-bold text-gray-500 hover:bg-gray-50 border-gray-200"
               >
                 Close
               </Button>

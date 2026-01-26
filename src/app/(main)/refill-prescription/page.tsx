@@ -127,7 +127,7 @@ const formatDateTime = (dateString: string): string => {
 
 export default function RefillPrescriptionRequests() {
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [dateRange, setDateRange] = useState<string>('all');
+  const [dateRange] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedRequest, setSelectedRequest] = useState<PrescriptionRequest | null>(null);
@@ -316,120 +316,130 @@ export default function RefillPrescriptionRequests() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-6 py-4">
+              <div className="space-y-4 md:space-y-6 py-2 md:py-4">
                 {/* Basic Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Basic Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Basic Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Request Type</p>
-                      <p className="text-sm text-gray-900 capitalize">{selectedRequest.requiestType}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Request Type</p>
+                      <p className="text-sm md:text-base text-gray-900 capitalize font-medium">{selectedRequest.requiestType}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Created At</p>
-                      <p className="text-sm text-gray-900">{formatDateTime(selectedRequest.createdAt)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Created At</p>
+                      <p className="text-sm md:text-base text-gray-900">{formatDateTime(selectedRequest.createdAt)}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Last Updated</p>
-                      <p className="text-sm text-gray-900">{formatDateTime(selectedRequest.updatedAt)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Last Updated</p>
+                      <p className="text-sm md:text-base text-gray-900">{formatDateTime(selectedRequest.updatedAt)}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Personal Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Personal Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Personal Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Patient Name</p>
-                      <p className="text-sm text-gray-900">{getPatientName(selectedRequest.personalInfo)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Patient Name</p>
+                      <p className="text-sm md:text-base text-gray-900 font-medium break-words">{getPatientName(selectedRequest.personalInfo)}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Phone</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.personalInfo.phone}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Phone</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.personalInfo.phone}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Date of Birth</p>
-                      <p className="text-sm text-gray-900">{formatDate(selectedRequest.personalInfo.dateOfBirth)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Date of Birth</p>
+                      <p className="text-sm md:text-base text-gray-900">{formatDate(selectedRequest.personalInfo.dateOfBirth)}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Pharmacy Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Pharmacy Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Pharmacy Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Pharmacy Name</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.name}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Pharmacy Name</p>
+                      <p className="text-sm md:text-base text-gray-900 font-medium break-words">{selectedRequest.pharmacyInfo.name}</p>
                     </div>
                     {selectedRequest.pharmacyInfo.phone && (
                       <div>
-                        <p className="text-sm font-medium text-gray-500">Pharmacy Phone</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.phone}</p>
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Pharmacy Phone</p>
+                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.phone}</p>
                       </div>
                     )}
                     {selectedRequest.pharmacyInfo.city && (
                       <div>
-                        <p className="text-sm font-medium text-gray-500">City</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.city}</p>
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">City</p>
+                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.city}</p>
                       </div>
                     )}
                     {selectedRequest.pharmacyInfo.state && (
                       <div>
-                        <p className="text-sm font-medium text-gray-500">State</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.state}</p>
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">State</p>
+                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.state}</p>
                       </div>
                     )}
                     {selectedRequest.pharmacyInfo.zipCode && (
                       <div>
-                        <p className="text-sm font-medium text-gray-500">ZIP Code</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.zipCode}</p>
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">ZIP Code</p>
+                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.zipCode}</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* Delivery Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Delivery Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="md:col-span-2">
-                      <p className="text-sm font-medium text-gray-500">Address</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.deliveryInfo.address}</p>
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Delivery Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                    <div className="sm:col-span-2 md:col-span-3">
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Address</p>
+                      <p className="text-sm md:text-base text-gray-900 break-words">{selectedRequest.deliveryInfo.address}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Apt/Unit</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.deliveryInfo.aptUnit}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Apt/Unit</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.deliveryInfo.aptUnit || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">City</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.deliveryInfo.city}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">City</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.deliveryInfo.city}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">State</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.deliveryInfo.state}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">State</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.deliveryInfo.state}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">ZIP Code</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.deliveryInfo.zipCode}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">ZIP Code</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.deliveryInfo.zipCode}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Medication List */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Medication List</h3>
-                  <div className="space-y-3">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Medication List</h3>
+                  </div>
+                  <div className="p-4 md:p-6 space-y-3">
                     {selectedRequest.medicationList.map((medication, index) => (
-                      <div key={medication._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={medication._id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-gray-50 rounded-lg gap-2">
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Medication {index + 1}</p>
-                          <p className="text-sm text-gray-600">{medication.medicationName}</p>
+                          <p className="text-xs md:text-sm font-semibold text-purple-600 uppercase tracking-wider">Medication {index + 1}</p>
+                          <p className="text-sm md:text-base text-gray-900 font-medium">{medication.medicationName}</p>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-500">RX Number</p>
-                          <p className="text-sm text-gray-900 font-mono">{medication.rxNumber}</p>
+                        <div className="sm:text-right">
+                          <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">RX Number</p>
+                          <p className="text-sm md:text-base text-gray-900 font-mono font-medium">{medication.rxNumber}</p>
                         </div>
                       </div>
                     ))}
@@ -438,10 +448,12 @@ export default function RefillPrescriptionRequests() {
 
                 {/* Additional Notes */}
                 {selectedRequest.additionalNotes && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Additional Notes</h3>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-900">{selectedRequest.additionalNotes}</p>
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                      <h3 className="text-base md:text-lg font-semibold text-gray-900">Additional Notes</h3>
+                    </div>
+                    <div className="p-4 md:p-6 bg-gray-50/50">
+                      <p className="text-sm md:text-base text-gray-900 whitespace-pre-wrap">{selectedRequest.additionalNotes}</p>
                     </div>
                   </div>
                 )}
@@ -453,53 +465,53 @@ export default function RefillPrescriptionRequests() {
 
       <div className="bg-white rounded-lg shadow-sm">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-900">
+        <div className="p-4 md:p-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <h1 className="text-lg md:text-xl font-semibold text-gray-900">
               Refill Prescription Requests
             </h1>
-            <div className="flex gap-5">
+            <div className="flex gap-3 md:gap-5 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportCSV}
               >
-                <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={28} height={28} />
+                <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={24} height={24} className="w-6 h-6" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportDocs}
               >
-                <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={28} height={28} />
+                <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={24} height={24} className="w-6 h-6" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportPDF}
               >
-                <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={28} height={28} className='w-8 h-8' />
+                <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={24} height={24} className="w-6 h-6" />
               </Button>
             </div>
           </div>
 
           {/* Filters */}
-          <div className="flex gap-4">
-            <div className="relative flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search by patient name, pharmacy, medication..."
                 value={searchQuery}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-gray-50 border-gray-200"
+                className="pl-10 bg-gray-50 border-gray-200 w-full"
               />
             </div>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200">
+              <SelectTrigger className="w-full bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Status: All" />
               </SelectTrigger>
               <SelectContent>
@@ -517,50 +529,46 @@ export default function RefillPrescriptionRequests() {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Ref ID</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Patient Name</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Prescription</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Pharmacy Name</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Date</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Status</th>
-                {/* <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Status</th> */}
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Action</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Ref ID</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Patient Name</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Prescription</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Pharmacy Name</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Date</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Status</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Action</th>
               </tr>
             </thead>
             <tbody>
               {currentData.length > 0 ? (
                 currentData.map((item: TransformedRequest) => (
                   <tr key={item._id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.refId}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.patientName}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.prescription}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.pharmacyName}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.date}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.status}</td>
-                    {/* <td className="px-6 py-4">
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-mono">{item.refId}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">{item.patientName}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 max-w-[150px] md:max-w-xs truncate">{item.prescription}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 truncate">{item.pharmacyName}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">{item.date}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <Badge
                         variant="secondary"
-                        className={getStatusBadgeClass(item.originalStatus)}
+                        className={`${getStatusBadgeClass(item.originalStatus)} border-none text-[10px] md:text-xs font-medium px-2 py-0.5 whitespace-nowrap`}
                       >
                         {item.status}
                       </Badge>
-                    </td> */}
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button
-                          className="p-1 cursor-pointer hover:bg-gray-100 rounded transition-colors"
-                          onClick={() => handleViewDetails(item.originalData)}
-                          title="View details"
-                        >
-                          <Image
-                            src="/icons/users/view.png"
-                            alt="View details"
-                            width={20}
-                            height={20}
-                            className="opacity-70  hover:opacity-100"
-                          />
-                        </button>
-                      </div>
+                    </td>
+                    <td className="px-2 md:px-6 py-4">
+                      <button
+                        className="p-2 cursor-pointer hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-center shrink-0"
+                        onClick={() => handleViewDetails(item.originalData)}
+                        title="View details"
+                      >
+                        <Image
+                          src="/icons/users/view.png"
+                          alt="View details"
+                          width={18}
+                          height={18}
+                          className="opacity-70 hover:opacity-100"
+                        />
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -577,49 +585,50 @@ export default function RefillPrescriptionRequests() {
 
         {/* Footer */}
         {filteredData.length > 0 && (
-          <div className="p-6 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+          <div className="p-4 md:p-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs md:text-sm text-gray-600 order-2 sm:order-1 text-center sm:text-left">
               Showing {Math.min(startIndex + 1, filteredData.length)} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="text-gray-600 hover:bg-gray-100"
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
               >
                 Prev
               </Button>
 
-              {getPageNumbers().map((page, index) => (
-                <React.Fragment key={index}>
-                  {page === '...' ? (
-                    <span className="px-3 py-1 text-gray-400">...</span>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                      className={
-                        currentPage === page
-                          ? 'bg-purple-600 hover:bg-purple-700 text-white'
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <React.Fragment key={index}>
+                    {page === '...' ? (
+                      <span className="px-1 md:px-2 text-gray-400 text-xs md:text-sm">...</span>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                        className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
+                          ? 'bg-purple-600 hover:bg-purple-700 text-white font-bold'
                           : 'text-gray-600 hover:bg-gray-100'
-                      }
-                    >
-                      {String(page).padStart(2, '0')}
-                    </Button>
-                  )}
-                </React.Fragment>
-              ))}
+                          }`}
+                      >
+                        {String(page).padStart(2, '0')}
+                      </Button>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="text-gray-600 hover:bg-gray-100"
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
               >
                 Next
               </Button>

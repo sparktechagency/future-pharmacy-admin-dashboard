@@ -335,99 +335,98 @@ const PartnerPharmacyTable = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-6 py-4">
-                <div className="bg-white rounded-lg border border-gray-200">
-                  <div className="p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Pharmacy Information</h3>
+              <div className="space-y-4 md:space-y-6 py-2 md:py-4">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Pharmacy Information</h3>
                   </div>
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-4">
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Name:</span>
-                        <span className="text-gray-900">{selectedPharmacy.name}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Address:</span>
-                        <span className="text-gray-900">{selectedPharmacy.address}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Phone:</span>
-                        <span className="text-gray-900">{selectedPharmacy.phone}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Email:</span>
-                        <span className="text-gray-900">{selectedPharmacy.email}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Bussiness Number: </span>
-                        <span className="text-gray-900"> {selectedPharmacy.businessPhoneNumber}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">License Number:</span>
-                        <span className="text-gray-900">{selectedPharmacy.licenseNumber}</span>
-                      </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Name</p>
+                      <p className="text-sm md:text-base text-gray-900 font-medium break-words">{selectedPharmacy.name}</p>
                     </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Contact Person:</span>
-                        <span className="text-gray-900">{selectedPharmacy.contactPerson}</span>
-                      </div>
-
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Title:</span>
-                        <span className="text-gray-900">{selectedPharmacy.title}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Year of Business:</span>
-                        <span className="text-gray-900">{selectedPharmacy.yearofBusiness}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Status:</span>
-                        <Badge
-                          variant="secondary"
-                          className={
-                            selectedPharmacy.status === 'approved'
-                              ? 'bg-green-100 text-green-800'
-                              : selectedPharmacy.status === 'rejected'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                          }
-                        >
-                          {selectedPharmacy.status}
-                        </Badge>
-                      </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Contact Person</p>
+                      <p className="text-sm md:text-base text-gray-900 font-medium underline underline-offset-4 decoration-purple-200">{selectedPharmacy.contactPerson || 'N/A'}</p>
                     </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Title</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedPharmacy.title || 'N/A'}</p>
+                    </div>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Address</p>
+                      <p className="text-sm md:text-base text-gray-900 break-words">{selectedPharmacy.address}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Phone</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedPharmacy.phone}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Business Phone</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedPharmacy.businessPhoneNumber || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Email</p>
+                      <p className="text-sm md:text-base text-gray-900 break-all">{selectedPharmacy.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">License Number</p>
+                      <p className="text-sm md:text-base text-gray-900 font-mono font-medium">{selectedPharmacy.licenseNumber || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Year of Business</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedPharmacy.yearofBusiness || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Status</p>
+                      <Badge
+                        variant="secondary"
+                        className={
+                          `mt-1 border-none px-2 py-0.5 text-xs font-medium capitalize ${selectedPharmacy.status === 'approved'
+                            ? 'bg-green-100 text-green-800'
+                            : selectedPharmacy.status === 'rejected'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`
+                        }
+                      >
+                        {selectedPharmacy.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
 
-                    <div className="md:col-span-1  space-y-4">
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Latitude:</span>
-                        <span className="text-gray-900">{selectedPharmacy.latitude}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Longitude:</span>
-                        <span className="text-gray-900">{selectedPharmacy.longitude}</span>
-                      </div>
-                      <div className="flex items-start">
-                        <span className="font-medium text-gray-700 min-w-32">Message:</span>
-                        <span className="text-gray-900">{selectedPharmacy.message}</span>
-                      </div>
-                      {selectedPharmacy.logo && (
-                        <div className="flex items-start">
-                          <span className="font-medium text-gray-700 min-w-32">Logo:</span>
-                          <div className="w-24 h-24 relative">
-                            <Image
-                              src={`${baseURL}/${selectedPharmacy.logo}`}
-                              alt={selectedPharmacy.name}
-                              fill
-                              className="object-contain"
-                              sizes="96px"
-                            />
-                          </div>
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Location & Media</h3>
+                  </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Latitude</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedPharmacy.latitude}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Longitude</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedPharmacy.longitude}</p>
+                    </div>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Message</p>
+                      <p className="text-sm md:text-base text-gray-900 whitespace-pre-wrap">{selectedPharmacy.message || 'No additional message'}</p>
+                    </div>
+                    {selectedPharmacy.logo && (
+                      <div className="sm:col-span-2 lg:col-span-3">
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Pharmacy Logo</p>
+                        <div className="w-24 h-24 md:w-32 md:h-32 relative bg-gray-50 rounded-lg p-2 border border-dashed border-gray-200 hover:border-purple-300 transition-colors">
+                          <Image
+                            src={`${baseURL}/${selectedPharmacy.logo}`}
+                            alt={selectedPharmacy.name}
+                            fill
+                            className="object-contain p-2"
+                            sizes="(max-width: 768px) 96px, 128px"
+                          />
                         </div>
-                      )}
-
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -472,91 +471,92 @@ const PartnerPharmacyTable = () => {
 
       <div className="">
         {/* Filters Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-900">
-              All Partner Pharmacies
-            </h1>
-            <div className="flex gap-5">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
-                onClick={handleExportCSV}
-              >
-                <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={28} height={28} />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
-                onClick={handleExportDocs}
-              >
-                <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={28} height={28} />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
-                onClick={handleExportPDF}
-              >
-                <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={28} height={28} className='w-8 h-8' />
-              </Button>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 md:p-6 border-b border-gray-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <h1 className="text-lg md:text-xl font-semibold text-gray-900">
+                All Partner Pharmacies
+              </h1>
+              <div className="flex gap-3 md:gap-5 w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
+                  onClick={handleExportCSV}
+                >
+                  <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={24} height={24} className="w-6 h-6" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
+                  onClick={handleExportDocs}
+                >
+                  <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={24} height={24} className="w-6 h-6" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
+                  onClick={handleExportPDF}
+                >
+                  <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={24} height={24} className="w-6 h-6" />
+                </Button>
+              </div>
             </div>
-          </div>
 
-          <div className='pb-3 flex justify-between'>
-            <div className='w-full'></div>
-            <Button
-              variant="outline"
-              className="h-auto w-auto bg-purple-600 py-2.5 px-4 hover:bg-purple-700 border-purple-600 text-white"
-              onClick={handleAddPharmacy}
-            >
-              Add Partner Pharmacy
-            </Button>
-          </div>
-
-          <div className="pb-4">
-            <div className="flex items-center justify-between gap-5">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder="Search by name, address, contact person or phone"
-                  value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white border-gray-300"
-                />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div className="w-full md:w-auto">
+                <Button
+                  variant="outline"
+                  className="h-auto w-full md:w-auto bg-[#9c4a8f] py-2.5 px-4 hover:bg-[#9c4a8f] border-[#9c4a8f] text-white font-medium shadow-sm transition-all active:scale-95"
+                  onClick={handleAddPharmacy}
+                >
+                  Add Partner Pharmacy
+                </Button>
               </div>
 
-              <div className='w-full'>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="bg-white w-full border-gray-300">
-                    <SelectValue placeholder="Status: All" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Status: All</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 lg:max-w-4xl">
+                <div className="relative order-1 lg:col-span-1 sm:col-span-2 lg:order-none">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search pharmacies..."
+                    value={searchQuery}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                    className="pl-10 bg-gray-50 border-gray-200 w-full focus:bg-white transition-colors"
+                  />
+                </div>
 
-              <div className='w-full'>
-                <Select value={pharmacyFilter} onValueChange={setPharmacyFilter}>
-                  <SelectTrigger className="bg-white w-full border-gray-300">
-                    <SelectValue placeholder="Pharmacy: All" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Pharmacy: All</SelectItem>
-                    {pharmacies.map(pharmacy => (
-                      <SelectItem key={pharmacy._id} value={pharmacy._id}>
-                        {pharmacy.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="order-2">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="bg-gray-50 w-full border-gray-200 focus:bg-white transition-colors">
+                      <SelectValue placeholder="Status: All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Status: All</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="order-3">
+                  <Select value={pharmacyFilter} onValueChange={setPharmacyFilter}>
+                    <SelectTrigger className="bg-gray-50 w-full border-gray-200 focus:bg-white transition-colors">
+                      <SelectValue placeholder="Pharmacy: All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Pharmacy: All</SelectItem>
+                      {pharmacies.map(pharmacy => (
+                        <SelectItem key={pharmacy._id} value={pharmacy._id}>
+                          {pharmacy.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
@@ -564,88 +564,61 @@ const PartnerPharmacyTable = () => {
           {/* Table */}
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-y border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Pharmacy Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Address
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Contact Person
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Phone
-                  </th>
-                  {/* <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Status
-                  </th> */}
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                    Action
-                  </th>
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Pharmacy Name</th>
+                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Address</th>
+                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Contact Person</th>
+                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Phone</th>
+                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Action</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {filteredPharmacies.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-500 italic">
                       No pharmacies found
                     </td>
                   </tr>
                 ) : (
                   filteredPharmacies.map((pharmacy) => (
                     <tr key={pharmacy._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm font-medium text-gray-900">
                         {pharmacy.name}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 max-w-[150px] md:max-w-xs truncate">
                         {pharmacy.address}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {pharmacy.contactPerson}
+                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600">
+                        {pharmacy.contactPerson || 'N/A'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 whitespace-nowrap">
                         {pharmacy.phone}
                       </td>
-                      {/* <td className="px-6 py-4">
-                        <Badge
-                          variant="secondary"
-                          className={
-                            pharmacy.status === 'approved'
-                              ? 'bg-green-100 text-green-800'
-                              : pharmacy.status === 'rejected'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                          }
-                        >
-                          {pharmacy.status}
-                        </Badge>
-                      </td> */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
+                      <td className="px-3 md:px-6 py-4">
+                        <div className="flex items-center gap-1 md:gap-2">
                           <button
                             onClick={() => handleViewDetails(pharmacy)}
-                            className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors"
+                            className="p-2 hover:bg-purple-50 text-gray-400 hover:text-purple-600 rounded-lg transition-colors"
                             title="View details"
                           >
-                            <Eye className="w-5 h-5 text-gray-600" />
+                            <Eye className="w-4 h-4 md:w-5 md:h-5" />
                           </button>
 
                           <button
                             onClick={() => handleEditPharmacy(pharmacy)}
-                            className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors"
+                            className="p-2 hover:bg-green-50 text-gray-400 hover:text-green-600 rounded-lg transition-colors"
                             title="Edit pharmacy"
                           >
-                            <Pencil className="w-5 h-5 text-green-600" />
+                            <Pencil className="w-4 h-4 md:w-5 md:h-5" />
                           </button>
 
                           <button
                             onClick={() => handleDeletePharmacy(pharmacy)}
-                            className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors"
+                            className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-600 rounded-lg transition-colors"
                             title="Delete pharmacy"
                           >
-                            <Trash2 className="w-5 h-5 text-red-600" />
+                            <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
                           </button>
                         </div>
                       </td>

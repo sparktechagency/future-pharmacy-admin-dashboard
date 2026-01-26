@@ -83,7 +83,7 @@ const PrivacyPolicyPage = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="sm:p-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">{title}</CardTitle>

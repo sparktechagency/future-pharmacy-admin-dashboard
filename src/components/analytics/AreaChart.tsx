@@ -103,18 +103,18 @@ function RevenueChart() {
   };
 
   return (
-    <Card className="p-6 h-full">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-semibold">Monthly Revenue</h1>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Total Revenue ({selectedYear})</p>
-            <p className="text-2xl font-bold text-[#8E4484]">
+    <Card className="p-4 md:p-6 h-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 className="text-lg md:text-xl font-semibold">Monthly Revenue</h1>
+        <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+          <div className="text-left sm:text-right">
+            <p className="text-[10px] md:text-sm text-gray-500">Total ({selectedYear})</p>
+            <p className="text-xl md:text-2xl font-bold text-[#8E4484]">
               ${totalRevenue.toFixed(2)}
             </p>
           </div>
           <Select value={selectedYear.toString()} onValueChange={handleYearChange}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[100px] md:w-[120px]">
               <SelectValue placeholder="Select year" />
             </SelectTrigger>
             <SelectContent>

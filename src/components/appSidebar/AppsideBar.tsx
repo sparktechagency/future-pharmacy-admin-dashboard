@@ -77,8 +77,8 @@ const sidebars: SidebarItem[] = [
 export default function OptimusSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { state, toggleSidebar } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const { state, toggleSidebar, isMobile, setOpenMobile } = useSidebar();
+  const isCollapsed = state === "collapsed" && !isMobile;
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const isActive = (path: string) => {
@@ -92,6 +92,13 @@ export default function OptimusSidebar() {
     setOpenDropdown(openDropdown === name ? null : name);
   };
 
+  const handleNavigation = (path: string) => {
+    console.log("path :", path);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   const isSettingsActive = () => {
     return pathname.startsWith("/settings");
   };
@@ -102,6 +109,9 @@ export default function OptimusSidebar() {
 
   const handleLogout = () => {
     console.log("Logging out...");
+    if (isMobile) {
+      setOpenMobile(false);
+    }
     router.push("/auth/login");
   };
 
@@ -109,19 +119,21 @@ export default function OptimusSidebar() {
     <Sidebar collapsible="icon" className="border-none transition-all duration-300">
       <SidebarContent className="bg-[#9c4a8f] text-white flex flex-col h-full relative overflow-hidden">
         <TooltipProvider>
-          {/* Toggle Button at the top right */}
-          <div className={`flex ${isCollapsed ? 'justify-center ' : 'justify-end'} px-4 pt-4`}>
-            <button
-              onClick={toggleSidebar}
-              className="text-white/80 hover:text-white cursor-pointer transition-colors p-1"
-              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {isCollapsed ? <Menu size={24} /> : <X size={24} />}
-            </button>
-          </div>
+          {/* Toggle Button - Only show on desktop */}
+          {!isMobile && (
+            <div className={`flex ${isCollapsed ? 'justify-center ' : 'justify-end'} px-4 pt-4`}>
+              <button
+                onClick={toggleSidebar}
+                className="text-white/80 hover:text-white cursor-pointer transition-colors p-1"
+                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                {isCollapsed ? <Menu size={24} /> : <X size={24} />}
+              </button>
+            </div>
+          )}
 
           {/* Logo Section */}
-          <div className={`flex flex-col items-center justify-center px-6 ${isCollapsed ? 'py-4' : 'pb-6 pt-2'}`}>
+          <div className={`flex flex-col items-center justify-center px-6 ${isCollapsed ? 'py-4' : 'pb-6 pt-6 md:pt-2'}`}>
             {!isCollapsed ? (
               <div className="relative w-full max-w-[160px] h-[60px]">
                 <Image
@@ -133,8 +145,8 @@ export default function OptimusSidebar() {
                 />
               </div>
             ) : (
-              <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                {/* <span className="text-white font-bold">O</span> */}
+              <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center border border-white/30 backdrop-blur-sm">
+                <span className="text-white font-black text-xl italic">O</span>
               </div>
             )}
           </div>
@@ -185,6 +197,7 @@ export default function OptimusSidebar() {
                         ) : (
                           <Link
                             href={item.path}
+                            onClick={() => handleNavigation(item.path)}
                             className={`w-full h-11 flex items-center cursor-pointer transition-all duration-200 ${isCollapsed ? 'justify-center rounded-lg' : 'px-4 rounded-lg'
                               } ${isItemActive
                                 ? "bg-white text-[#9c4a8f]"
@@ -217,6 +230,7 @@ export default function OptimusSidebar() {
                             <li key={subItem.path}>
                               <Link
                                 href={subItem.path}
+                                onClick={() => handleNavigation(subItem.path)}
                                 className={`w-full h-9 flex items-center cursor-pointer transition-all duration-200 px-3 rounded-md ${isSubActive
                                   ? 'bg-white/20 text-white'
                                   : 'text-white/80 hover:text-white hover:bg-white/10'

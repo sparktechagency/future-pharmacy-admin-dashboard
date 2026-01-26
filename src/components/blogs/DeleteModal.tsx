@@ -32,8 +32,9 @@ export default function DeleteModal({ isOpen, onClose, blog, onSuccess }: Delete
       await deleteBlog(blog._id).unwrap();
       toast.success('Blog deleted successfully!');
       onSuccess();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to delete blog');
+    } catch (error: unknown) {
+      const errorMessage = (error as { data?: { message?: string } })?.data?.message || 'Failed to delete blog';
+      toast.error(errorMessage);
     }
   };
 
@@ -60,7 +61,7 @@ export default function DeleteModal({ isOpen, onClose, blog, onSuccess }: Delete
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={confirmDelete}
-            className="flex-1 sm:flex-none bg-primary"
+            className="flex-1 sm:flex-none bg-[#9c4a8f]"
             disabled={isDeleting}
           >
             {isDeleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

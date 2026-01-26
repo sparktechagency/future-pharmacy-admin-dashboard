@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Edit, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { baseURL } from '../../utils/BaseURL';
 import { Blog } from '../../utils/blogs';
@@ -64,8 +65,10 @@ export default function BlogCard({ blog, onEdit, onDelete }: BlogCardProps) {
         <div className="relative h-48 w-full overflow-hidden shrink-0">
           {
             blog.image !== "null" ? (
-              <img
+              <Image
                 src={getImageUrl(blog.image)}
+                width={1000}
+                height={1000}
                 alt={blog.title}
                 className="w-full h-full object-cover"
               />

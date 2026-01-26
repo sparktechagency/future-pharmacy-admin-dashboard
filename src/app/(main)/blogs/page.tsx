@@ -45,10 +45,10 @@ export default function BlogManagementApp() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Blog Management</h1>
-        <Button variant={"default"} onClick={handleCreateNew} className="bg-[#8E4585]">
+    <div className="sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold">Blog Management</h1>
+        <Button variant={"default"} onClick={handleCreateNew} className="bg-[#8E4585] w-full sm:w-auto">
           Create a New Blog
         </Button>
       </div>

@@ -52,12 +52,12 @@ const TipTapEditor = ({
 }: TipTapEditorProps) => {
   const [wordCount, setWordCount] = useState(0);
   const [mounted, setMounted] = useState(false);
-  const [fontSize, setFontSize] = useState("14");
+
   const [textColor, setTextColor] = useState("#000000");
   const [showFontSizeDropdown, setShowFontSizeDropdown] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showWrapStyleDropdown, setShowWrapStyleDropdown] = useState(false);
-  const [fontSizeButtonRef, setFontSizeButtonRef] =
+  const [fontSizeButtonRef] =
     useState<HTMLButtonElement | null>(null);
   const [colorButtonRef, setColorButtonRef] =
     useState<HTMLButtonElement | null>(null);
@@ -85,20 +85,7 @@ const TipTapEditor = ({
     return words.length;
   }, []);
 
-  // Font sizes
-  const fontSizes = [
-    "10",
-    "12",
-    "14",
-    "16",
-    "18",
-    "20",
-    "24",
-    "28",
-    "32",
-    "36",
-    "48",
-  ];
+
 
   // Common colors
   const colors = [
@@ -264,14 +251,7 @@ const TipTapEditor = ({
     }
   }, [content, editor]);
 
-  // Font size handler
-  const handleFontSizeChange = (size: string) => {
-    if (editor) {
-      editor.chain().focus().setFontSize(size).run();
-      setFontSize(size);
-      setShowFontSizeDropdown(false);
-    }
-  };
+
 
   // Text color handler
   const handleColorChange = (color: string) => {

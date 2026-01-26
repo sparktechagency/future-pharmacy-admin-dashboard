@@ -24,9 +24,9 @@ export default function RootLayout({
     // <CrossTabLogoutHandler />
     <SidebarProvider>
       <OptimusSidebar />
-      <SidebarInset className="bg-gray-100 h-screen flex flex-col">
+      <SidebarInset className="bg-gray-100 min-h-svh flex flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 p-4 overflow-auto min-w-0">{children}</main>
+        <main className="flex-1 p-2 md:p-6 overflow-auto min-w-0">{children}</main>
       </SidebarInset>
     </SidebarProvider>
     // </AuthGuard>

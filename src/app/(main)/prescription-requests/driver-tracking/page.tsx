@@ -6,21 +6,21 @@ import { CheckCircleIcon, ClockIcon, PackageIcon, SearchIcon, TruckIcon, UserIco
 
 export default function TrackPrescriptionPage() {
   return (
-    <div className="p-3 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold">Track Prescription Delivery</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Track Prescription Delivery</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Enter your Request ID to See real-time Updates.
+          Enter your Request ID to see real-time updates.
         </p>
       </div>
 
       {/* Search Bar */}
-      <div className="relative">
-        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+      <div className="relative w-full sm:max-w-md">
+        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
-          placeholder="Type Something"
-          className="pl-10 w-full max-w-md"
+          placeholder="Enter Request ID..."
+          className="pl-10 w-full border-gray-300 bg-white"
         />
       </div>
 

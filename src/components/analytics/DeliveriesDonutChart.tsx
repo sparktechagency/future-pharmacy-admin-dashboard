@@ -82,7 +82,7 @@ function DeliveriesDonutChart() {
   ];
 
   const renderCustomizedLabel: PieLabel = (props: CustomLabelProps) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, percent,value } = props;
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, value } = props;
 
     // Add null checks for all required values
     if (
@@ -187,12 +187,12 @@ function DeliveriesDonutChart() {
   const hasData = totalOrders > 0;
 
   return (
-    <Card className="h-full p-6 flex flex-col gap-4">
+    <Card className="h-full p-4 md:p-6 flex flex-col gap-4">
       {/* Updated title to include "Failed" */}
-      <h1 className="text-xl font-semibold">
+      <h1 className="text-lg md:text-xl font-semibold">
         Delivery Status Overview
       </h1>
-      <div className="w-full h-[500px]">
+      <div className="w-full h-[350px] md:h-[500px]">
         {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>

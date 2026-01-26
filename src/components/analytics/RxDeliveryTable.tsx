@@ -129,12 +129,12 @@ function RxDeliveryTable() {
   const prescriptionData: PrescriptionData[] = data?.data || [];
 
   return (
-    <Card className="p-6">
+    <Card className="p-4 md:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold">Latest Rx Delivery Request</h1>
-        <div className="text-sm text-gray-500">
-          Total: {prescriptionData.length} prescription{prescriptionData.length !== 1 ? 's' : ''}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-6">
+        <h1 className="text-lg md:text-xl font-semibold">Latest Rx Delivery Request</h1>
+        <div className="text-xs md:text-sm text-gray-500 bg-gray-50 px-2 py-1 rounded-md">
+          Total: {prescriptionData.length} prescriptions
         </div>
       </div>
 

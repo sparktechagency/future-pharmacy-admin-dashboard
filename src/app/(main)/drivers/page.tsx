@@ -176,91 +176,117 @@ export default function AllDriverList() {
 
   return (
     <>
-      <div className="flex flex-col gap-5">
-        <div className="bg-white rounded-lg shadow-sm">
+      <div className="flex flex-col gap-6 sm:p-6 ">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-xl font-semibold text-gray-900">
-                All Driver List
-              </h1>
-              <div className="flex gap-5">
-                <Button onClick={() => downloadCSV(apiResponse?.data)} variant="outline" size="icon" className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200">
-                  <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={28} height={28} />
+          <div className="p-4 md:p-8 border-b border-gray-100">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 pb-6 border-b border-gray-50">
+              <div className="space-y-1">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+                  All Driver List
+                </h1>
+                <p className="text-sm text-gray-500 font-medium">Manage and monitor all delivery drivers in the system</p>
+              </div>
+
+              <div className="flex items-center gap-3 w-full lg:w-auto justify-end">
+                <span className="hidden md:block text-xs font-bold text-gray-400 uppercase tracking-widest mr-2">Export Data:</span>
+                <Button onClick={() => downloadCSV(apiResponse?.data)} variant="outline" size="icon" className="h-10 w-10 md:h-11 md:w-11 bg-gray-50 hover:bg-white hover:shadow-md border-gray-200 transition-all flex-1 sm:flex-none">
+                  <Image src="/icons/refill-prescription/csv.png" alt="CSV" width={24} height={24} className="w-6 h-6" />
                 </Button>
-                <Button onClick={() => downloadExcel(apiResponse?.data)} variant="outline" size="icon" className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200">
-                  <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={28} height={28} />
+                <Button onClick={() => downloadExcel(apiResponse?.data)} variant="outline" size="icon" className="h-10 w-10 md:h-11 md:w-11 bg-gray-50 hover:bg-white hover:shadow-md border-gray-200 transition-all flex-1 sm:flex-none">
+                  <Image src="/icons/refill-prescription/docs.png" alt="Excel" width={24} height={24} className="w-6 h-6" />
                 </Button>
-                <Button onClick={() => downloadPDF(apiResponse?.data)} variant="outline" size="icon" className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200">
-                  <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={28} height={28} className='w-8 h-8' />
+                <Button onClick={() => downloadPDF(apiResponse?.data)} variant="outline" size="icon" className="h-10 w-10 md:h-11 md:w-11 bg-gray-50 hover:bg-white hover:shadow-md border-gray-200 transition-all flex-1 sm:flex-none">
+                  <Image src="/icons/refill-prescription/pdf.png" alt="PDF" width={24} height={24} className="w-6 h-6" />
                 </Button>
               </div>
             </div>
 
             {/* Filters */}
-            <div className="flex gap-4">
-              <div className="relative flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative md:col-span-3">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search by name, phone, email, or city"
+                  placeholder="Search by name, phone, email, or city..."
                   value={searchQuery}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-gray-50 border-gray-200"
+                  className="pl-10 bg-gray-50 border-gray-100 h-11 focus:bg-white transition-all w-full"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200">
-                  <SelectValue placeholder="Status: All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Status: All</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="available">Available</SelectItem>
-                  <SelectItem value="ondelivery">On Delivery</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="w-full">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full bg-gray-50 border-gray-100 h-11 focus:bg-white transition-all shadow-none">
+                    <SelectValue placeholder="Status: All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Status: All</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="available">Available</SelectItem>
+                    <SelectItem value="ondelivery">On Delivery</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Driver ID</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Driver Name</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Contact</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Action</th>
+                <tr className="bg-gray-50 border-b border-gray-100">
+                  <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Driver Info</th>
+                  <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Contact</th>
+                  <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">City</th>
+                  <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Status</th>
+                  <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-50 bg-white">
                 {currentData.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-500 italic">
                       {apiData.length === 0 ? "No drivers found" : "No drivers match your filters"}
                     </td>
                   </tr>
                 ) : (
                   currentData.map((driver) => (
-                    <tr key={driver._id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-900">{getDriverId(driver._id)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{driver.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{driver.phone}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{driver.status}</td>
-                      <td className="px-6 py-4">
+                    <tr key={driver._id} className="hover:bg-purple-50/30 transition-colors group">
+                      <td className="px-4 md:px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="text-xs md:text-sm font-bold text-gray-900 line-clamp-1">{driver.name}</span>
+                          <span className="text-[10px] md:text-xs text-gray-400 font-mono font-medium">{getDriverId(driver._id)}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 md:px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="text-xs md:text-sm font-semibold text-gray-700">{driver.phone}</span>
+                          <span className="text-[10px] md:text-xs text-purple-600 font-medium truncate max-w-[120px] md:max-w-none">{driver.email}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600 font-medium whitespace-nowrap">{driver.city}</td>
+                      <td className="px-4 md:px-6 py-4 text-center">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold capitalize shadow-sm border-none ${driver.status === 'active' ? 'bg-green-100 text-green-700' :
+                          driver.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                            driver.status === 'available' ? 'bg-blue-100 text-blue-700' :
+                              driver.status === 'ondelivery' ? 'bg-purple-100 text-purple-700' :
+                                'bg-gray-100 text-gray-700'
+                          }`}>
+                          {driver.status}
+                        </span>
+                      </td>
+                      <td className="px-4 md:px-6 py-4 text-right">
                         <button
                           onClick={() => handleViewDetails(driver._id)}
-                          className="p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors"
+                          className="p-2 hover:bg-purple-100 text-purple-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-purple-100"
                           title="View details"
                         >
                           <Image
                             src="/icons/users/view.png"
                             alt="view details"
-                            width={20}
-                            height={20}
-                            className="opacity-70 hover:opacity-100"
+                            width={18}
+                            height={18}
+                            className="opacity-80"
                           />
                         </button>
                       </td>
@@ -272,53 +298,54 @@ export default function AllDriverList() {
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
+          <div className="p-4 md:p-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6 bg-gray-50/50">
+            <div className="text-xs md:text-sm text-gray-600 font-medium text-center md:text-left order-2 md:order-1">
+              Showing <span className="text-purple-600 font-bold">{startIndex + 1}</span> to <span className="text-purple-600 font-bold">{Math.min(endIndex, filteredData.length)}</span> of <span className="text-purple-600 font-bold">{filteredData.length}</span> entries
               {isApiDataValid(apiResponse) && (
-                <span className="ml-2">(Total in system: {apiResponse.meta.total})</span>
+                <span className="ml-2 hidden sm:inline text-gray-400">(Total: {apiResponse.meta.total})</span>
               )}
             </div>
 
             {totalPages > 1 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 md:gap-2 order-1 md:order-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="text-gray-600 hover:bg-gray-100"
+                  className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white hover:shadow-sm transition-all font-bold text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
                 >
                   Prev
                 </Button>
 
-                {getPageNumbers().map((page, index) => (
-                  <React.Fragment key={index}>
-                    {page === '...' ? (
-                      <span className="px-3 py-1 text-gray-400">...</span>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                        className={
-                          currentPage === page
-                            ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                            : 'text-gray-600 hover:bg-gray-100'
-                        }
-                      >
-                        {String(page).padStart(2, '0')}
-                      </Button>
-                    )}
-                  </React.Fragment>
-                ))}
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-[150px] sm:max-w-none">
+                  {getPageNumbers().map((page, index) => (
+                    <React.Fragment key={index}>
+                      {page === '...' ? (
+                        <span className="px-2 py-1 text-gray-300 text-xs">...</span>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                          className={`h-8 w-8 min-w-[32px] md:h-9 md:w-9 md:min-w-[36px] p-0 text-xs font-bold transition-all ${currentPage === page
+                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-95'
+                            : 'text-gray-500 hover:bg-white hover:text-purple-600 hover:shadow-sm'
+                            }`}
+                        >
+                          {String(page).padStart(2, '0')}
+                        </Button>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
 
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="text-gray-600 hover:bg-gray-100"
+                  className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white hover:shadow-sm transition-all font-bold text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
                 >
                   Next
                 </Button>

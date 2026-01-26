@@ -13,7 +13,8 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { CalendarIcon, Shield, User } from 'lucide-react';
+import { CalendarIcon, Clock, Shield, User } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useGetMyProfileQuery, useResetPasswordProfileMutation, useTwoStepVerificationMutation, useUpdateProfileMutation } from "../../../features/profile/profileApi";
@@ -316,52 +317,59 @@ export default function UserProfilePage() {
   console.log("Profile Image URL:", profileImageUrl);
 
   return (
-    <div className="">
+    <div className="flex flex-col gap-6 sm:p-6">
       <div className="">
         {/* Profile Header Card */}
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex gap-6">
+        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 overflow-hidden">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8">
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 flex-1 w-full">
               {/* Profile Image */}
-              <div className="w-32 h-32 rounded-full overflow-hidden shrink-0 relative">
-                {profileImageUrl ? (
-                  <img
-                    src={profileImageUrl}
-                    alt="Profile"
-                    className="object-cover h-full"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <User className="w-16 h-16 text-gray-400" />
-                  </div>
-                )}
+              <div className="relative shrink-0 group">
+                <div className="w-28 h-28 md:w-36 md:h-36 rounded-2xl overflow-hidden shadow-lg border-4 border-purple-50 transition-transform duration-300 group-hover:scale-105">
+                  {profileImageUrl ? (
+                    <Image
+                      src={profileImageUrl}
+                      alt="Profile"
+                      width={1000}
+                      height={1000}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-50 flex items-center justify-center">
+                      <User className="w-16 h-16 text-gray-300" />
+                    </div>
+                  )}
+                </div>
+
               </div>
 
               {/* Profile Info Grid */}
-              <div className="grid grid-cols-3 gap-x-16 gap-y-6 flex-1">
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">First Name</div>
-                  <div className="text-base font-medium text-gray-900">{profileData?.first_name || 'N/A'}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 flex-1 w-full pb-2">
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">First Name</div>
+                  <div className="text-sm md:text-base font-bold text-gray-900">{profileData?.first_name || 'N/A'}</div>
                 </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">Last Name</div>
-                  <div className="text-base font-medium text-gray-900">{profileData?.last_name || 'N/A'}</div>
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Last Name</div>
+                  <div className="text-sm md:text-base font-bold text-gray-900">{profileData?.last_name || 'N/A'}</div>
                 </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">Role</div>
-                  <div className="text-base font-medium text-gray-900 capitalize">{profileData?.role}</div>
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">User Role</div>
+                  <div className="text-xs md:text-sm font-bold bg-purple-50 text-purple-700 px-3 py-1 rounded-lg w-fit capitalize">
+                    {profileData?.role}
+                  </div>
                 </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">Email Address</div>
-                  <div className="text-base font-medium text-gray-900">{profileData?.email}</div>
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email Address</div>
+                  <div className="text-sm md:text-base font-bold text-gray-900 break-all">{profileData?.email}</div>
                 </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">Phone Number</div>
-                  <div className="text-base font-medium text-gray-900">{profileData?.phone || 'N/A'}</div>
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mobile Number</div>
+                  <div className="text-sm md:text-base font-bold text-gray-900">{profileData?.phone || 'N/A'}</div>
                 </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">Location</div>
-                  <div className="text-base font-medium text-gray-900">{profileData?.location || 'N/A'}</div>
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Office Location</div>
+                  <div className="text-sm md:text-base font-bold text-gray-900">{profileData?.location || 'N/A'}</div>
                 </div>
               </div>
             </div>
@@ -369,7 +377,7 @@ export default function UserProfilePage() {
             {/* Edit Button */}
             <Button
               onClick={() => setIsEditDialogOpen(true)}
-              className="text-white px-6"
+              className="w-full lg:w-auto bg-[#9c4a8f] hover:bg-[#9c4a8f]/80 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-[#9c4a8f]/20 transition-all active:scale-95 shrink-0"
             >
               Edit Profile
             </Button>
@@ -377,197 +385,207 @@ export default function UserProfilePage() {
         </div>
 
         {/* Password Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex flex-col gap-4 w-full mr-4">
-              <div className='grid grid-cols-2 gap-6'>
-                <div className='w-full'>
-                  <div className="text-base font-semibold mb-3">Old Password</div>
+        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 mb-6 mt-6">
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-col lg:flex-row items-end gap-6 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full flex-1">
+                <div className="space-y-2">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Current Password</div>
                   <Input
                     type="password"
-                    placeholder="Enter your old password here..."
-                    className={`w-full ${passwordErrors.oldPassword ? 'border-red-500' : ''}`}
+                    placeholder="••••••••"
+                    className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.oldPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
                   />
                   {passwordErrors.oldPassword && (
-                    <p className="text-red-500 text-sm mt-1">{passwordErrors.oldPassword}</p>
+                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.oldPassword}</p>
                   )}
                 </div>
-                <div className='w-full'>
-                  <div className="text-base font-semibold mb-3">New Password</div>
+                <div className="space-y-2">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">New Secure Password</div>
                   <Input
                     type="password"
-                    placeholder="Enter your new password here..."
-                    className={`w-full ${passwordErrors.newPassword ? 'border-red-500' : ''}`}
+                    placeholder="••••••••"
+                    className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.newPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
                   {passwordErrors.newPassword && (
-                    <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
+                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.newPassword}</p>
                   )}
                 </div>
               </div>
+              <Button
+                className="w-full lg:w-auto bg-[#9c4a8f] border-none hover:bg-[#9c4a8f]/80 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-[#9c4a8f]/20 transition-all active:scale-95 shrink-0"
+                onClick={handlePasswordChange}
+                disabled={isResettingPassword}
+              >
+                {isResettingPassword ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Changing...</span>
+                  </div>
+                ) : 'Update Password'}
+              </Button>
             </div>
-            <Button
-              className="text-white px-6 mt-10 shrink-0"
-              onClick={handlePasswordChange}
-              disabled={isResettingPassword}
-            >
-              {isResettingPassword ? 'Changing...' : 'Change password'}
-            </Button>
           </div>
         </div>
 
         {/* Security Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="text-base font-semibold mb-4">Security</div>
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <div className="font-medium text-gray-900 mb-1">Two-Factor Authentication (2FA)</div>
-              <div className="text-sm text-gray-500">Enable 2FA for enhanced security</div>
+        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 mb-6">
+          <div className="flex items-center gap-2 mb-6 border-l-4 border-purple-600 pl-4">
+            <Shield className="w-5 h-5 text-purple-600" />
+            <h2 className="text-lg font-bold text-gray-900 tracking-tight">Security Protocol</h2>
+          </div>
+
+          <div className="p-5 bg-gray-50 border border-gray-100 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 group transition-all hover:bg-white hover:shadow-md">
+            <div className="text-center sm:text-left">
+              <div className="font-bold text-gray-900 mb-0.5">Two-Factor Authentication (2FA)</div>
+              <div className="text-xs font-medium text-gray-500 max-w-sm">Enhance your account security by requiring a specialized verification code during login.</div>
             </div>
             <Switch
               checked={profileData?.twoStepVerification}
               onCheckedChange={handle2FAToggle}
               disabled={isEnabling2FA}
-              className="data-[state=checked]:bg-primary cursor-pointer"
+              className="data-[state=checked]:bg-purple-600 shadow-sm outline-none border-none shrink-0"
             />
           </div>
         </div>
 
         {/* Activity Log */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="text-base font-semibold mb-6">Activity Log</div>
+        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 overflow-hidden">
+          <div className="flex items-center gap-2 mb-8 border-l-4 border-[#9c4a8f] pl-4">
+            <Clock className="w-5 h-5 text-[#9c4a8f]" />
+            <h2 className="text-lg font-bold text-gray-900 tracking-tight">System Activity Log</h2>
+          </div>
+
           {activityLog.length > 0 ? (
-            <div className="space-y-6">
+            <div className="relative space-y-8 before:absolute before:left-[19px] before:top-4 before:bottom-4 before:w-0.5 before:bg-gray-100">
               {activityLog.map((activity, index) => (
-                <div key={index} className="flex gap-4">
-                  <div className={`w-10 h-10 rounded-full ${activity.bgColor} flex items-center justify-center shrink-0`}>
-                    <activity.icon className={`w-5 h-5 ${activity.iconColor}`} />
+                <div key={index} className="flex gap-4 relative">
+                  <div className={`w-10 h-10 rounded-xl ${activity.bgColor} flex items-center justify-center shrink-0 shadow-sm z-10 border-2 border-white`}>
+                    <activity.icon className={`w-4 h-4 ${activity.iconColor}`} />
                   </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900 mb-1">{activity.title}</div>
-                    <div className="text-sm text-gray-600 mb-1">{activity.description}</div>
-                    <div className="text-xs text-gray-400">{getRelativeTime(activity.timestamp)}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1">
+                      <div className="font-bold text-gray-900 text-sm md:text-base">{activity.title}</div>
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-0.5 rounded sm:bg-transparent sm:px-0 sm:py-0">
+                        {getRelativeTime(activity.timestamp)}
+                      </div>
+                    </div>
+                    <div className="text-xs md:text-sm text-gray-500 font-medium leading-relaxed">{activity.description}</div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center text-gray-500 py-8">No recent activity</div>
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                <Clock className="w-8 h-8 text-gray-200" />
+              </div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No recent security events logged</p>
+            </div>
           )}
         </div>
       </div>
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={handleDialogClose}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-semibold">Edit Profile</DialogTitle>
+        <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-none shadow-2xl rounded-2xl animate-in fade-in zoom-in duration-200">
+          <DialogHeader className="p-6 md:p-8 bg-gray-50/50 border-b border-gray-100">
+            <DialogTitle className="text-xl md:text-2xl font-bold text-gray-900 border-l-4 border-purple-600 pl-4">Update Profile</DialogTitle>
+            <p className="text-sm font-medium text-gray-500 mt-1 pl-5">Configure your account identity and contact details</p>
           </DialogHeader>
 
-          <div className="text-sm text-gray-600 mb-4">
-            Update your profile information below
-          </div>
-
-          <div className="space-y-4">
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh] no-scrollbar">
             {/* First Name and Last Name in a row */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName" className="text-sm font-medium mb-2 block">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="firstName" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
                   First Name
                 </Label>
                 <Input
                   id="firstName"
                   value={editFormData.first_name}
                   onChange={(e) => setEditFormData({ ...editFormData, first_name: e.target.value })}
-                  className="w-full"
-                  placeholder="Enter your first name"
+                  className="h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl"
+                  placeholder="e.g. John"
                 />
               </div>
-              <div>
-                <Label htmlFor="lastName" className="text-sm font-medium mb-2 block">
+              <div className="space-y-1.5">
+                <Label htmlFor="lastName" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
                   Last Name
                 </Label>
                 <Input
                   id="lastName"
                   value={editFormData.last_name}
                   onChange={(e) => setEditFormData({ ...editFormData, last_name: e.target.value })}
-                  className="w-full"
-                  placeholder="Enter your last name"
+                  className="h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl"
+                  placeholder="e.g. Doe"
                 />
               </div>
             </div>
 
             {/* Profile Picture with Preview */}
-            <div>
-              <Label htmlFor="profile" className="text-sm font-medium mb-2 block">
-                Profile Picture
-              </Label>
-
-              {/* Show current image if no preview */}
-              {!previewImage && profileImageUrl && (
-                <div className="mb-3 relative w-24 h-24">
-                  <img
-                    src={profileImageUrl}
-                    alt="Current Profile"
-                    className="rounded-full h-full border-2 border-gray-200"
-                  />
+            <div className="bg-purple-50/30 p-5 rounded-2xl border border-purple-100 flex flex-col md:flex-row items-center gap-6">
+              <div className="relative shrink-0">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-4 border-white shadow-md bg-white">
+                  {previewImage ? (
+                    <Image src={previewImage} width={1000} height={1000} alt="Preview" className="w-full h-full object-cover" />
+                  ) : profileImageUrl ? (
+                    <Image src={profileImageUrl} width={1000} height={1000} alt="Current" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                      <User className="w-10 h-10" />
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
-              {/* Show preview if exists */}
-              {previewImage && (
-                <div className="mb-3 relative w-24 h-24">
-                  <img
-                    src={previewImage}
-                    alt="Preview"
-                    className="rounded-full h-full object-cover border-2 border-gray-200"
-                  />
-                </div>
-              )}
-
-              <Input
-                id="profile"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="w-full"
-              />
-              <p className="text-xs text-gray-500 mt-1">Upload a new profile picture (optional)</p>
+              <div className="flex-1 w-full space-y-2">
+                <Label htmlFor="profile" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Profile Identity Image</Label>
+                <Input
+                  id="profile"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="bg-white border-purple-100 cursor-pointer text-xs h-10 py-2 w-full"
+                />
+                <p className="text-[10px] font-bold text-purple-400 uppercase tracking-tight pl-1 italic">Recommended: Square JPG/PNG, Max 2MB</p>
+              </div>
             </div>
 
             {/* Phone Number */}
-            <div>
-              <Label htmlFor="phone" className="text-sm font-medium mb-2 block">
-                Phone Number
+            <div className="space-y-1.5">
+              <Label htmlFor="phone" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
+                Mobile Number
               </Label>
               <Input
                 id="phone"
                 value={editFormData.phone}
                 onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
-                className="w-full"
-                placeholder="e.g., +1234567890"
+                className="h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl"
+                placeholder="+1 (555) 000-0000"
               />
             </div>
 
             {/* Location and Date of Birth Row */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="location" className="text-sm font-medium mb-2 block">
-                  Location
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <Label htmlFor="location" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
+                  Primary Location
                 </Label>
                 <Input
                   id="location"
                   value={editFormData.location}
                   onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
-                  className="w-full"
-                  placeholder="e.g., bangladesh"
+                  className="h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl"
+                  placeholder="e.g. New York, USA"
                 />
               </div>
-              <div>
-                <Label htmlFor="dateOfBirth" className="text-sm font-medium mb-2 block">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
                   Date of Birth
                 </Label>
                 <Popover>
@@ -575,11 +593,11 @@ export default function UserProfilePage() {
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !editFormData.dateOfBirth && "text-muted-foreground"
+                        "w-full h-11 justify-start text-left font-bold rounded-xl bg-gray-50 border-gray-100 hover:bg-white transition-all",
+                        !editFormData.dateOfBirth && "text-gray-400"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="mr-2 h-4 w-4 text-purple-600" />
                       {editFormData.dateOfBirth ? (
                         format(
                           editFormData.dateOfBirth instanceof Date
@@ -588,7 +606,7 @@ export default function UserProfilePage() {
                           "PPP"
                         )
                       ) : (
-                        <span>Pick a date</span>
+                        <span className="text-sm font-medium">Select Birthday</span>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -615,25 +633,29 @@ export default function UserProfilePage() {
                 </Popover>
               </div>
             </div>
+          </div>
 
-            {/* Dialog Footer Buttons */}
-            <div className="flex justify-end gap-3 mt-6">
-              <Button
-                variant="outline"
-                onClick={handleDialogClose}
-                className="px-6"
-                disabled={isUpdatingProfile}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSaveChanges}
-                className="text-white px-6"
-                disabled={isUpdatingProfile}
-              >
-                {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
+          <div className="p-6 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
+            <Button
+              variant="ghost"
+              onClick={handleDialogClose}
+              className="px-8 font-bold text-gray-500 order-2 sm:order-1 h-11"
+              disabled={isUpdatingProfile}
+            >
+              Cancel Update
+            </Button>
+            <Button
+              onClick={handleSaveChanges}
+              className="px-8 bg-[#9c4a8f] hover:bg-[#9c4a8f]/80 text-white font-bold order-1 sm:order-2 h-11 shadow-lg shadow-[#9c4a8f]/20 transition-all active:scale-95"
+              disabled={isUpdatingProfile}
+            >
+              {isUpdatingProfile ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Saving...</span>
+                </div>
+              ) : 'Commit Changes'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

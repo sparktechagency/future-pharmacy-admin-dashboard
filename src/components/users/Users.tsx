@@ -485,7 +485,7 @@ export default function UserManagement() {
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     {userDetailsData?.data?.profile ? (
-                      <img
+                      <Image
                         src={baseURL + "/" + userDetailsData?.data?.profile}
                         alt="Profile"
                         width={64}

@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
+        protocol: "https",
+        hostname: "api.optimushs.com",
+        pathname: "/**",
+      },
+      {
         protocol: "http",
         hostname: "10.10.7.65",
         port: "5010",

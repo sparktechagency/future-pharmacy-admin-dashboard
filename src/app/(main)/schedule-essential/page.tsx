@@ -173,7 +173,7 @@ const getStatusBadgeClass = (status: string): string => {
 
 export default function HealthcareSchedule() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [dateRange, setDateRange] = useState('all');
+  const [dateRange] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRequest, setSelectedRequest] = useState<ScheduleRequest | null>(null);
@@ -386,7 +386,25 @@ export default function HealthcareSchedule() {
 
   console.log(stats)
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 sm:p-6">
+      {/* Statistics Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {stats.map((stat, index) => (
+          <div
+            key={index}
+            className={`${stat.bgColor} flex items-center p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group`}
+          >
+            <div className={`${stat.iconBgColor} p-4 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+              <Image src={stat.icon} alt={stat.label} width={32} height={32} className="w-8 h-8 object-contain" />
+            </div>
+            <div className="ml-5">
+              <p className="text-2xl md:text-3xl font-bold text-gray-900">{stat.value}</p>
+              <p className={`text-sm md:text-md font-medium ${stat.textColor} mt-1`}>{stat.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           {selectedRequest && (
@@ -406,114 +424,121 @@ export default function HealthcareSchedule() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-6 py-4">
+              <div className="space-y-4 md:space-y-6 py-2 md:py-4">
                 {/* Basic Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Basic Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Basic Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Request Type</p>
-                      <p className="text-sm text-gray-900 capitalize">{selectedRequest.requiestType}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Request Type</p>
+                      <p className="text-sm md:text-base text-gray-900 capitalize font-medium">{selectedRequest.requiestType}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Service Type</p>
-                      <p className="text-sm text-gray-900">{formatServiceType(selectedRequest.pharmacyInfo.serviceType)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Service Type</p>
+                      <p className="text-sm md:text-base text-gray-900 font-medium">{formatServiceType(selectedRequest.pharmacyInfo.serviceType)}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Created At</p>
-                      <p className="text-sm text-gray-900">{formatDateTime(selectedRequest.createdAt)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Created At</p>
+                      <p className="text-sm md:text-base text-gray-900">{formatDateTime(selectedRequest.createdAt)}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Last Updated</p>
-                      <p className="text-sm text-gray-900">{formatDateTime(selectedRequest.updatedAt)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Last Updated</p>
+                      <p className="text-sm md:text-base text-gray-900">{formatDateTime(selectedRequest.updatedAt)}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Personal Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Personal Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Personal Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Patient Name</p>
-                      <p className="text-sm text-gray-900">{getPatientName(selectedRequest.personalInfo)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Patient Name</p>
+                      <p className="text-sm md:text-base text-gray-900 font-medium break-words">{getPatientName(selectedRequest.personalInfo)}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Phone</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.personalInfo.phone}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Phone</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.personalInfo.phone}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Date of Birth</p>
-                      <p className="text-sm text-gray-900">{formatDate(selectedRequest.personalInfo.dateOfBirth)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Date of Birth</p>
+                      <p className="text-sm md:text-base text-gray-900">{formatDate(selectedRequest.personalInfo.dateOfBirth)}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Pharmacy Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Pharmacy Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Pharmacy Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Pharmacy Name</p>
-                      <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.name}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Pharmacy Name</p>
+                      <p className="text-sm md:text-base text-gray-900 font-medium break-words">{selectedRequest.pharmacyInfo.name}</p>
                     </div>
                     {selectedRequest.pharmacyInfo.phone && (
                       <div>
-                        <p className="text-sm font-medium text-gray-500">Pharmacy Phone</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.phone}</p>
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Pharmacy Phone</p>
+                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.phone}</p>
                       </div>
                     )}
                     {selectedRequest.pharmacyInfo.address && (
-                      <div className="md:col-span-2">
-                        <p className="text-sm font-medium text-gray-500">Address</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.address}</p>
+                      <div className="sm:col-span-2 md:col-span-3">
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Address</p>
+                        <p className="text-sm md:text-base text-gray-900 break-words">{selectedRequest.pharmacyInfo.address}</p>
                       </div>
                     )}
                     {selectedRequest.pharmacyInfo.city && (
                       <div>
-                        <p className="text-sm font-medium text-gray-500">City</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.city}</p>
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">City</p>
+                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.city}</p>
                       </div>
                     )}
                     {selectedRequest.pharmacyInfo.state && (
                       <div>
-                        <p className="text-sm font-medium text-gray-500">State</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.state}</p>
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">State</p>
+                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.state}</p>
                       </div>
                     )}
                     {selectedRequest.pharmacyInfo.zipCode && (
                       <div>
-                        <p className="text-sm font-medium text-gray-500">ZIP Code</p>
-                        <p className="text-sm text-gray-900">{selectedRequest.pharmacyInfo.zipCode}</p>
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">ZIP Code</p>
+                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.zipCode}</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* Schedule Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Schedule Information</h3>
-
-                  {/* Check for availableDateTime */}
-                  {selectedRequest.pharmacyInfo.availableDateTime &&
-                    selectedRequest.pharmacyInfo.availableDateTime.length > 0 ? (
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500 mb-2">Available Date & Time Slots:</p>
-                        <div className="space-y-3">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Schedule Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6">
+                    {/* Check for availableDateTime */}
+                    {selectedRequest.pharmacyInfo.availableDateTime &&
+                      selectedRequest.pharmacyInfo.availableDateTime.length > 0 ? (
+                      <div className="space-y-4">
+                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Available Date & Time Slots</p>
+                        <div className="grid grid-cols-1 gap-4">
                           {selectedRequest.pharmacyInfo.availableDateTime.map((slot) => (
-                            <div key={slot._id} className="p-3 bg-gray-50 rounded-lg">
+                            <div key={slot._id} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
                               <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm font-medium text-gray-900">Date: {slot.date}</p>
-                                <Badge variant="outline" className="text-xs">
-                                  {slot.time.length} time slot(s)
+                                <p className="text-sm font-semibold text-gray-900">Date: {slot.date}</p>
+                                <Badge variant="outline" className="text-[10px] bg-white">
+                                  {slot.time.length} slots
                                 </Badge>
                               </div>
                               <div className="flex flex-wrap gap-2">
                                 {slot.time.map((time, timeIndex) => (
                                   <span
                                     key={timeIndex}
-                                    className="px-3 py-1 bg-white border border-gray-200 rounded-md text-sm text-gray-700"
+                                    className="px-2 py-1 bg-white border border-gray-200 rounded text-xs text-gray-700 shadow-sm"
                                   >
                                     {time}
                                   </span>
@@ -523,58 +548,60 @@ export default function HealthcareSchedule() {
                           ))}
                         </div>
                       </div>
-                    </div>
-                  ) : (
-                    // Fallback to availableDate and availableTime
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedRequest.pharmacyInfo.availableDate &&
-                        selectedRequest.pharmacyInfo.availableDate.length > 0 && (
-                          <div>
-                            <p className="text-sm font-medium text-gray-500">Preferred Dates</p>
-                            <div className="mt-2 space-y-1">
-                              {selectedRequest.pharmacyInfo.availableDate.map((date, index) => (
-                                <p key={index} className="text-sm text-gray-900">
-                                  • {formatDate(date)}
-                                </p>
-                              ))}
+                    ) : (
+                      // Fallback to availableDate and availableTime
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {selectedRequest.pharmacyInfo.availableDate &&
+                          selectedRequest.pharmacyInfo.availableDate.length > 0 && (
+                            <div>
+                              <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Preferred Dates</p>
+                              <div className="flex flex-wrap gap-2">
+                                {selectedRequest.pharmacyInfo.availableDate.map((date, index) => (
+                                  <Badge key={index} variant="secondary" className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-none">
+                                    {formatDate(date)}
+                                  </Badge>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                      {selectedRequest.pharmacyInfo.availableTime &&
-                        selectedRequest.pharmacyInfo.availableTime.length > 0 && (
-                          <div>
-                            <p className="text-sm font-medium text-gray-500">Preferred Times</p>
-                            <div className="mt-2 space-y-1">
-                              {selectedRequest.pharmacyInfo.availableTime.map((time, index) => (
-                                <p key={index} className="text-sm text-gray-900">
-                                  • {time}
-                                </p>
-                              ))}
+                        {selectedRequest.pharmacyInfo.availableTime &&
+                          selectedRequest.pharmacyInfo.availableTime.length > 0 && (
+                            <div>
+                              <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Preferred Times</p>
+                              <div className="flex flex-wrap gap-2">
+                                {selectedRequest.pharmacyInfo.availableTime.map((time, index) => (
+                                  <Badge key={index} variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-none">
+                                    {time}
+                                  </Badge>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                      {(!selectedRequest.pharmacyInfo.availableDate ||
-                        selectedRequest.pharmacyInfo.availableDate.length === 0) &&
-                        (!selectedRequest.pharmacyInfo.availableTime ||
-                          selectedRequest.pharmacyInfo.availableTime.length === 0) && (
-                          <div className="col-span-2">
-                            <p className="text-sm text-gray-500">No schedule preferences specified</p>
-                          </div>
-                        )}
-                    </div>
-                  )}
+                        {(!selectedRequest.pharmacyInfo.availableDate ||
+                          selectedRequest.pharmacyInfo.availableDate.length === 0) &&
+                          (!selectedRequest.pharmacyInfo.availableTime ||
+                            selectedRequest.pharmacyInfo.availableTime.length === 0) && (
+                            <div className="sm:col-span-2 text-center py-4 text-gray-500 italic text-sm">
+                              No schedule preferences specified
+                            </div>
+                          )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Driver Information (Placeholder) */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Driver Information</h3>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-900">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Driver Information</h3>
+                  </div>
+                  <div className="p-4 md:p-6 bg-gray-50/50">
+                    <p className="text-sm md:text-base text-gray-900 font-medium">
                       {getAssignedDriver(selectedRequest)}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-[10px] md:text-xs text-gray-500 mt-2 italic border-l-2 border-gray-200 pl-2">
                       Driver assignment functionality can be implemented as needed
                     </p>
                   </div>
@@ -582,10 +609,12 @@ export default function HealthcareSchedule() {
 
                 {/* Additional Notes */}
                 {selectedRequest.additionalNotes && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Additional Notes</h3>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-900">{selectedRequest.additionalNotes}</p>
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
+                      <h3 className="text-base md:text-lg font-semibold text-gray-900">Additional Notes</h3>
+                    </div>
+                    <div className="p-4 md:p-6 bg-gray-50/50">
+                      <p className="text-sm md:text-base text-gray-900 whitespace-pre-wrap">{selectedRequest.additionalNotes}</p>
                     </div>
                   </div>
                 )}
@@ -597,52 +626,52 @@ export default function HealthcareSchedule() {
 
       <div className="bg-white rounded-lg shadow-sm">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-gray-900">
+        <div className="p-4 md:p-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <h1 className="text-lg md:text-xl font-semibold text-gray-900 line-clamp-2 sm:line-clamp-none">
               Schedule Essential Healthcare Services
             </h1>
-            <div className="flex gap-5">
+            <div className="flex gap-3 md:gap-5 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportCSV}
               >
-                <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={28} height={28} />
+                <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={24} height={24} className="w-6 h-6" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportDocs}
               >
-                <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={28} height={28} />
+                <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={24} height={24} className="w-6 h-6" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="h-11 w-11 bg-gray-100 hover:bg-gray-100 border-gray-200"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
                 onClick={handleExportPDF}
               >
-                <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={28} height={28} className='w-8 h-8' />
+                <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={24} height={24} className="w-6 h-6" />
               </Button>
             </div>
           </div>
 
           {/* Filters */}
-          <div className="flex gap-4">
-            <div className="relative flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search by patient name, pharmacy, service type..."
                 value={searchQuery}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-gray-50 border-gray-200"
+                className="pl-10 bg-gray-50 border-gray-200 w-full"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px] bg-gray-50 border-gray-200">
+              <SelectTrigger className="w-full bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Status: All" />
               </SelectTrigger>
               <SelectContent>
@@ -661,61 +690,60 @@ export default function HealthcareSchedule() {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">No</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Patient Name</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Pharmacy Name</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Service Type</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Scheduled Date</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">Action</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-600">No</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-600">Patient Name</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-600">Pharmacy Name</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-600">Service Type</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-600">Scheduled Date</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-600">Status</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-600">Action</th>
               </tr>
             </thead>
             <tbody>
               {currentData.length > 0 ? (
                 currentData.map((item: TransformedScheduleRequest) => (
-                  <tr key={item._id} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.no}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                  <tr key={item._id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-mono">{item.no}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <div className="flex flex-col">
-                        <span>{item.patientName}</span>
-                        <span className="text-xs text-gray-500">{item.phone}</span>
+                        <span className="font-medium">{item.patientName}</span>
+                        <span className="text-[10px] md:text-xs text-gray-500">{item.phone}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.pharmacyName}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 truncate max-w-[120px] md:max-w-none">{item.pharmacyName}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <div className="flex flex-col">
-                        <span>{item.serviceType}</span>
+                        <span className="font-medium">{item.serviceType}</span>
                         {item.availableTimes && item.availableTimes !== 'No times specified' && (
-                          <span className="text-xs text-gray-500">Available: {item.availableTimes}</span>
+                          <span className="text-[10px] md:text-xs text-gray-500 truncate max-w-[150px]">Times: {item.availableTimes}</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <div className="flex flex-col">
-                        <span>{item.scheduledDate}</span>
-                        <span className="text-xs text-gray-500">Requested: {item.requestDate}</span>
+                        <span className="font-medium">{item.scheduledDate}</span>
+                        <span className="text-[10px] md:text-xs text-gray-500">Requested: {item.requestDate}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.status}</td>
-                    {/* <td className="px-6 py-4">
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <Badge
-                        variant="secondary"
-                        className={getStatusBadgeClass(item.status)}
+                        variant="outline"
+                        className={`${getStatusBadgeClass(item.status)} border-none text-[10px] md:text-xs font-medium px-2 py-0.5 whitespace-nowrap capitalize`}
                       >
-                        {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                        {item.status}
                       </Badge>
-                    </td> */}
-                    <td className="px-6 py-4">
+                    </td>
+                    <td className="px-2 md:px-6 py-4">
                       <button
-                        className="p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors"
+                        className="p-2 hover:bg-gray-100 cursor-pointer rounded-lg transition-colors flex items-center justify-center shrink-0"
                         onClick={() => handleViewDetails(item.originalData)}
                         title="View details"
                       >
                         <Image
                           src="/icons/users/view.png"
                           alt="View details"
-                          width={20}
-                          height={20}
+                          width={18}
+                          height={18}
                           className="opacity-70 hover:opacity-100"
                         />
                       </button>
@@ -724,7 +752,7 @@ export default function HealthcareSchedule() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     {apiData.length === 0 ? 'No schedule requests found' : 'No matching requests found'}
                   </td>
                 </tr>
@@ -735,49 +763,50 @@ export default function HealthcareSchedule() {
 
         {/* Footer */}
         {filteredData.length > 0 && (
-          <div className="p-6 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+          <div className="p-4 md:p-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs md:text-sm text-gray-600 order-2 sm:order-1 text-center sm:text-left">
               Showing {Math.min(startIndex + 1, filteredData.length)} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="text-gray-600"
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
               >
                 Prev
               </Button>
 
-              {getPageNumbers().map((page, index) => (
-                <React.Fragment key={index}>
-                  {page === '...' ? (
-                    <span className="px-3 py-1 text-gray-400">...</span>
-                  ) : (
-                    <Button
-                      variant={currentPage === page ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                      className={
-                        currentPage === page
-                          ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                          : 'text-gray-600'
-                      }
-                    >
-                      {String(page).padStart(2, '0')}
-                    </Button>
-                  )}
-                </React.Fragment>
-              ))}
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <React.Fragment key={index}>
+                    {page === '...' ? (
+                      <span className="px-1 md:px-2 text-gray-400 text-xs md:text-sm">...</span>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                        className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
+                          ? 'bg-purple-600 hover:bg-purple-700 text-white font-bold'
+                          : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                      >
+                        {String(page).padStart(2, '0')}
+                      </Button>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
 
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="text-gray-600"
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
               >
                 Next
               </Button>
