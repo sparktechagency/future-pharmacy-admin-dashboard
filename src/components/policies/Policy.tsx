@@ -1,15 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
+import { FiEdit3 } from "react-icons/fi";
+import TipTapEditor from "../../TipTapEditor/TipTapEditor";
+import { Button } from "../ui/button";
 import {
   Card,
-  CardHeader,
-  CardContent,
   CardAction,
+  CardContent,
+  CardHeader,
   CardTitle,
 } from "../ui/card";
-import { FiEdit3 } from "react-icons/fi";
-import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import TipTapEditor from "../../TipTapEditor/TipTapEditor";
+import { Separator } from "../ui/separator";
 
 interface PolicyProps {
   policyType: "terms" | "privacy" | "cookies" | "refund" | "shipping";
@@ -128,11 +128,9 @@ function Policy({
 
           <div className="flex-1 border border-gray-200 rounded-lg overflow-hidden bg-white">
             <TipTapEditor
-              handleJobDescription={handleContentChange}
-              handleMustHaveQualifications={() => {}}
-              handlePreferredQualifications={() => {}}
+              onChange={handleContentChange}
               resetTrigger={false}
-              description={policyContent}
+              content={policyContent}
               minHeight="400px"
               maxHeight="600px"
             />

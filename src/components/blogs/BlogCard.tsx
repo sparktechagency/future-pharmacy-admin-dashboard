@@ -13,6 +13,7 @@ interface BlogCardProps {
 }
 
 export default function BlogCard({ blog, onEdit, onDelete }: BlogCardProps) {
+  console.log("blog :", blog);
   const [isHovered, setIsHovered] = useState(false);
 
   const getImageUrl = (imagePath: string) => {
@@ -34,28 +35,56 @@ export default function BlogCard({ blog, onEdit, onDelete }: BlogCardProps) {
     return `${month} ${day}, ${year}`;
   }
 
+  const getProcessedDescription = (html: string) => {
+    if (!html) return "";
+
+    // Replace images with [Image]
+    let text = html.replace(/<img[^>]*>/g, ' [Image] ');
+
+    // Strip all remaining HTML tags
+    text = text.replace(/<[^>]*>/g, ' ');
+
+    // Normalize whitespace
+    text = text.replace(/\s+/g, ' ').trim();
+
+    const words = text.split(' ');
+    if (words.length > 20) {
+      return words.slice(0, 20).join(' ') + '...';
+    }
+    return text;
+  };
+
   return (
     <Card
-      className="relative overflow-hidden transition-all duration-300 p-0"
+      className="relative overflow-hidden transition-all duration-300 p-0 h-[350px] flex flex-col"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={`transition-all duration-300 ${isHovered ? 'blur-sm' : ''}`}>
-        <img
-          src={getImageUrl(blog.image) || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400'}
-          alt={blog.title}
-          height={1000}
-          width={1000}
-          className="w-full h-48 object-cover"
-        />
-        <CardContent className="p-4">
-          <p className="text-sm text-gray-500 mb-1">Created: {formatCreatedAt(blog.createdAt)}</p>
-          <p className="text-sm text-gray-500 mb-1">{blog.blogLikes?.length} Likes</p>
-          <h3 className="font-semibold text-lg mb-2">{blog.title}</h3>
-          <div
-            className="text-sm text-gray-600 line-clamp-2 prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: blog.description }}
-          />
+      <div className={`flex flex-col h-full transition-all duration-300 ${isHovered ? 'blur-sm' : ''}`}>
+        <div className="relative h-48 w-full overflow-hidden shrink-0">
+          {
+            blog.image !== "null" ? (
+              <img
+                src={getImageUrl(blog.image)}
+                alt={blog.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                <p className="text-gray-500">No Image</p>
+              </div>
+            )
+          }
+        </div>
+        <CardContent className="p-4 flex flex-col flex-1 overflow-hidden">
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-xs text-gray-500">Created: {formatCreatedAt(blog.createdAt)}</p>
+            <p className="text-xs text-gray-500 font-medium">{blog.blogLikes?.length || 0} Likes</p>
+          </div>
+          <h3 className="font-bold text-lg mb-2 line-clamp-2 text-gray-800 h-14">{blog.title}</h3>
+          <p className="text-sm text-gray-600 overflow-hidden text-pretty">
+            {getProcessedDescription(blog.description)}
+          </p>
         </CardContent>
       </div>
 

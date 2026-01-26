@@ -15,7 +15,6 @@ import { RTKError } from '../../../../utils/types';
 const AboutPage = () => {
   const [content, setContent] = useState<string>("");
   const [title] = useState<string>("HIPAA Policy");
-  const [hasDataLoaded, setHasDataLoaded] = useState<boolean>(false);
 
   // Fetch CMS data
   const {
@@ -31,7 +30,6 @@ const AboutPage = () => {
   useEffect(() => {
     if (data?.success && data?.data?.aboutUs) {
       setContent(data.data.aboutUs);
-      setHasDataLoaded(true);
     }
   }, [data]);
 
@@ -93,21 +91,12 @@ const AboutPage = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {/* ✅ Only render editor when data has loaded */}
-            {hasDataLoaded ? (
-              <TipTapEditor
-                description={content}
-                handleJobDescription={setContent}
-                minHeight="400px"
-                maxHeight="600px"
-              />
-            ) : (
-              <div className="flex justify-center items-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <p className="ml-2">Loading editor...</p>
-              </div>
-            )}
-
+            <TipTapEditor
+              content={content}
+              onChange={setContent}
+              minHeight="400px"
+              maxHeight="600px"
+            />
             <div className="flex justify-end gap-2 pt-4">
               <Button
                 variant="outline"

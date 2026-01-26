@@ -6,13 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { format, parse } from 'date-fns';
-import { CalendarIcon, Loader2, Upload } from 'lucide-react';
+import { CalendarIcon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useCreateBlogMutation, useUpdateBlogMutation } from '../../features/blog/blogApi';
+import TipTapEditor from '../../TipTapEditor/TipTapEditor';
 import { baseURL } from '../../utils/BaseURL';
 import { Blog } from '../../utils/blogs';
-import TiptapEditor from './TiptapEditor';
 
 interface CreateEditModalProps {
   isOpen: boolean;
@@ -141,24 +141,8 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
       toast.error('Please fill in all required fields');
       return;
     }
-
-    // For new blogs, image is required
-    if (!currentBlog && !imageFile) {
-      toast.error('Please upload an image for new blog');
-      return;
-    }
-
-    // For editing, either need new image or existing image
-    if (currentBlog && !imageFile && !hasExistingImage) {
-      toast.error('Please upload an image');
-      return;
-    }
-
     try {
       const formattedDate = format(date, 'MM--dd-yyyy');
-
-      console.log("imageFile :", imageFile);
-
       if (currentBlog) {
         // Update existing blog
         console.log("update blog here :");
@@ -198,7 +182,7 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex flex-col max-w-5xl w-full h-[90vh] max-h-[90vh] p-0">
+      <DialogContent className="flex flex-col w-full h-[90vh] max-h-[90vh] p-0">
         <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle>{currentBlog ? 'Edit Blog' : 'Create New Blog'}</DialogTitle>
         </DialogHeader>
@@ -242,10 +226,11 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
 
           <div className="space-y-2">
             <Label>Description *</Label>
-            <TiptapEditor
+            <TipTapEditor
               content={description}
               onChange={setDescription}
-              isEditing={!!currentBlog}
+              minHeight="300px"
+              maxHeight="500px"
             />
             <p className="text-sm text-gray-500">
               Use the toolbar to format your text with bold, italic, bullet lists, and numbered lists.
@@ -253,7 +238,7 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
           </div>
 
           <div className="space-y-2">
-            <Label>Upload Image {!currentBlog && '*'}</Label>
+            <Label>Upload Image</Label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
               {imagePreview ? (
                 <div className="space-y-4">
@@ -283,10 +268,6 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <Upload className="w-12 h-12 mx-auto text-purple-600" />
-                  <p className="text-sm text-gray-600">
-                    Drag and drop or click to upload (JPG or PNG, max 5MB)
-                  </p>
                   <Button
                     type="button"
                     variant="outline"
@@ -319,16 +300,8 @@ export default function CreateEditModal({ isOpen, onClose, currentBlog, onSucces
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-primary"
-            disabled={
-              !title.trim() ||
-              !date ||
-              !description.trim() ||
-              isCreating ||
-              isUpdating ||
-              (!currentBlog && !imageFile) ||
-              (currentBlog && !imageFile && !hasExistingImage)
-            }
+            className="bg-[#9c4a8f]"
+            disabled={!date || !title || !description}
           >
             {(isCreating || isUpdating) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {currentBlog ? 'Update Blog' : 'Create Blog'}

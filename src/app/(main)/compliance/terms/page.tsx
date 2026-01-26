@@ -15,9 +15,6 @@ import { RTKError } from '../../../../utils/types';
 const TermsConditionsPage = () => {
   const [content, setContent] = useState<string>("");
   const [title] = useState<string>("Terms and Conditions");
-  const [hasDataLoaded, setHasDataLoaded] = useState<boolean>(false);
-
-  // Fetch CMS data
   const {
     data,
     isLoading: isFetching,
@@ -25,13 +22,14 @@ const TermsConditionsPage = () => {
     refetch,
   } = useGetCMSQuery({});
 
+
+
   // Update mutation
   const [updateCMS, { isLoading: isUpdating }] = useCreateCMSMutation();
 
   useEffect(() => {
     if (data?.success && data?.data?.termsOfService) {
       setContent(data.data.termsOfService);
-      setHasDataLoaded(true);
     }
   }, [data]);
 
@@ -94,21 +92,12 @@ const TermsConditionsPage = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {/* ✅ Only render editor when data has loaded */}
-            {hasDataLoaded ? (
-              <TipTapEditor
-                description={content}
-                handleJobDescription={setContent}
-                minHeight="400px"
-                maxHeight="600px"
-              />
-            ) : (
-              <div className="flex justify-center items-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <p className="ml-2">Loading editor...</p>
-              </div>
-            )}
-
+            <TipTapEditor
+              content={content}
+              onChange={setContent}
+              minHeight="400px"
+              maxHeight="600px"
+            />
             <div className="flex justify-end gap-2 pt-4">
               <Button
                 variant="outline"

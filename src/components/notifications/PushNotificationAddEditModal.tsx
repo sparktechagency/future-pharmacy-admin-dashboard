@@ -1,7 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import TipTapEditor from "@/TipTapEditor/TipTapEditor";
+import { ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import {
@@ -11,8 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ArrowRight } from "lucide-react";
-import TipTapEditor from "@/TipTapEditor/TipTapEditor";
 
 interface PushNotificationAddEditModalProps {
   isOpen: boolean;
@@ -130,8 +130,8 @@ function PushNotificationAddEditModal({
             </Label>
             <div className="bg-[#f5f5f5] border border-gray-300 rounded-md">
               <TipTapEditor
-                handleJobDescription={handleDescriptionChange}
-                description={formData.description}
+                onChange={handleDescriptionChange}
+                content={formData.description}
                 minHeight="150px"
                 maxHeight="300px"
               />
