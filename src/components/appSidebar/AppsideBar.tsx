@@ -69,7 +69,7 @@ const sidebars: SidebarItem[] = [
     subItems: [
       { name: "Terms & Conditions", path: "/compliance/terms", icon: FileTextIcon },
       { name: "Privacy Policy", path: "/compliance/privacy", icon: ShieldIcon },
-      { name: "Hipaa Policy", path: "/compliance/hipaa", icon: AboutIcon },
+      { name: "HIPAA Policy", path: "/compliance/hipaa", icon: AboutIcon },
     ]
   },
 ];
