@@ -5,6 +5,7 @@ export interface Pharmacy {
   address: string;
   phone: string;
   email: string;
+  zipCode: string;
   contactPerson: string;
   title: string;
   yearofBusiness: string;
@@ -22,6 +23,7 @@ export interface PharmacyFormData {
   name: string;
   address: string;
   phone: string;
+  zipCode: string;
   email: string;
   contactPerson: string;
   title: string;
@@ -40,4 +42,5 @@ export interface PharmacyFormProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setFormData: React.Dispatch<React.SetStateAction<PharmacyFormData>>;
+  isEdit?: boolean;
 }

@@ -32,6 +32,7 @@ import {
   Settings,
   Shield as ShieldIcon,
   ShoppingBag,
+  SquareChartGantt,
   Users,
   X
 } from "lucide-react";
@@ -55,6 +56,7 @@ const sidebars: SidebarItem[] = [
   { name: "Schedule Essential", path: "/schedule-essential", icon: Calendar },
   { name: "Partner Pharmacies", path: "/partner-pharmacy", icon: Building },
   { name: "Business", path: "/business", icon: ShoppingBag },
+  { name: "Zip Code", path: "/zip-code", icon: SquareChartGantt },
   { name: "Delivery Zone", path: "/delivery-zone", icon: MapPin },
   { name: "Drivers", path: "/drivers", icon: Car },
   { name: "Blog", path: "/blogs", icon: Newspaper },

@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { PharmacyFormProps } from '.';
 
 
-const PharmacyForm = ({ formData, handleInputChange, handleFileChange }: PharmacyFormProps) => (
+const PharmacyForm = ({ formData, handleInputChange, handleFileChange, isEdit }: PharmacyFormProps) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div className="space-y-2">
       <Label htmlFor="name">Pharmacy Name *</Label>
@@ -26,6 +26,8 @@ const PharmacyForm = ({ formData, handleInputChange, handleFileChange }: Pharmac
         value={formData.address}
         onChange={handleInputChange}
         placeholder="Enter address"
+        readOnly={isEdit}
+        className={isEdit ? 'bg-gray-100 cursor-not-allowed' : ''}
         required
       />
     </div>
@@ -116,6 +118,8 @@ const PharmacyForm = ({ formData, handleInputChange, handleFileChange }: Pharmac
         onChange={handleInputChange}
         placeholder="Enter latitude"
         required
+        readOnly={isEdit}
+        className={isEdit ? 'bg-gray-100 cursor-not-allowed' : ''}
       />
     </div>
 
@@ -130,6 +134,24 @@ const PharmacyForm = ({ formData, handleInputChange, handleFileChange }: Pharmac
         onChange={handleInputChange}
         placeholder="Enter longitude"
         required
+        readOnly={isEdit}
+        className={isEdit ? 'bg-gray-100 cursor-not-allowed' : ''}
+      />
+    </div>
+
+    <div className="space-y-2">
+      <Label htmlFor="zipCode">Zip Code *</Label>
+      <Input
+        id="zipCode"
+        name="zipCode"
+        type="number"
+        step="any"
+        value={formData.zipCode}
+        onChange={handleInputChange}
+        placeholder="Enter zip code"
+        required
+        readOnly={isEdit}
+        className={isEdit ? 'bg-gray-100 cursor-not-allowed' : ''}
       />
     </div>
 

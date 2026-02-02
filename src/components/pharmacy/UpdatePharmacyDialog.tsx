@@ -51,6 +51,7 @@ const UpdatePharmacyDialog = ({
           handleInputChange={handleInputChange}
           handleFileChange={handleFileChange}
           setFormData={setFormData}
+          isEdit={true}
         />
 
         <div className="flex justify-end gap-3 pt-4">

@@ -55,7 +55,7 @@ const PartnerPharmacyTable = () => {
   const { downloadPDF } = useDownloadPDF();
   const { downloadExcel } = useDownloadXlShit();
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
-  console.log("pharmacies", pharmacies);
+  // console.log("pharmacies", pharmacies);
 
 
 
@@ -69,6 +69,7 @@ const PartnerPharmacyTable = () => {
     name: '',
     address: '',
     phone: '',
+    zipCode: '',
     email: '',
     contactPerson: '',
     title: '',
@@ -88,6 +89,7 @@ const PartnerPharmacyTable = () => {
       name: '',
       address: '',
       phone: '',
+      zipCode: '',
       email: '',
       contactPerson: '',
       title: '',
@@ -127,6 +129,7 @@ const PartnerPharmacyTable = () => {
       yearofBusiness: pharmacy.yearofBusiness,
       message: pharmacy.message,
       status: pharmacy.status,
+      zipCode: pharmacy.zipCode,
       licenseNumber: pharmacy.licenseNumber,
       businessPhoneNumber: pharmacy.businessPhoneNumber,
       latitude: pharmacy.latitude.toString(),
@@ -168,6 +171,7 @@ const PartnerPharmacyTable = () => {
     validData.append('address', formData.address);
     validData.append('phone', formData.phone);
     validData.append('email', formData.email);
+    validData.append('zipCode', formData.zipCode);
     validData.append('contactPerson', formData.contactPerson);
     validData.append('title', formData.title);
     validData.append('yearofBusiness', formData.yearofBusiness);
@@ -206,6 +210,7 @@ const PartnerPharmacyTable = () => {
     validData.append('address', formData.address);
     validData.append('phone', formData.phone);
     validData.append('email', formData.email);
+    validData.append('zipCode', formData.zipCode);
     validData.append('contactPerson', formData.contactPerson);
     validData.append('title', formData.title);
     validData.append('yearofBusiness', formData.yearofBusiness);
@@ -356,6 +361,10 @@ const PartnerPharmacyTable = () => {
                     <div className="sm:col-span-2 lg:col-span-3">
                       <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Address</p>
                       <p className="text-sm md:text-base text-gray-900 break-words">{selectedPharmacy.address}</p>
+                    </div>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Zip Code</p>
+                      <p className="text-sm md:text-base text-gray-900 break-words">{selectedPharmacy.zipCode}</p>
                     </div>
                     <div>
                       <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Phone</p>
@@ -569,6 +578,7 @@ const PartnerPharmacyTable = () => {
                   <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Pharmacy Name</th>
                   <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Address</th>
                   <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Contact Person</th>
+                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Zip Code</th>
                   <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Phone</th>
                   <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Action</th>
                 </tr>
@@ -591,6 +601,9 @@ const PartnerPharmacyTable = () => {
                       </td>
                       <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600">
                         {pharmacy.contactPerson || 'N/A'}
+                      </td>
+                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 whitespace-nowrap">
+                        {pharmacy.zipCode}
                       </td>
                       <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 whitespace-nowrap">
                         {pharmacy.phone}
