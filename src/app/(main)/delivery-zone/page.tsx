@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, Plus, Search, Trash2, X } from 'lucide-react';
+import { Eye, Search, Trash2, X } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import {
@@ -75,10 +75,10 @@ const DeliveryZoneTable = () => {
     setIsViewDialogOpen(true);
   };
 
-  // Handle add zone button click
-  const handleAddZone = () => {
-    setIsAddDialogOpen(true);
-  };
+  // // Handle add zone button click
+  // const handleAddZone = () => {
+  //   setIsAddDialogOpen(true);
+  // };
 
   // Handle form input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,9 +196,9 @@ const DeliveryZoneTable = () => {
           <div className="p-4 md:p-6 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <h1 className="text-lg md:text-xl font-semibold text-gray-900">
-                All Delivery Zones
+                All Delivery Zones - Requested
               </h1>
-              <Button
+              {/* <Button
                 variant="outline"
                 className="h-auto w-full sm:w-auto bg-[#9c4a8f] py-2.5 px-4 hover:bg-[#9c4a8f] border-[#9c4a8f] text-white flex items-center justify-center gap-2"
                 onClick={handleAddZone}
@@ -206,7 +206,7 @@ const DeliveryZoneTable = () => {
               >
                 <Plus className="w-4 h-4" />
                 Add Delivery Zone
-              </Button>
+              </Button> */}
             </div>
 
             <div className="relative w-full">
