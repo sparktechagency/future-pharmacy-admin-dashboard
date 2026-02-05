@@ -8,9 +8,9 @@ import "../globals.css";
 export const metadata: Metadata = {
   title: "Optimus HS Dashboard",
   description: "OptimusHS Dashboard for Future Pharmacy",
-  icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-  },
+  // icons: {
+  //   icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  // },
   manifest: "/site.webmanifest",
 };
 // dsfsdfsdfs

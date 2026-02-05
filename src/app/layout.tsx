@@ -15,9 +15,9 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "OptimusHS Dashboard",
   description: "OptimusHS Dashboard for Future Pharmacy",
-  icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-  },
+  // icons: {
+  //   icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  // },
   manifest: "/site.webmanifest",
 };
 
@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        {/* <link rel="icon" href="/favicon.svg" type="image/svg+xml" /> */}
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body
