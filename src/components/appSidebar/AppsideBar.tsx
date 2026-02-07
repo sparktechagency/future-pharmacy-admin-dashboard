@@ -75,10 +75,13 @@ const sidebars: SidebarItem[] = [
   },
 ];
 
+import { useAuth } from '../../contexts/AuthContext';
+
 export default function OptimusSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { state, toggleSidebar, isMobile, setOpenMobile } = useSidebar();
+  const { logout } = useAuth();
   const isCollapsed = state === "collapsed" && !isMobile;
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
@@ -109,11 +112,10 @@ export default function OptimusSidebar() {
   };
 
   const handleLogout = () => {
-    console.log("Logging out...");
     if (isMobile) {
       setOpenMobile(false);
     }
-    router.push("/auth/login");
+    logout();
   };
 
   return (

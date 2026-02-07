@@ -9,10 +9,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useGetMyProfileQuery } from '../../features/profile/profileApi';
 import { baseURL } from '../../utils/BaseURL';
 
+import { useAuth } from '../../contexts/AuthContext';
+
 export default function Header() {
   const unreadCount = 1; // Example unread count
   const userName = "Jane Cooper";
   const router = useRouter();
+  const { logout } = useAuth();
   const { data: profileResponse } = useGetMyProfileQuery({});
   const profileData = profileResponse?.data;
   console.log("Profile Data:", profileData);
@@ -44,10 +47,8 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    // Add your logout logic here
-    console.log("Logging out...");
     setIsDropdownOpen(false);
-    router.push("/auth/login");
+    logout();
   };
 
   return (
