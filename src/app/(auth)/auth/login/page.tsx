@@ -3,11 +3,11 @@
 import { Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { FormEvent, Suspense, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../../../contexts/AuthContext';
 import { useLoginMutation } from '../../../../features/auth/authApi';
-import { saveToken } from '../../../../utils/storage';
 
 interface ApiError {
   data?: {
@@ -27,7 +27,7 @@ interface LoginCredentials {
   password: string;
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -36,7 +36,10 @@ export default function LoginPage() {
     password: ''
   });
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [Login, { isLoading }] = useLoginMutation();
+  const { login } = useAuth();
+  const redirectUrl = searchParams.get('redirect') || '/';
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -75,13 +78,13 @@ export default function LoginPage() {
         const response = await Login(credentials).unwrap() as LoginResponse;
         console.log("Login response:", response);
 
-        // Save token to storage
+        // Save token to storage via AuthContext
         if (response.data) {
-          saveToken(response.data?.accessToken);
+          login(response.data?.accessToken);
           toast.success(response.message || 'Login successful!');
 
-          // Redirect to home page
-          router.push('/');
+          // Redirect to requested page or home
+          router.push(redirectUrl);
         } else {
           toast.error('No access token received');
         }
@@ -211,5 +214,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
