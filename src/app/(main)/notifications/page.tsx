@@ -190,7 +190,7 @@ const NotificationSystem = () => {
         variant={currentPage === 1 ? "default" : "ghost"}
         size="sm"
         onClick={() => setPage(1)}
-        className={`h-8 w-8 md:h-9 md:w-9 font-bold text-xs ${currentPage === 1 ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
+        className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === 1 ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
       >
         01
       </Button>
@@ -204,7 +204,7 @@ const NotificationSystem = () => {
           variant={currentPage === i ? "default" : "ghost"}
           size="sm"
           onClick={() => setPage(i)}
-          className={`h-8 w-8 md:h-9 md:w-9 font-bold text-xs ${currentPage === i ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
+          className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === i ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
         >
           {i.toString().padStart(2, '0')}
         </Button>
@@ -219,7 +219,7 @@ const NotificationSystem = () => {
           variant={currentPage === totalPages ? "default" : "ghost"}
           size="sm"
           onClick={() => setPage(totalPages)}
-          className={`h-8 w-8 md:h-9 md:w-9 font-bold text-xs ${currentPage === totalPages ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
+          className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === totalPages ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
         >
           {totalPages.toString().padStart(2, '0')}
         </Button>
@@ -233,7 +233,7 @@ const NotificationSystem = () => {
     return (
       <div className="flex flex-col justify-center items-center h-64 gap-4">
         <Loader2 className="w-10 h-10 animate-spin text-purple-600" />
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Loading alerts...</p>
+        <p className="text-xs font-normal text-gray-400 uppercase tracking-widest">Loading alerts...</p>
       </div>
     );
   }
@@ -255,8 +255,8 @@ const NotificationSystem = () => {
         <div className="p-4 md:p-8 border-b border-gray-100">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 pb-6 border-b border-gray-50">
             <div className="space-y-1">
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900">Notification History</h1>
-              <p className="text-sm text-gray-500 font-medium">Track and manage all system-wide alerts and messages</p>
+              <h1 className="text-xl md:text-2xl font-semibold text-gray-900">Notification History</h1>
+              <p className="text-sm text-gray-500 font-normal">Track and manage all system-wide alerts and messages</p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
@@ -265,7 +265,7 @@ const NotificationSystem = () => {
                 size="sm"
                 onClick={handleReadAllNotifications}
                 disabled={isReadAllLoading || filteredNotifications.length === 0}
-                className="w-full sm:w-auto font-bold h-10 border-gray-200 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200 transition-all active:scale-95"
+                className="w-full sm:w-auto font-normal h-10 border-gray-200 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200 transition-all active:scale-95"
               >
                 {isReadAllLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -279,7 +279,7 @@ const NotificationSystem = () => {
                 size="sm"
                 onClick={confirmDeleteAll}
                 disabled={isDeleteAllLoading || filteredNotifications.length === 0}
-                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 rounded-xl font-bold h-10 shadow-lg shadow-red-100 transition-all active:scale-95"
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 rounded-xl font-normal h-10 shadow-lg shadow-red-100 transition-all active:scale-95"
               >
                 {isDeleteAllLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -305,7 +305,7 @@ const NotificationSystem = () => {
             </div>
             <div className="w-full">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full bg-gray-50 border-gray-100 h-11 focus:bg-white transition-all shadow-none">
+                <SelectTrigger className="w-full bg-gray-50 border-gray-100 h-11 py-[22px] focus:bg-white transition-all shadow-none">
                   <SelectValue placeholder="Delivery Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -324,11 +324,11 @@ const NotificationSystem = () => {
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Notif ID</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Message Content</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Target</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Delivery</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Notif ID</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Message Content</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Target</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Delivery</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 bg-white">
@@ -341,33 +341,33 @@ const NotificationSystem = () => {
                     <td className="px-4 md:px-6 py-4">
                       <div className="flex items-center gap-3">
                         {!notification.isRead && <div className="w-2 h-2 rounded-full bg-purple-600 animate-pulse border-none shadow-[0_0_8px_rgba(147,51,234,0.5)]"></div>}
-                        <span className="text-xs md:text-sm font-mono font-bold text-gray-900 leading-none">
+                        <span className="text-xs md:text-sm font-mono font-normal text-gray-900 leading-none">
                           #{notification._id.slice(-6).toUpperCase()}
                         </span>
                       </div>
                     </td>
                     <td className="px-4 md:px-6 py-4">
                       <div className="flex flex-col gap-1 min-w-[200px] md:min-w-none">
-                        <p className="text-xs md:text-sm font-medium text-gray-700 leading-relaxed max-w-sm">
+                        <p className="text-xs md:text-sm font-normal text-gray-700 leading-relaxed max-w-sm">
                           {notification.message}
                         </p>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                        <span className="text-[10px] font-normal text-gray-400 uppercase tracking-tighter">
                           {formatDate(notification.createdAt)}
                         </span>
                       </div>
                     </td>
                     <td className="px-4 md:px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="text-xs md:text-sm font-bold text-gray-900 capitalize italic">{notification.role}</span>
+                        <span className="text-xs md:text-sm font-normal text-gray-900">{notification.role}</span>
                         <span className="text-[10px] text-gray-400 font-mono">UID: {notification.userId ? notification.userId.slice(-6).toUpperCase() : 'Global'}</span>
                       </div>
                     </td>
                     <td className="px-4 md:px-6 py-4">
                       <div className="flex flex-col gap-1.5">
-                        <span className={`inline-block text-center w-fit px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold shadow-sm whitespace-nowrap ${getReadStatusColor(notification.isRead)}`}>
+                        <span className={`inline-block text-center w-fit px-2 py-0.5 rounded-full text-[10px] md:text-xs font-normal shadow-sm whitespace-nowrap ${getReadStatusColor(notification.isRead)}`}>
                           {notification.isRead ? 'Opened' : 'New Alert'}
                         </span>
-                        <span className={`inline-block text-center w-fit px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold shadow-sm whitespace-nowrap ${getStatusColor(mapApiStatus(notification.status))}`}>
+                        <span className={`inline-block text-center w-fit px-2 py-0.5 rounded-full text-[10px] md:text-xs font-normal shadow-sm whitespace-nowrap ${getStatusColor(mapApiStatus(notification.status))}`}>
                           {mapApiStatus(notification.status)}
                         </span>
                       </div>
@@ -383,7 +383,7 @@ const NotificationSystem = () => {
                           <DropdownMenuItem
                             onClick={() => confirmDelete(notification._id)}
                             disabled={isDeleteSingleLoading}
-                            className="text-xs font-bold text-red-600 hover:bg-red-50 focus:bg-red-50 cursor-pointer py-2.5"
+                            className="text-xs font-normal text-red-600 hover:bg-red-50 focus:bg-red-50 cursor-pointer py-2.5"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete Record
@@ -395,7 +395,7 @@ const NotificationSystem = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-16 text-center text-gray-500 italic text-sm">
+                  <td colSpan={5} className="px-6 py-16 text-center text-gray-500 text-sm">
                     No matching alerts found in history
                   </td>
                 </tr>
@@ -407,10 +407,10 @@ const NotificationSystem = () => {
         {/* Pagination */}
         {apiData?.meta && (
           <div className="p-4 md:p-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6 bg-gray-50/50">
-            <div className="text-xs md:text-sm text-gray-600 font-medium text-center md:text-left order-2 md:order-1">
-              Displaying <span className="text-purple-600 font-bold">{((apiData.meta.page - 1) * apiData.meta.limit) + 1}</span> to{' '}
-              <span className="text-purple-600 font-bold">{Math.min(apiData.meta.page * apiData.meta.limit, apiData.meta.total)}</span> of{' '}
-              <span className="text-purple-600 font-bold">{apiData.meta.total}</span> logs
+            <div className="text-xs md:text-sm text-gray-600 font-normal text-center md:text-left order-2 md:order-1">
+              Displaying <span className="text-purple-600 font-normal">{((apiData.meta.page - 1) * apiData.meta.limit) + 1}</span> to{' '}
+              <span className="text-purple-600 font-normal">{Math.min(apiData.meta.page * apiData.meta.limit, apiData.meta.total)}</span> of{' '}
+              <span className="text-purple-600 font-normal">{apiData.meta.total}</span> logs
             </div>
 
             <div className="flex items-center gap-1.5 md:gap-2 order-1 md:order-2">
@@ -419,7 +419,7 @@ const NotificationSystem = () => {
                 size="sm"
                 onClick={handlePrevPage}
                 disabled={apiData.meta.page === 1}
-                className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white hover:shadow-sm transition-all font-bold text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
+                className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white hover:shadow-sm transition-all font-normal text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Prev
@@ -434,7 +434,7 @@ const NotificationSystem = () => {
                 size="sm"
                 onClick={handleNextPage}
                 disabled={apiData.meta.page >= apiData.meta.totalPage}
-                className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white hover:shadow-sm transition-all font-bold text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
+                className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white hover:shadow-sm transition-all font-normal text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
               >
                 Next
                 <ChevronRight className="w-4 h-4" />
@@ -448,19 +448,19 @@ const NotificationSystem = () => {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent className="rounded-2xl border-purple-100 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold text-gray-900 border-l-4 border-red-500 pl-4">Delete Entry</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl font-normal text-gray-900 border-l-4 border-red-500 pl-4">Delete Entry</AlertDialogTitle>
             <AlertDialogDescription className="text-sm font-medium text-gray-500 leading-relaxed">
               This action will permanently remove this notification from the history. This process cannot be reversed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4 gap-2">
-            <AlertDialogCancel disabled={isDeleteSingleLoading} className="rounded-xl font-bold text-gray-500">
+            <AlertDialogCancel disabled={isDeleteSingleLoading} className="rounded-xl font-normal text-gray-500">
               Go Back
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteNotification}
               disabled={isDeleteSingleLoading}
-              className="bg-red-600 hover:bg-red-700 rounded-xl font-bold shadow-lg shadow-red-100"
+              className="bg-red-600 hover:bg-red-700 rounded-xl font-normal shadow-lg shadow-red-100"
             >
               {isDeleteSingleLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
               Confirm Delete
@@ -472,19 +472,19 @@ const NotificationSystem = () => {
       <AlertDialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
         <AlertDialogContent className="rounded-2xl border-purple-100 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold text-gray-900 border-l-4 border-red-600 pl-4">Purge All Records</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm font-medium text-gray-500 leading-relaxed">
+            <AlertDialogTitle className="text-xl font-normal text-gray-900 border-l-4 border-red-600 pl-4">Purge All Records</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm font-normal text-gray-500 leading-relaxed">
               DANGER: You are about to delete every single notification log in the system. This action is global and destructive.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4 gap-2">
-            <AlertDialogCancel disabled={isDeleteAllLoading} className="rounded-xl font-bold text-gray-500">
+            <AlertDialogCancel disabled={isDeleteAllLoading} className="rounded-xl font-normal text-gray-500">
               Abort Purge
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAllNotifications}
               disabled={isDeleteAllLoading}
-              className="bg-red-700 hover:bg-red-800 rounded-xl font-bold shadow-xl shadow-red-200"
+              className="bg-red-700 hover:bg-red-800 rounded-xl font-normal shadow-xl shadow-red-200"
             >
               {isDeleteAllLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
               Delete Everything
