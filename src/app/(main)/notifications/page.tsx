@@ -12,11 +12,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -30,19 +31,21 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Eye,
   Loader2,
-  MoreVertical,
   Search,
   Trash2
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   useAllDeleteNotificationMutation,
   useAllReadNotificationMutation,
   useGetAllNotificationQuery,
-  useSingleDeleteNotificationMutation
+  useSingleDeleteNotificationMutation,
+  useSingleReadNotificationMutation
 } from '../../../features/notification/notificationApi';
-import { ApiResponse, FrontendStatus } from './type';
+import { socket } from '../../../utils/socket';
+import { ApiResponse, FrontendStatus, NotificationType } from './type';
 
 const NotificationSystem = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -52,13 +55,26 @@ const NotificationSystem = () => {
   const [selectedNotification, setSelectedNotification] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState<NotificationType | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // Fetch data with pagination
   const { data, isLoading, error, refetch } = useGetAllNotificationQuery({ page, limit });
 
+  useEffect(() => {
+    socket.on("notification", () => {
+      refetch();
+    });
+
+    return () => {
+      socket.off("notification");
+    };
+  }, [refetch]);
+
   const [readAllNotification, { isLoading: isReadAllLoading }] = useAllReadNotificationMutation();
   const [deleteAllNotification, { isLoading: isDeleteAllLoading }] = useAllDeleteNotificationMutation();
   const [deleteSingleNotification, { isLoading: isDeleteSingleLoading }] = useSingleDeleteNotificationMutation();
+  const [readSingleNotification] = useSingleReadNotificationMutation();
 
   const apiData = data as ApiResponse;
 
@@ -150,8 +166,21 @@ const NotificationSystem = () => {
     setShowDeleteAllDialog(true);
   };
 
+  const handleViewNotification = async (notification: NotificationType) => {
+    setSelectedDetail(notification);
+    setIsDetailOpen(true);
+    if (!notification.isRead) {
+      try {
+        await readSingleNotification(notification._id).unwrap();
+        // Since useGetAllNotificationQuery hook will handle update automatically if cache is invalidated or data refetched
+      } catch (error) {
+        console.error("Failed to mark as read:", error);
+      }
+    }
+  };
+
   // Filter notifications based on search and status
-  const filteredNotifications = apiData?.data?.filter(notification => {
+  const filteredNotifications = apiData?.data?.result?.filter(notification => {
     const matchesSearch =
       searchQuery === '' ||
       notification.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -327,7 +356,7 @@ const NotificationSystem = () => {
                 <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Notif ID</th>
                 <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Message Content</th>
                 <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Target</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Delivery</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Status</th>
                 <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest text-right">Actions</th>
               </tr>
             </thead>
@@ -373,23 +402,27 @@ const NotificationSystem = () => {
                       </div>
                     </td>
                     <td className="px-4 md:px-6 py-4 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-white hover:shadow-md border-none outline-none">
-                            <MoreVertical className="w-4 h-4 text-gray-400" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="rounded-xl border-gray-100 shadow-xl min-w-[120px]">
-                          <DropdownMenuItem
-                            onClick={() => confirmDelete(notification._id)}
-                            disabled={isDeleteSingleLoading}
-                            className="text-xs font-normal text-red-600 hover:bg-red-50 focus:bg-red-50 cursor-pointer py-2.5"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete Record
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewNotification(notification)}
+                          className="h-8 w-8 p-0 hover:bg-purple-100 text-purple-600 rounded-full"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => confirmDelete(notification._id)}
+                          disabled={isDeleteSingleLoading}
+                          className="h-8 w-8 p-0 hover:bg-red-100 text-red-600 rounded-full"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -492,7 +525,69 @@ const NotificationSystem = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+
+      {/* Detail Modal */}
+      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+        <DialogContent className="sm:max-w-md rounded-2xl border-gray-100 shadow-2xl">
+          <DialogHeader className="border-b border-gray-100 pb-4">
+            <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-purple-600"></span>
+              Notification Details
+            </DialogTitle>
+            <DialogDescription className="text-xs text-gray-500 font-mono">
+              ID: {selectedDetail?._id}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-4">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Message Content</span>
+              <p className="text-sm text-gray-800 leading-relaxed bg-gray-50 p-3 rounded-lg border border-gray-100">
+                {selectedDetail?.message}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Target Role</span>
+                <span className="text-sm font-medium text-gray-900">{selectedDetail?.role}</span>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Date Sent</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {selectedDetail?.createdAt && formatDate(selectedDetail.createdAt)}
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</span>
+                <span className={`text-xs font-medium px-2 py-1 rounded w-fit ${selectedDetail && getStatusColor(mapApiStatus(selectedDetail.status))}`}>
+                  {selectedDetail && mapApiStatus(selectedDetail.status)}
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</span>
+                <span className="text-xs font-mono text-gray-600 truncate">
+                  {selectedDetail?.userId || 'Global'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-gray-100">
+            <Button
+              variant="outline"
+              onClick={() => setIsDetailOpen(false)}
+              className="text-gray-600 hover:bg-gray-50"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog >
+    </div >
   );
 };
 

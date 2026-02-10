@@ -6,13 +6,27 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Bell, ChevronDown } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useGetAllNotificationQuery } from '../../features/notification/notificationApi';
 import { useGetMyProfileQuery } from '../../features/profile/profileApi';
 import { baseURL } from '../../utils/BaseURL';
+import { socket } from '../../utils/socket';
 
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Header() {
-  const unreadCount = 1; // Example unread count
+  const { data: notificationData, refetch: refetchNotifications } = useGetAllNotificationQuery({ page: 1, limit: 10 });
+  const unreadCount = notificationData?.data?.unReadCount || 0;
+
+  useEffect(() => {
+    socket.on("notification", () => {
+      refetchNotifications();
+    });
+
+    return () => {
+      socket.off("notification");
+    };
+  }, [refetchNotifications]);
+
   const userName = "Jane Cooper";
   const router = useRouter();
   const { logout } = useAuth();

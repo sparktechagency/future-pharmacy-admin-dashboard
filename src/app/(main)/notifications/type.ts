@@ -1,4 +1,4 @@
-export interface Notification {
+export interface NotificationType {
   _id: string;
   userId: string;
   message: string;
@@ -21,7 +21,10 @@ export interface ApiResponse {
   success: boolean;
   message: string;
   meta: MetaData;
-  data: Notification[];
+  data: {
+    unReadCount: number;
+    result: NotificationType[];
+  };
 }
 
 // Map API status to frontend status types

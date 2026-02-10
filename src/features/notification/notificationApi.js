@@ -12,7 +12,7 @@ export const notificationApi = baseApi.injectEndpoints({
 
     singleReadNotification: builder.mutation({
       query: (id) => ({
-        url: `/notification/read/${id}`,
+        url: `/notification/${id}`,
         method: "PATCH",
       }),
     }),
