@@ -37,7 +37,7 @@ import {
   X
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
 type SidebarItem = {
@@ -75,11 +75,11 @@ const sidebars: SidebarItem[] = [
   },
 ];
 
+import Image from 'next/image';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function OptimusSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { state, toggleSidebar, isMobile, setOpenMobile } = useSidebar();
   const { logout } = useAuth();
   const isCollapsed = state === "collapsed" && !isMobile;
@@ -139,12 +139,12 @@ export default function OptimusSidebar() {
           <div className={`flex flex-col items-center justify-center px-6 ${isCollapsed ? 'py-4' : 'pb-6 pt-6 md:pt-2'}`}>
             {!isCollapsed ? (
               <div className="relative w-full max-w-[160px] h-[60px]">
-                <img
+                <Image
                   src="/logo3.png"
                   alt="Dashboard Logo"
-                  // fill
+                  fill
                   className="object-contain"
-                // priority
+                  priority
                 />
               </div>
             ) : (

@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { socket } from "../utils/socket";
+
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -70,6 +72,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Also set as cookie for middleware
     document.cookie = `PharmacyAdmin=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
 
+    // Update socket auth and reconnect
+    if (socket) {
+      socket.auth = { token };
+      socket.disconnect().connect();
+    }
+
     setIsAuthenticated(true);
   };
 
@@ -80,9 +88,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Remove cookie
     document.cookie = "PharmacyAdmin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 
+    // Disconnect socket
+    if (socket) {
+      socket.disconnect();
+    }
+
     setIsAuthenticated(false);
     router.replace("/auth/login");
   };
+
 
   return (
     <AuthContext.Provider

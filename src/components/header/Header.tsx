@@ -18,23 +18,64 @@ export default function Header() {
   const unreadCount = notificationData?.data?.unReadCount || 0;
 
   useEffect(() => {
-    socket.on("notification", () => {
+    // Ensure socket is connected
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    const handleNotification = (eventName: string, data: unknown) => {
+      if (eventName.startsWith("notification")) {
+        console.log(`🔔 Real-time notification received (${eventName}):`, data);
+        refetchNotifications();
+      }
+    };
+
+    // Listen to ALL events and filter for notification ones
+    socket.onAny(handleNotification);
+
+    socket.on("connect", () => {
+      console.log("🌐 Socket connected/reconnected in Header. ID:", socket.id);
       refetchNotifications();
     });
 
+    socket.on("connect_error", (err) => {
+      console.error("❌ Socket connection error in Header:", err.message);
+    });
+
     return () => {
-      socket.off("notification");
+      socket.offAny(handleNotification);
+      socket.off("connect");
+      socket.off("connect_error");
     };
   }, [refetchNotifications]);
+
+
+
 
   const userName = "Jane Cooper";
   const router = useRouter();
   const { logout } = useAuth();
   const { data: profileResponse } = useGetMyProfileQuery({});
   const profileData = profileResponse?.data;
-  console.log("Profile Data:", profileData);
+
+  const [isBadgeVisible, setIsBadgeVisible] = useState(true);
+  const prevCountRef = useRef(unreadCount);
+
+  // Show badge again if new notifications arrive
+  useEffect(() => {
+    if (unreadCount > prevCountRef.current) {
+      setIsBadgeVisible(true);
+    }
+    prevCountRef.current = unreadCount;
+  }, [unreadCount]);
+
+  const handleNotificationClick = () => {
+    setIsBadgeVisible(false);
+    router.push("/notifications");
+  };
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -82,9 +123,9 @@ export default function Header() {
         <div className="flex items-center gap-2 md:gap-4">
           {/* Notification Bell */}
           <div className="relative">
-            <button onClick={() => router.push("/notifications")} className="relative flex cursor-pointer h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors">
+            <button onClick={handleNotificationClick} className="relative flex cursor-pointer h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors">
               <Bell className="h-5 w-5 md:h-6 md:w-6 text-gray-700" />
-              {unreadCount > 0 && (
+              {unreadCount > 0 && isBadgeVisible && (
                 <Badge
                   className="absolute -top-1 -right-1 h-4 min-w-4 md:h-5 md:min-w-5 rounded-full px-1 text-[10px] md:text-xs font-semibold"
                   variant="destructive"
@@ -94,6 +135,7 @@ export default function Header() {
               )}
             </button>
           </div>
+
 
           {/* User Profile with Dropdown */}
           <div className="relative" ref={dropdownRef}>

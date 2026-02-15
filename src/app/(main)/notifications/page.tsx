@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -28,142 +28,159 @@ import {
 } from '@/components/ui/select';
 
 import {
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Eye,
-  Loader2,
-  Search,
-  Trash2
+  Loader2
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  useAllDeleteNotificationMutation,
-  useAllReadNotificationMutation,
+  useDeleteNotificationMutation,
   useGetAllNotificationQuery,
-  useSingleDeleteNotificationMutation,
-  useSingleReadNotificationMutation
+  useReadNotificationMutation,
+  useUnreadNotificationMutation
 } from '../../../features/notification/notificationApi';
 import { socket } from '../../../utils/socket';
-import { ApiResponse, FrontendStatus, NotificationType } from './type';
+import { ApiResponse, NotificationType } from './type';
 
 const NotificationSystem = () => {
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [readFilter, setReadFilter] = useState<string>('all');
   const [page, setPage] = useState<number>(1);
   const [limit] = useState<number>(10);
-  const [selectedNotification, setSelectedNotification] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState<NotificationType | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<string>('');
 
   // Fetch data with pagination
   const { data, isLoading, error, refetch } = useGetAllNotificationQuery({ page, limit });
 
   useEffect(() => {
-    socket.on("notification", () => {
+    // Ensure socket is connected
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    const handleNotification = (eventName: string, data: any) => {
+      if (eventName.startsWith("notification")) {
+        console.log(`🔔 Real-time notification received (${eventName}):`, data);
+        refetch();
+      }
+    };
+
+    // Listen to ALL events and filter for notification ones
+    socket.onAny(handleNotification);
+
+    // Refetch on re-connect to ensure list is up to date
+    socket.on("connect", () => {
+      console.log("🌐 Socket connected/reconnected in Page. ID:", socket.id);
       refetch();
     });
 
+    socket.on("connect_error", (err) => {
+      console.error("❌ Socket connection error in Page:", err.message);
+    });
+
     return () => {
-      socket.off("notification");
+      socket.offAny(handleNotification);
+      socket.off("connect");
+      socket.off("connect_error");
     };
   }, [refetch]);
 
-  const [readAllNotification, { isLoading: isReadAllLoading }] = useAllReadNotificationMutation();
-  const [deleteAllNotification, { isLoading: isDeleteAllLoading }] = useAllDeleteNotificationMutation();
-  const [deleteSingleNotification, { isLoading: isDeleteSingleLoading }] = useSingleDeleteNotificationMutation();
-  const [readSingleNotification] = useSingleReadNotificationMutation();
+  const [deleteNotifications, { isLoading: isDeleting }] = useDeleteNotificationMutation();
+  const [readNotifications] = useReadNotificationMutation();
+  const [unreadNotifications] = useUnreadNotificationMutation();
+
 
   const apiData = data as ApiResponse;
 
-  // Map API status to frontend status
-  const mapApiStatus = (apiStatus: string): FrontendStatus => {
-    switch (apiStatus.toLowerCase()) {
-      case 'sent':
-        return 'Sent';
-      case 'pending':
-        return 'Pending';
-      case 'failed':
-        return 'Failed';
-      default:
-        return 'Pending';
+  // Filter notifications based on Read/Unread status
+  const filteredNotifications = apiData?.data?.result?.filter(notification => {
+    if (readFilter === 'read') return notification.isRead;
+    if (readFilter === 'unread') return !notification.isRead;
+    return true;
+  }) || [];
+
+  // Toggle single selection
+  const toggleSelect = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  // Toggle all selection
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredNotifications.length && filteredNotifications.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredNotifications.map(n => n._id)));
     }
   };
 
-  // Format date
+  // Handle Bulk Actions
+  const handleBulkActionExecute = async () => {
+    if (selectedIds.size === 0 || !bulkAction) return;
+
+    if (bulkAction === 'delete') {
+      setShowDeleteDialog(true);
+      return;
+    }
+
+    try {
+      const ids = Array.from(selectedIds);
+      if (bulkAction === 'markRead') {
+        const unreadIds = filteredNotifications
+          .filter(n => ids.includes(n._id) && !n.isRead)
+          .map(n => n._id);
+
+        if (unreadIds.length > 0) {
+          await readNotifications({ notification: "read", notificationIds: unreadIds }).unwrap();
+        }
+      } else if (bulkAction === 'markUnread') {
+        const readIds = filteredNotifications
+          .filter(n => ids.includes(n._id) && n.isRead)
+          .map(n => n._id);
+
+        if (readIds.length > 0) {
+          await unreadNotifications({ notification: "unread", notificationIds: readIds }).unwrap();
+        }
+      }
+
+      setSelectedIds(new Set());
+      setBulkAction('');
+      refetch();
+    } catch (err) {
+      console.error("Bulk action failed:", err);
+    }
+  };
+
+  const confirmBulkDelete = async () => {
+    try {
+      const ids = Array.from(selectedIds);
+      if (ids.length > 0) {
+        await deleteNotifications({ notification: "delete", notificationIds: ids }).unwrap();
+      }
+      setSelectedIds(new Set());
+      setShowDeleteDialog(false);
+      setBulkAction('');
+      refetch();
+    } catch (err) {
+      console.error("Bulk delete failed:", err);
+    }
+  };
+
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     }).replace(',', '');
-  };
-
-  const getStatusColor = (status: FrontendStatus): string => {
-    switch (status) {
-      case 'Sent':
-        return 'bg-green-100 text-green-700';
-      case 'Pending':
-        return 'bg-orange-100 text-orange-700';
-      case 'Failed':
-        return 'bg-pink-100 text-pink-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  const getReadStatusColor = (isRead: boolean): string => {
-    return isRead ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700';
-  };
-
-  // Handle all notifications read
-  const handleReadAllNotifications = async () => {
-    try {
-      await readAllNotification({}).unwrap();
-      refetch();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // Handle single notification delete
-  const handleDeleteNotification = async () => {
-    if (!selectedNotification) return;
-    try {
-      await deleteSingleNotification(selectedNotification).unwrap();
-      setShowDeleteDialog(false);
-      setSelectedNotification(null);
-      refetch();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // Handle all notifications delete
-  const handleDeleteAllNotifications = async () => {
-    try {
-      await deleteAllNotification({}).unwrap();
-      setShowDeleteAllDialog(false);
-      refetch();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // Confirm delete dialog for single notification
-  const confirmDelete = (id: string) => {
-    setSelectedNotification(id);
-    setShowDeleteDialog(true);
-  };
-
-  // Confirm delete all dialog
-  const confirmDeleteAll = () => {
-    setShowDeleteAllDialog(true);
   };
 
   const handleViewNotification = async (notification: NotificationType) => {
@@ -171,90 +188,38 @@ const NotificationSystem = () => {
     setIsDetailOpen(true);
     if (!notification.isRead) {
       try {
-        await readSingleNotification(notification._id).unwrap();
-        // Since useGetAllNotificationQuery hook will handle update automatically if cache is invalidated or data refetched
+        await readNotifications({ notification: "read", notificationIds: [notification._id] }).unwrap();
+        refetch(); // Ensure UI updates
       } catch (error) {
         console.error("Failed to mark as read:", error);
       }
     }
   };
 
-  // Filter notifications based on search and status
-  const filteredNotifications = apiData?.data?.result?.filter(notification => {
-    const matchesSearch =
-      searchQuery === '' ||
-      notification.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      notification.role.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === 'all' ||
-      notification.status.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
-  }) || [];
-
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(prev => prev - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (apiData?.meta && page < apiData.meta.totalPage) {
-      setPage(prev => prev + 1);
-    }
-  };
+  const handlePrevPage = () => { if (page > 1) setPage(prev => prev - 1); };
+  const handleNextPage = () => { if (apiData?.meta && page < apiData.meta.totalPage) setPage(prev => prev + 1); };
 
   const renderPaginationButtons = () => {
     if (!apiData?.meta) return null;
-
     const totalPages = apiData.meta.totalPage;
     const currentPage = apiData.meta.page;
     const pages = [];
-
-    // Always show first page
-    pages.push(
-      <Button
-        key={1}
-        variant={currentPage === 1 ? "default" : "ghost"}
-        size="sm"
-        onClick={() => setPage(1)}
-        className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === 1 ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
-      >
-        01
-      </Button>
-    );
-
-    // Show pages around current page
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-      pages.push(
-        <Button
-          key={i}
-          variant={currentPage === i ? "default" : "ghost"}
-          size="sm"
-          onClick={() => setPage(i)}
-          className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === i ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
-        >
-          {i.toString().padStart(2, '0')}
-        </Button>
-      );
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+        pages.push(
+          <Button
+            key={i}
+            variant={currentPage === i ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setPage(i)}
+            className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === i ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
+          >
+            {i.toString().padStart(2, '0')}
+          </Button>
+        );
+      }
     }
-
-    // Always show last page
-    if (totalPages > 1) {
-      pages.push(
-        <Button
-          key={totalPages}
-          variant={currentPage === totalPages ? "default" : "ghost"}
-          size="sm"
-          onClick={() => setPage(totalPages)}
-          className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === totalPages ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
-        >
-          {totalPages.toString().padStart(2, '0')}
-        </Button>
-      );
-    }
-
     return pages;
   };
 
@@ -282,100 +247,88 @@ const NotificationSystem = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Header */}
         <div className="p-4 md:p-8 border-b border-gray-100">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 pb-6 border-b border-gray-50">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="space-y-1">
               <h1 className="text-xl md:text-2xl font-semibold text-gray-900">Notification History</h1>
               <p className="text-sm text-gray-500 font-normal">Track and manage all system-wide alerts and messages</p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReadAllNotifications}
-                disabled={isReadAllLoading || filteredNotifications.length === 0}
-                className="w-full sm:w-auto font-normal h-10 border-gray-200 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200 transition-all active:scale-95"
-              >
-                {isReadAllLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : (
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                )}
-                <span className="text-xs uppercase tracking-wider">Mark All as Read</span>
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={confirmDeleteAll}
-                disabled={isDeleteAllLoading || filteredNotifications.length === 0}
-                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 rounded-xl font-normal h-10 shadow-lg shadow-red-100 transition-all active:scale-95"
-              >
-                {isDeleteAllLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : (
-                  <Trash2 className="w-4 h-4 mr-2" />
-                )}
-                <span className="text-xs uppercase tracking-wider">Clear All</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative md:col-span-3">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search notifications by content, role, or ID..."
-                value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-gray-50 border-gray-100 h-11 focus:bg-white transition-all w-full"
-              />
-            </div>
-            <div className="w-full">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full bg-gray-50 border-gray-100 h-11 py-[22px] focus:bg-white transition-all shadow-none">
-                  <SelectValue placeholder="Delivery Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Status: All</SelectItem>
-                  <SelectItem value="sent">Sent Successfully</SelectItem>
-                  <SelectItem value="pending">Awaiting Send</SelectItem>
-                  <SelectItem value="failed">Delivery Failed</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="w-full sm:w-48">
+                <Select value={readFilter} onValueChange={setReadFilter}>
+                  <SelectTrigger className="w-full bg-gray-50 border-gray-100 h-10 text-xs shadow-none">
+                    <SelectValue placeholder="Filter Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Read and Unread</SelectItem>
+                    <SelectItem value="read">Read</SelectItem>
+                    <SelectItem value="unread">Unread</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Select value={bulkAction} onValueChange={setBulkAction}>
+                  <SelectTrigger className="w-full sm:w-48 bg-gray-50 border-gray-200 h-10 text-xs shadow-none">
+                    <SelectValue placeholder="Bulk Actions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="markRead">Mark as Read</SelectItem>
+                    <SelectItem value="markUnread">Mark as Unread</SelectItem>
+                    <SelectItem value="delete">Move to Trash</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={handleBulkActionExecute}
+                  disabled={!bulkAction || selectedIds.size === 0}
+                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-10 px-6 rounded-xl transition-all active:scale-95"
+                >
+                  Apply
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+
 
         {/* Table/List View */}
         <div className="overflow-x-auto no-scrollbar">
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Notif ID</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Message Content</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Target</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest">Status</th>
-                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest text-right">Actions</th>
+                <th className="px-4 py-4 w-12 text-center border-none">
+                  <Checkbox
+                    checked={selectedIds.size === filteredNotifications.length && filteredNotifications.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest border-none">Notif ID</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest border-none">Message Content</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest border-none">Target</th>
+                <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-medium text-gray-400 tracking-widest text-right border-none">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 bg-white">
+            <tbody className="divide-y divide-gray-50 bg-white border-none">
               {filteredNotifications.length > 0 ? (
                 filteredNotifications.map((notification) => (
                   <tr
                     key={notification._id}
                     className={`hover:bg-purple-50/30 transition-colors group ${notification.isRead ? '' : 'bg-purple-50/50'}`}
                   >
-                    <td className="px-4 md:px-6 py-4">
+                    <td className="px-4 py-4 text-center border-none">
+                      <Checkbox
+                        checked={selectedIds.has(notification._id)}
+                        onCheckedChange={() => toggleSelect(notification._id)}
+                      />
+                    </td>
+                    <td className="px-4 md:px-6 py-4 border-none">
                       <div className="flex items-center gap-3">
-                        {!notification.isRead && <div className="w-2 h-2 rounded-full bg-purple-600 animate-pulse border-none shadow-[0_0_8px_rgba(147,51,234,0.5)]"></div>}
-                        <span className="text-xs md:text-sm font-mono font-normal text-gray-900 leading-none">
+                        {!notification.isRead && <div className="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></div>}
+                        <span className="text-xs md:text-sm font-mono font-normal text-gray-900 leading-none lowercase">
                           #{notification._id.slice(-6).toUpperCase()}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 md:px-6 py-4">
+                    <td className="px-4 md:px-6 py-4 border-none">
                       <div className="flex flex-col gap-1 min-w-[200px] md:min-w-none">
                         <p className="text-xs md:text-sm font-normal text-gray-700 leading-relaxed max-w-sm">
                           {notification.message}
@@ -385,23 +338,13 @@ const NotificationSystem = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 md:px-6 py-4">
+                    <td className="px-4 md:px-6 py-4 border-none">
                       <div className="flex flex-col">
-                        <span className="text-xs md:text-sm font-normal text-gray-900">{notification.role}</span>
+                        <span className="text-xs md:text-sm font-normal text-gray-900 capitalize">{notification.role}</span>
                         <span className="text-[10px] text-gray-400 font-mono">UID: {notification.userId ? notification.userId.slice(-6).toUpperCase() : 'Global'}</span>
                       </div>
                     </td>
-                    <td className="px-4 md:px-6 py-4">
-                      <div className="flex flex-col gap-1.5">
-                        <span className={`inline-block text-center w-fit px-2 py-0.5 rounded-full text-[10px] md:text-xs font-normal shadow-sm whitespace-nowrap ${getReadStatusColor(notification.isRead)}`}>
-                          {notification.isRead ? 'Opened' : 'New Alert'}
-                        </span>
-                        <span className={`inline-block text-center w-fit px-2 py-0.5 rounded-full text-[10px] md:text-xs font-normal shadow-sm whitespace-nowrap ${getStatusColor(mapApiStatus(notification.status))}`}>
-                          {mapApiStatus(notification.status)}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 md:px-6 py-4 text-right">
+                    <td className="px-4 md:px-6 py-4 text-right border-none">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
@@ -412,23 +355,13 @@ const NotificationSystem = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => confirmDelete(notification._id)}
-                          disabled={isDeleteSingleLoading}
-                          className="h-8 w-8 p-0 hover:bg-red-100 text-red-600 rounded-full"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-16 text-center text-gray-500 text-sm">
+                  <td colSpan={5} className="px-6 py-16 text-center text-gray-500 text-sm border-none">
                     No matching alerts found in history
                   </td>
                 </tr>
@@ -446,28 +379,26 @@ const NotificationSystem = () => {
               <span className="text-purple-600 font-normal">{apiData.meta.total}</span> logs
             </div>
 
-            <div className="flex items-center gap-1.5 md:gap-2 order-1 md:order-2">
+            <div className="flex items-center gap-2 order-1 md:order-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handlePrevPage}
                 disabled={apiData.meta.page === 1}
-                className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white hover:shadow-sm transition-all font-normal text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
+                className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white transition-all font-normal text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Prev
               </Button>
-
-              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-[150px] sm:max-w-none">
+              <div className="flex items-center gap-1">
                 {renderPaginationButtons()}
               </div>
-
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleNextPage}
                 disabled={apiData.meta.page >= apiData.meta.totalPage}
-                className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white hover:shadow-sm transition-all font-normal text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
+                className="h-8 md:h-9 px-2 md:px-3 text-gray-500 hover:bg-white transition-all font-normal text-[10px] md:text-xs uppercase tracking-widest disabled:opacity-30"
               >
                 Next
                 <ChevronRight className="w-4 h-4" />
@@ -477,50 +408,26 @@ const NotificationSystem = () => {
         )}
       </div>
 
-      {/* Dialogs */}
+      {/* Bulk Action Confirm Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent className="rounded-2xl border-purple-100 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-normal text-gray-900 border-l-4 border-red-500 pl-4">Delete Entry</AlertDialogTitle>
+            <AlertDialogTitle className="text-xl font-normal text-gray-900 border-l-4 border-red-500 pl-4">Confirm Bulk Action</AlertDialogTitle>
             <AlertDialogDescription className="text-sm font-medium text-gray-500 leading-relaxed">
-              This action will permanently remove this notification from the history. This process cannot be reversed.
+              Are you sure you want to delete {selectedIds.size} selected notification(s)? This action is permanent and cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4 gap-2">
-            <AlertDialogCancel disabled={isDeleteSingleLoading} className="rounded-xl font-normal text-gray-500">
+            <AlertDialogCancel className="rounded-xl font-normal text-gray-500">
               Go Back
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteNotification}
-              disabled={isDeleteSingleLoading}
+              onClick={confirmBulkDelete}
+              disabled={isDeleting}
               className="bg-red-600 hover:bg-red-700 rounded-xl font-normal shadow-lg shadow-red-100"
             >
-              {isDeleteSingleLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              {isDeleting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
               Confirm Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
-        <AlertDialogContent className="rounded-2xl border-purple-100 shadow-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-normal text-gray-900 border-l-4 border-red-600 pl-4">Purge All Records</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm font-normal text-gray-500 leading-relaxed">
-              DANGER: You are about to delete every single notification log in the system. This action is global and destructive.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-4 gap-2">
-            <AlertDialogCancel disabled={isDeleteAllLoading} className="rounded-xl font-normal text-gray-500">
-              Abort Purge
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteAllNotifications}
-              disabled={isDeleteAllLoading}
-              className="bg-red-700 hover:bg-red-800 rounded-xl font-normal shadow-xl shadow-red-200"
-            >
-              {isDeleteAllLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-              Delete Everything
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -550,7 +457,7 @@ const NotificationSystem = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Target Role</span>
-                <span className="text-sm font-medium text-gray-900">{selectedDetail?.role}</span>
+                <span className="text-sm font-medium text-gray-900 capitalize">{selectedDetail?.role}</span>
               </div>
 
               <div className="flex flex-col gap-1">
@@ -562,8 +469,8 @@ const NotificationSystem = () => {
 
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</span>
-                <span className={`text-xs font-medium px-2 py-1 rounded w-fit ${selectedDetail && getStatusColor(mapApiStatus(selectedDetail.status))}`}>
-                  {selectedDetail && mapApiStatus(selectedDetail.status)}
+                <span className={`text-xs font-medium px-2 py-1 rounded w-fit ${selectedDetail?.isRead ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                  {selectedDetail?.isRead ? 'Read' : 'Unread'}
                 </span>
               </div>
 

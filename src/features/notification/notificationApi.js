@@ -10,33 +10,48 @@ export const notificationApi = baseApi.injectEndpoints({
       }),
     }),
 
-    singleReadNotification: builder.mutation({
-      query: (id) => ({
-        url: `/notification/${id}`,
-        method: "PATCH",
-      }),
-    }),
-
-    allReadNotification: builder.mutation({
-      query: () => ({
-        url: `/notification/all-read`,
+    deleteNotification: builder.mutation({
+      query: (data) => ({
+        url: `/notification/all-read-delete`,
         method: "POST",
+        body: data, /* 
+          {
+            notification:"delete",
+            notificationIds : ["675c4f5b3b6b6b6b6b6b6b6b", "675c4f5b3b6b6b6b6b6b6b6b"]
+          }
+        */
       }),
     }),
 
-    allDeleteNotification: builder.mutation({
-      query: () => ({
-        url: `/notification/admin`,
-        method: "DELETE",
+    readNotification: builder.mutation({
+      query: (data) => ({
+        url: `/notification/all-read-delete`,
+        method: "POST",
+        body: data,/* 
+          {
+            notification:"read",
+            notificationIds : ["675c4f5b3b6b6b6b6b6b6b6b", "675c4f5b3b6b6b6b6b6b6b6b"]
+          }
+        */
       }),
     }),
 
-    singleDeleteNotification: builder.mutation({
-      query: (id) => ({
-        url: `/notification/admin/${id}`,
-        method: "DELETE",
+
+    unreadNotification: builder.mutation({
+      query: (data) => ({
+        url: `/notification/all-read-delete`,
+        method: "POST",
+        body: data,/* 
+          {
+            notification:"unread",
+            notificationIds : ["675c4f5b3b6b6b6b6b6b6b6b", "675c4f5b3b6b6b6b6b6b6b6b"]
+          }
+        */
       }),
     }),
+
+
+
 
   }),
 });
@@ -44,8 +59,7 @@ export const notificationApi = baseApi.injectEndpoints({
 // Export hooks
 export const {
   useGetAllNotificationQuery,
-  useSingleReadNotificationMutation,
-  useAllReadNotificationMutation,
-  useAllDeleteNotificationMutation,
-  useSingleDeleteNotificationMutation
+  useDeleteNotificationMutation,
+  useReadNotificationMutation,
+  useUnreadNotificationMutation,
 } = notificationApi;
