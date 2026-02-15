@@ -62,7 +62,7 @@ const NotificationSystem = () => {
       socket.connect();
     }
 
-    const handleNotification = (eventName: string, data: any) => {
+    const handleNotification = (eventName: string, data: unknown) => {
       if (eventName.startsWith("notification")) {
         console.log(`🔔 Real-time notification received (${eventName}):`, data);
         refetch();
