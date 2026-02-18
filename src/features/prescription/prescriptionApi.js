@@ -8,9 +8,8 @@ export const prescriptionApi = baseApi.injectEndpoints({
         url: "/prescription-order",
         method: "GET",
       }),
+      providesTags: ["prescription"],
     }),
-
-
 
   }),
 });

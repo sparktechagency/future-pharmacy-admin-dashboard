@@ -8,6 +8,7 @@ export const usersApi = baseApi.injectEndpoints({
         url: "/users/all-users",
         method: "GET",
       }),
+      providesTags: ["users"],
     }),
 
     updateBlockAndUnblock: builder.mutation({
@@ -15,6 +16,7 @@ export const usersApi = baseApi.injectEndpoints({
         url: `/users/blocked/${id}`,
         method: "PATCH",
       }),
+      invalidatesTags: ["users"],
     }),
 
     viewUserDetails: builder.query({
@@ -22,8 +24,8 @@ export const usersApi = baseApi.injectEndpoints({
         url: `/users/${id}`,
         method: "GET",
       }),
+      providesTags: ["users"],
     }),
-
   }),
 });
 

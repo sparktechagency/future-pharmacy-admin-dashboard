@@ -15,5 +15,9 @@ export const baseApi = createApi({
     },
   }),
   endpoints: () => ({}),
-  tagTypes: ["Driver", "investors", "pharmacyz", "pharmacy", "zone", "otherBusiness", "zip"],
+  tagTypes: ["Driver", "investors", "pharmacyz", "pharmacy", "zone", "otherBusiness", "zip", "blog", "cms", "notification", "overview", "payment", "prescription", "profile", "refillTransferScheduleRequiest", "users", "independentPharmacy"],
+  // Global configuration for all queries
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+  refetchOnMountOrArgChange: true,
 });

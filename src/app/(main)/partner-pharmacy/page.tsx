@@ -55,7 +55,6 @@ const PartnerPharmacyTable = () => {
   const { downloadPDF } = useDownloadPDF();
   const { downloadExcel } = useDownloadXlShit();
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
-  // console.log("pharmacies", pharmacies);
 
 
 
@@ -187,7 +186,6 @@ const PartnerPharmacyTable = () => {
 
     try {
       const response = await createPharmacy(validData).unwrap();
-      console.log("create response", response);
       toast.success(response.message || "Pharmacy created successfully");
 
       if (response.success) {

@@ -64,7 +64,6 @@ const NotificationSystem = () => {
 
     const handleNotification = (eventName: string, data: unknown) => {
       if (eventName.startsWith("notification")) {
-        console.log(`🔔 Real-time notification received (${eventName}):`, data);
         refetch();
       }
     };
@@ -74,7 +73,6 @@ const NotificationSystem = () => {
 
     // Refetch on re-connect to ensure list is up to date
     socket.on("connect", () => {
-      console.log("🌐 Socket connected/reconnected in Page. ID:", socket.id);
       refetch();
     });
 
@@ -474,12 +472,12 @@ const NotificationSystem = () => {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1">
+              {/* <div className="flex flex-col gap-1">
                 <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</span>
                 <span className="text-xs font-mono text-gray-600 truncate">
                   {selectedDetail?.userId || 'Global'}
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
 

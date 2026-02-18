@@ -8,6 +8,7 @@ export const notificationApi = baseApi.injectEndpoints({
         url: `/notification/admin-all?page=${page}&limit=${limit}`,
         method: "GET",
       }),
+      providesTags: ["notification"],
     }),
 
     deleteNotification: builder.mutation({
@@ -21,6 +22,7 @@ export const notificationApi = baseApi.injectEndpoints({
           }
         */
       }),
+      invalidatesTags: ["notification"],
     }),
 
     readNotification: builder.mutation({
@@ -34,6 +36,7 @@ export const notificationApi = baseApi.injectEndpoints({
           }
         */
       }),
+      invalidatesTags: ["notification"],
     }),
 
 
@@ -48,6 +51,7 @@ export const notificationApi = baseApi.injectEndpoints({
           }
         */
       }),
+      invalidatesTags: ["notification"],
     }),
 
 

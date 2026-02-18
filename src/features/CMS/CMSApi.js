@@ -12,6 +12,7 @@ export const CMSApi = baseApi.injectEndpoints({
           Object.entries(data).filter(([, value]) => value !== undefined && value !== null)
         ),
       }),
+      invalidatesTags: ["cms"],
     }),
 
 
@@ -20,6 +21,7 @@ export const CMSApi = baseApi.injectEndpoints({
         url: '/setting',
         method: 'GET',
       }),
+      providesTags: ["cms"],
     }),
 
   }),

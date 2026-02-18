@@ -68,7 +68,7 @@ export default function TransactionsList() {
   const { downloadPDF } = useDownloadPDF();
   const { downloadCSV } = useCSVDownload();
 
-  const { data: apiResponse, isLoading, error } = useGetAllPaymentQuery({});
+  const { data: apiResponse, isLoading, error } = useGetAllPaymentQuery({}, { pollingInterval: 5000 });
 
   const payments = useMemo<Payment[]>(() => {
     return apiResponse?.data?.result || [];
@@ -199,7 +199,7 @@ export default function TransactionsList() {
   }
 
   return (
-    <div className='flex flex-col gap-6 sm:p-6'>
+    <div className='flex flex-col gap-6'>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Header */}
         <div className="p-4 md:p-8 border-b border-gray-100">

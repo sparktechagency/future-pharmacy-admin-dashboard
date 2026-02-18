@@ -84,7 +84,7 @@ const AboutPage = () => {
   }
 
   return (
-    <div className="sm:p-6">
+    <div className="">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">{title}</CardTitle>

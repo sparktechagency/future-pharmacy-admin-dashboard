@@ -23,6 +23,7 @@ import React, { ReactElement, ReactNode, useState } from 'react';
 import { Button } from '../../../components/ui/button';
 import { useGetAllDriverQuery } from '../../../features/driver/driverApi';
 import { useGetAllPharmacyQuery } from "../../../features/fharmacy/fharmacyApi";
+import { useGetAllIndependentPharmacyQuery } from "../../../features/independentPharmacy/IndependentApi";
 import { useGetAllInvestorsQuery } from "../../../features/investor/investorApi";
 import { useGetAllOtherBussinessQuery } from "../../../features/other/otherAPi";
 import { CustomLoading } from '../../../hooks/CustomLoading';
@@ -130,6 +131,21 @@ interface Pharmacy {
   updatedAt: string;
 }
 
+interface IndependentPharmacy {
+  _id: string;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  contactPerson: string;
+  title: string;
+  yearofBusiness: string;
+  message: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Tabs Component
 const Tabs = ({ value, onValueChange, children }: TabsProps) => {
   return (
@@ -180,8 +196,8 @@ const TabsContent = ({ children, tabValue, value }: TabsContentProps) => {
 
 // View Details Dialog Component
 interface ViewDetailsDialogProps {
-  type: 'pharmacy' | 'driver' | 'investor' | "other Bussiness";
-  data: Pharmacy | Driver | Investor | OtherBussiness | null;
+  type: 'pharmacy' | 'driver' | 'investor' | "other Bussiness" | "independentPharmacy";
+  data: Pharmacy | Driver | Investor | OtherBussiness | IndependentPharmacy | null;
   children: ReactNode;
 }
 
@@ -204,7 +220,49 @@ const ViewDetailsDialog = ({ type, data, children }: ViewDetailsDialogProps) => 
         </DialogHeader>
 
         <div className="p-6 space-y-6">
-          {/* Pharmacy Details */}
+          {/* Independent Pharmacy Details */}
+          {type === 'independentPharmacy' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-purple-50/50 p-6 rounded-2xl border border-purple-100">
+                <div className="text-center sm:text-left space-y-1">
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-900">{(data as IndependentPharmacy).name}</h3>
+                  <p className="text-purple-600 font-medium break-all text-sm md:text-base">{(data as IndependentPharmacy).email}</p>
+                  <div className="pt-2">
+                    <Badge variant="outline" className={`border-none px-3 py-1 font-semibold ${data.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                      {data.status.toUpperCase()}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { label: "Contact Person", value: (data as IndependentPharmacy).contactPerson },
+                  { label: "Title", value: (data as IndependentPharmacy).title },
+                  { label: "Phone", value: (data as IndependentPharmacy).phone },
+                  { label: "Year of Business", value: (data as IndependentPharmacy).yearofBusiness },
+                  { label: "Created At", value: new Date(data.createdAt).toLocaleDateString() },
+                  { label: "Updated At", value: new Date(data.updatedAt).toLocaleDateString() },
+                ].map((item, idx) => (
+                  <div key={idx} className="p-4 rounded-xl bg-gray-50 border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md group">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400 transition-colors">{item.label}</p>
+                    <p className={`text-sm md:text-base text-gray-900 font-semibold break-words`}>{item.value || 'N/A'}</p>
+                  </div>
+                ))}
+                <div className="sm:col-span-2 p-4 rounded-xl bg-gray-50 border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md group">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400 transition-colors">Complete Address</p>
+                  <p className="text-sm md:text-base text-gray-900 font-semibold break-words">{(data as IndependentPharmacy).address}</p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-gray-50/50 border border-gray-100 shadow-inner">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Additional Message</p>
+                <p className="text-sm text-gray-700 leading-relaxed italic">{(data as IndependentPharmacy).message || 'No additional message provided.'}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Regular Pharmacy Details */}
           {type === 'pharmacy' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-purple-50/50 p-6 rounded-2xl border border-purple-100">
@@ -388,10 +446,10 @@ const PharmacyTab = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
 
-  const { data: pharmacyResponse, isLoading } = useGetAllPharmacyQuery({});
+  const { data: independentResponse, isLoading } = useGetAllIndependentPharmacyQuery({}, { pollingInterval: 5000 });
 
   // Filter pharmacy data based on search and status
-  const filteredPharmacyData = pharmacyResponse?.data?.filter((pharmacy: Pharmacy) => {
+  const filteredPharmacyData = independentResponse?.data?.filter((pharmacy: IndependentPharmacy) => {
     const matchesSearch = searchTerm === '' ||
       pharmacy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pharmacy.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -443,7 +501,7 @@ const PharmacyTab = () => {
                   <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">No</th>
                     <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Pharmacy Name</th>
-                    <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">License</th>
+                    <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Phone</th>
                     <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Email</th>
                     <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Contact</th>
                     <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
@@ -452,7 +510,7 @@ const PharmacyTab = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {filteredPharmacyData.length > 0 ? (
-                    filteredPharmacyData.map((item: Pharmacy, index: number) => (
+                    filteredPharmacyData.map((item: IndependentPharmacy, index: number) => (
                       <tr key={item._id} className="hover:bg-purple-50/30 transition-colors group">
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">{String(index + 1).padStart(2, '0')}</td>
                         <td className="px-4 md:px-6 py-4">
@@ -461,7 +519,7 @@ const PharmacyTab = () => {
                             <span className="text-[10px] md:text-xs text-gray-500 line-clamp-1">{item.address}</span>
                           </div>
                         </td>
-                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600 font-medium">{item.licenseNumber || 'N/A'}</td>
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600 font-medium">{item.phone || 'N/A'}</td>
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-purple-600 font-medium truncate max-w-[120px] md:max-w-none">{item.email}</td>
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600">{item.contactPerson}</td>
                         <td className="px-4 md:px-6 py-4">
@@ -473,7 +531,7 @@ const PharmacyTab = () => {
                           </Badge>
                         </td>
                         <td className="px-4 md:px-6 py-4">
-                          <ViewDetailsDialog type="pharmacy" data={item}>
+                          <ViewDetailsDialog type="independentPharmacy" data={item}>
                             <button
                               className="p-2 hover:bg-purple-100 text-purple-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-purple-100"
                               title="View details"
@@ -504,7 +562,7 @@ const PharmacyTab = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
             <div className="text-xs md:text-sm text-gray-600 font-medium">
-              Showing <span className="text-purple-600 font-bold">{filteredPharmacyData.length}</span> of <span className="text-purple-600 font-bold">{pharmacyResponse?.meta?.total || 0}</span> pharmacies
+              Showing <span className="text-purple-600 font-bold">{filteredPharmacyData.length}</span> of <span className="text-purple-600 font-bold">{independentResponse?.meta?.total || 0}</span> pharmacies
             </div>
           </div>
         </div>
@@ -519,7 +577,7 @@ const DriverTab = () => {
   const [dateRange, setDateRange] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
 
-  const { data: driverResponse, isLoading } = useGetAllDriverQuery({});
+  const { data: driverResponse, isLoading } = useGetAllDriverQuery({}, { pollingInterval: 5000 });
 
   // Filter driver data based on search and status
   const filteredDriverData = driverResponse?.data?.filter((driver: Driver) => {
@@ -663,7 +721,7 @@ const InvestorTab = () => {
   const [dateRange, setDateRange] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
 
-  const { data: investorResponse, isLoading } = useGetAllInvestorsQuery({});
+  const { data: investorResponse, isLoading } = useGetAllInvestorsQuery({}, { pollingInterval: 5000 });
 
   // Filter investor data based on search and status
   const filteredInvestorData = investorResponse?.data?.filter((investor: Investor) => {
@@ -802,7 +860,7 @@ const OtherTab = () => {
   const [dateRange, setDateRange] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
 
-  const { data: otherBusinessResponse, isLoading } = useGetAllOtherBussinessQuery({});
+  const { data: otherBusinessResponse, isLoading } = useGetAllOtherBussinessQuery({}, { pollingInterval: 5000 });
 
   // Filter other business data based on search and status
   const filteredOtherBusinessData = otherBusinessResponse?.data?.filter((business: OtherBussiness) => {
@@ -941,10 +999,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('pharmacy');
 
   // ✅ Call hooks ONCE at component top level
-  const { data: pharmacyResponse } = useGetAllPharmacyQuery({});
-  const { data: driverResponse } = useGetAllDriverQuery({});
-  const { data: investorResponse } = useGetAllInvestorsQuery({});
-  const { data: otherBusinessResponse } = useGetAllOtherBussinessQuery({});
+  const { data: pharmacyResponse } = useGetAllPharmacyQuery({}, { pollingInterval: 5000 });
+  const { data: independentResponse } = useGetAllIndependentPharmacyQuery({}, { pollingInterval: 5000 });
+  const { data: driverResponse } = useGetAllDriverQuery({}, { pollingInterval: 5000 });
+  const { data: investorResponse } = useGetAllInvestorsQuery({}, { pollingInterval: 5000 });
+  const { data: otherBusinessResponse } = useGetAllOtherBussinessQuery({}, { pollingInterval: 5000 });
 
   const { downloadCSV } = useCSVDownload();
   const { downloadPDF } = useDownloadPDF();
@@ -952,8 +1011,8 @@ export default function App() {
 
   // ✅ Reuse already-fetched data — DO NOT call hooks inside these functions!
   const handleExportPharmacyCSV = () => {
-    const pharmacyData = pharmacyResponse?.data || [];
-    const dataToExport = pharmacyData.map((pharmacy: Pharmacy) => ({
+    const pharmacyData = independentResponse?.data || [];
+    const dataToExport = pharmacyData.map((pharmacy: IndependentPharmacy) => ({
       PharmacyID: pharmacy._id,
       PharmacyName: pharmacy.name,
       Email: pharmacy.email,
@@ -965,7 +1024,7 @@ export default function App() {
       Status: pharmacy.status,
       CreatedAt: new Date(pharmacy.createdAt).toLocaleDateString(),
     }));
-    downloadCSV(dataToExport, 'pharmacy-data');
+    downloadCSV(dataToExport, 'independent-pharmacy-data');
   };
 
   const handleExportDriverCSV = () => {
@@ -1003,8 +1062,8 @@ export default function App() {
   };
 
   const handleExportPharmacyPDF = () => {
-    const pharmacyData = pharmacyResponse?.data || [];
-    const dataToExport = pharmacyData.map((pharmacy: Pharmacy) => ({
+    const pharmacyData = independentResponse?.data || [];
+    const dataToExport = pharmacyData.map((pharmacy: IndependentPharmacy) => ({
       PharmacyID: pharmacy._id,
       PharmacyName: pharmacy.name,
       Email: pharmacy.email,
@@ -1016,7 +1075,7 @@ export default function App() {
       Status: pharmacy.status,
       CreatedAt: new Date(pharmacy.createdAt).toLocaleDateString(),
     }));
-    downloadPDF(dataToExport, 'pharmacy-data');
+    downloadPDF(dataToExport, 'independent-pharmacy-data');
   };
 
   const handleExportDriverPDF = () => {
@@ -1054,8 +1113,8 @@ export default function App() {
   };
 
   const handleExportPharmacyExcel = () => {
-    const pharmacyData = pharmacyResponse?.data || [];
-    const dataToExport = pharmacyData.map((pharmacy: Pharmacy) => ({
+    const pharmacyData = independentResponse?.data || [];
+    const dataToExport = pharmacyData.map((pharmacy: IndependentPharmacy) => ({
       PharmacyID: pharmacy._id,
       PharmacyName: pharmacy.name,
       Email: pharmacy.email,
@@ -1067,7 +1126,7 @@ export default function App() {
       Status: pharmacy.status,
       CreatedAt: new Date(pharmacy.createdAt).toLocaleDateString(),
     }));
-    downloadExcel(dataToExport, 'pharmacy-data');
+    downloadExcel(dataToExport, 'independent-pharmacy-data');
   };
 
   const handleExportDriverExcel = () => {
@@ -1192,7 +1251,7 @@ export default function App() {
   };
 
   return (
-    <div className='flex flex-col gap-6 sm:p-6'>
+    <div className='flex flex-col gap-6'>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 md:p-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 border-b border-gray-100 pb-6">
@@ -1200,16 +1259,16 @@ export default function App() {
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList value={activeTab} onValueChange={setActiveTab}>
                   <TabsTrigger tabValue="pharmacy" value={activeTab} onValueChange={setActiveTab}>
-                    Partner Pharmacy
+                    Independent Pharmacy
                   </TabsTrigger>
                   <TabsTrigger tabValue="driver" value={activeTab} onValueChange={setActiveTab}>
-                    Delivery Drivers
+                    Delivery Driver
                   </TabsTrigger>
                   <TabsTrigger tabValue="investor" value={activeTab} onValueChange={setActiveTab}>
-                    Strategic Investors
+                    Investor
                   </TabsTrigger>
                   <TabsTrigger tabValue="other" value={activeTab} onValueChange={setActiveTab}>
-                    Legal Entities
+                    Other Businesses
                   </TabsTrigger>
                 </TabsList>
               </Tabs>

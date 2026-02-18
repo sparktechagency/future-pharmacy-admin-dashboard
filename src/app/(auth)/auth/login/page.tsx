@@ -73,10 +73,10 @@ function LoginForm() {
           password: password
         };
 
-        console.log("Login credentials:", credentials);
+        
 
         const response = await Login(credentials).unwrap() as LoginResponse;
-        console.log("Login response:", response);
+        
 
         // Save token to storage via AuthContext
         if (response.data) {
@@ -89,7 +89,6 @@ function LoginForm() {
           toast.error('No access token received');
         }
       } catch (error) {
-        console.log('Login error:', error);
         const apiError = error as ApiError;
         toast.error(apiError?.data?.message || 'Login failed! Please check your credentials.');
       }

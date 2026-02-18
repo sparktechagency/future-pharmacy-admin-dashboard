@@ -317,7 +317,7 @@ export default function UserProfilePage() {
   console.log("Profile Image URL:", profileImageUrl);
 
   return (
-    <div className="flex flex-col gap-6 sm:p-6">
+    <div className="flex flex-col gap-6">
       <div className="">
         {/* Profile Header Card */}
         <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 overflow-hidden">

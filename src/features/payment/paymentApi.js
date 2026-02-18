@@ -8,12 +8,14 @@ export const paymentApi = baseApi.injectEndpoints({
         url: "/payment",
         method: "GET",
       }),
+      providesTags: ["payment"],
     }),
     getSinglePayment: builder.query({
       query: (id) => ({
         url: `/payment/${id}`,
         method: "GET",
       }),
+      providesTags: ["payment"],
     }),
 
   }),

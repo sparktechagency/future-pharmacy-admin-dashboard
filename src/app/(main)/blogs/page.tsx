@@ -18,7 +18,6 @@ export default function BlogManagementApp() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentBlog, setCurrentBlog] = useState<Blog | null>(null);
   const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
-
   const blogs = blogsData?.data?.data || [];
 
   const handleCreateNew = () => {
@@ -45,7 +44,7 @@ export default function BlogManagementApp() {
   }
 
   return (
-    <div className="sm:p-6">
+    <div className="">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h1 className="text-2xl md:text-3xl font-bold">Blog Management</h1>
         <Button variant={"default"} onClick={handleCreateNew} className="bg-[#8E4585] w-full sm:w-auto">

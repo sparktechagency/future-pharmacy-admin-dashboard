@@ -8,6 +8,7 @@ export const blogApi = baseApi.injectEndpoints({
         method: "POST",
         body: data
       }),
+      invalidatesTags: ["blog"],
     }),
 
     getAllBlogs: builder.query({
@@ -15,6 +16,7 @@ export const blogApi = baseApi.injectEndpoints({
         url: "/blog",
         method: "GET",
       }),
+      providesTags: ["blog"],
     }),
 
     blogLike: builder.mutation({
@@ -22,6 +24,7 @@ export const blogApi = baseApi.injectEndpoints({
         url: `/blog/blog-likes/${id}`,
         method: "POST",
       }),
+      invalidatesTags: ["blog"],
     }),
 
     getSingleBlog: builder.query({
@@ -29,6 +32,7 @@ export const blogApi = baseApi.injectEndpoints({
         url: `/blog/${id}`,
         method: "GET",
       }),
+      providesTags: ["blog"],
     }),
 
     updateBlog: builder.mutation({
@@ -51,6 +55,7 @@ export const blogApi = baseApi.injectEndpoints({
           body: isFormData ? data : JSON.stringify(data)
         };
       },
+      invalidatesTags: ["blog"],
     }),
 
     deleteBlog: builder.mutation({
@@ -58,6 +63,7 @@ export const blogApi = baseApi.injectEndpoints({
         url: `/blog/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["blog"],
     }),
   }),
 });

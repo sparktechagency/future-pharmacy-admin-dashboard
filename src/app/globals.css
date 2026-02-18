@@ -167,7 +167,55 @@
     @apply border-border outline-ring/50;
   }
 
+  /* Ensure body has a scrollable area with custom styling */
+  html,
+  body {
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Custom Scrollbar Styles (Slim & Modern) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--primary) 30%, transparent);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--primary) 50%, transparent);
+  }
+
+  /* Firefox Support */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--primary) 30%, transparent) transparent;
+  }
+}
+
+@layer utilities {
+
+  /* Utility to hide scrollbar while keeping scroll functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
   }
 }

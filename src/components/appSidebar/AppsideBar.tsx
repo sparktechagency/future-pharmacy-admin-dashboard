@@ -155,7 +155,7 @@ export default function OptimusSidebar() {
           </div>
 
           {/* Navigation Menu */}
-          <div className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20 ${isCollapsed ? '' : 'px-4'} py-4`}>
+          <div className={`flex-1 overflow-y-auto hide-scrollbar ${isCollapsed ? '' : 'px-4'} py-4`}>
             <ul className="space-y-1">
               {sidebars.map((item) => {
                 const hasSubItems = item.subItems && item.subItems.length > 0;
@@ -283,18 +283,12 @@ export default function OptimusSidebar() {
       </SidebarContent>
 
       <style jsx global>{`
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 4px;
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
         }
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.2);
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </Sidebar>

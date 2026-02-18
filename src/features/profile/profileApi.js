@@ -8,6 +8,7 @@ export const profileApi = baseApi.injectEndpoints({
         url: "/users/my-profile",
         method: "GET",
       }),
+      providesTags: ["profile"],
     }),
 
     updateProfile: builder.mutation({
@@ -16,6 +17,7 @@ export const profileApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data
       }),
+      invalidatesTags: ["profile"],
     }),
 
     twoStepVerification: builder.mutation({
@@ -26,6 +28,7 @@ export const profileApi = baseApi.injectEndpoints({
           Authorization: `Bearer ${localStorage.getItem("PharmacyAdmin")}`,
         }
       }),
+      invalidatesTags: ["profile"],
     }),
 
     resetPasswordProfile: builder.mutation({
@@ -34,6 +37,7 @@ export const profileApi = baseApi.injectEndpoints({
         method: "POST",
       }),
     }),
+    invalidatesTags: ["profile"],
   }),
 });
 

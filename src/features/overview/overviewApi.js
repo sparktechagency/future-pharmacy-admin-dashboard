@@ -8,6 +8,7 @@ export const authApi = baseApi.injectEndpoints({
         url: "/payment/overview",
         method: "GET",
       }),
+      providesTags: ["overview"],
     }),
 
     reveniewResio: builder.query({
@@ -15,6 +16,7 @@ export const authApi = baseApi.injectEndpoints({
         url: `/payment/all-earning-rasio?year=${year}`,
         method: "GET",
       }),
+      providesTags: ["overview"],
     }),
 
 
@@ -23,6 +25,7 @@ export const authApi = baseApi.injectEndpoints({
         url: `/users/all-users`,
         method: "GET",
       }),
+      providesTags: ["overview"],
     }),
 
     singleUser: builder.query({
@@ -30,6 +33,7 @@ export const authApi = baseApi.injectEndpoints({
         url: `/users/${id}`,
         method: "GET",
       }),
+      providesTags: ["overview"],
     }),
   }),
 });

@@ -167,7 +167,6 @@ const PrescriptionRequestsTable = () => {
   };
 
   const handleExportDocs = () => {
-    console.log('Export Docs', filteredRequests);
     const dataToExport = filteredRequests.map(request => ({
       RequestID: request.id,
       PatientName: request.patientName,
