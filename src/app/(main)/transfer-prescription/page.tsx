@@ -150,6 +150,19 @@ export default function PrescriptionTransferRequests() {
   const [dateRange, setDateRange] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<TransferRequest | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
+
+  // Load viewed IDs from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('viewed_transfer_requests');
+    if (saved) {
+      try {
+        setViewedIds(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to parse viewed IDs', e);
+      }
+    }
+  }, []);
 
   const { data, isLoading } = useGetAllTransferQuery(currentPage);
   const { downloadExcel } = useDownloadXlShit();
@@ -244,6 +257,13 @@ export default function PrescriptionTransferRequests() {
   const handleViewDetails = (request: TransferRequest) => {
     setSelectedRequest(request);
     setIsDialogOpen(true);
+
+    // Mark as viewed
+    if (!viewedIds.has(request._id)) {
+      const newViewed = new Set(viewedIds).add(request._id);
+      setViewedIds(newViewed);
+      localStorage.setItem('viewed_transfer_requests', JSON.stringify(Array.from(newViewed)));
+    }
   };
 
   // Handle export functions
@@ -570,7 +590,14 @@ export default function PrescriptionTransferRequests() {
                   currentData.map((item: TransformedTransferRequest) => (
                     <tr key={item._id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-mono">{item.transId}</td>
-                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">{item.patientName}</td>
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
+                        <div className="flex items-center gap-2">
+                          {!viewedIds.has(item._id) && (
+                            <div className="w-2 h-2 rounded-full bg-[#9c4a8f] animate-pulse shrink-0" title="New request" />
+                          )}
+                          <span>{item.patientName}</span>
+                        </div>
+                      </td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 max-w-[120px] md:max-w-none truncate">{item.transferFrom}</td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 max-w-[120px] md:max-w-none truncate">{item.transferTo}</td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
@@ -582,7 +609,7 @@ export default function PrescriptionTransferRequests() {
                         </div>
                       </td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">{item.date}</td>
-                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 border-none">
                         <Badge
                           variant="secondary"
                           className={`${getStatusBadgeClass(item.status)} border-none text-[10px] md:text-xs font-medium px-2 py-0.5 whitespace-nowrap`}

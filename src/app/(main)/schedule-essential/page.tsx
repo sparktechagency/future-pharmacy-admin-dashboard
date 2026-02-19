@@ -181,6 +181,19 @@ export default function HealthcareSchedule() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRequest, setSelectedRequest] = useState<ScheduleRequest | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
+
+  // Load viewed IDs from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('viewed_schedule_requests');
+    if (saved) {
+      try {
+        setViewedIds(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to parse viewed IDs', e);
+      }
+    }
+  }, []);
   const itemsPerPage = 10;
 
   const { downloadCSV } = useCSVDownload();
@@ -365,8 +378,14 @@ export default function HealthcareSchedule() {
   const handleViewDetails = (request: ScheduleRequest) => {
     setSelectedRequest(request);
     setIsDialogOpen(true);
-  };
 
+    // Mark as viewed
+    if (!viewedIds.has(request._id)) {
+      const newViewed = new Set(viewedIds).add(request._id);
+      setViewedIds(newViewed);
+      localStorage.setItem('viewed_schedule_requests', JSON.stringify(Array.from(newViewed)));
+    }
+  };
   // Handle export functions
   const handleExportCSV = () => {
     const dataToExport = filteredData.map(item => ({
@@ -741,10 +760,15 @@ export default function HealthcareSchedule() {
                 currentData.map((item: TransformedScheduleRequest) => (
                   <tr key={item._id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-mono">{item.no}</td>
-                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
-                      <div className="flex flex-col">
-                        <span className="font-medium">{item.patientName}</span>
-                        <span className="text-[10px] md:text-xs text-gray-500">{item.phone}</span>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 border-none">
+                      <div className="flex items-center gap-2">
+                        {!viewedIds.has(item._id) && (
+                          <div className="w-2 h-2 rounded-full bg-[#9c4a8f] animate-pulse shrink-0" title="New request" />
+                        )}
+                        <div className="flex flex-col">
+                          <span className="font-medium">{item.patientName}</span>
+                          <span className="text-[10px] md:text-xs text-gray-500">{item.phone}</span>
+                        </div>
                       </div>
                     </td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 truncate max-w-[120px] md:max-w-none">{item.pharmacyName}</td>

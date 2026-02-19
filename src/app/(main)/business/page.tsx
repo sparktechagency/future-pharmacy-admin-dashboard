@@ -446,6 +446,27 @@ const PharmacyTab = () => {
   const [status, setStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
+
+  // Load viewed IDs from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('viewed_business_pharmacy');
+    if (saved) {
+      try {
+        setViewedIds(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to parse viewed IDs', e);
+      }
+    }
+  }, []);
+
+  const handleMarkAsViewed = (id: string) => {
+    if (!viewedIds.has(id)) {
+      const newViewed = new Set(viewedIds).add(id);
+      setViewedIds(newViewed);
+      localStorage.setItem('viewed_business_pharmacy', JSON.stringify(Array.from(newViewed)));
+    }
+  };
 
   const { data: independentResponse, isLoading } = useGetAllIndependentPharmacyQuery(currentPage, { pollingInterval: 5000 });
 
@@ -519,9 +540,14 @@ const PharmacyTab = () => {
                           {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
                         </td>
                         <td className="px-4 md:px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="text-xs md:text-sm font-bold text-gray-900 line-clamp-1">{item.name}</span>
-                            <span className="text-[10px] md:text-xs text-gray-500 line-clamp-1">{item.address}</span>
+                          <div className="flex items-center gap-2">
+                            {!viewedIds.has(item._id) && (
+                              <div className="w-2 h-2 rounded-full bg-purple-600 animate-pulse shrink-0" title="New entry" />
+                            )}
+                            <div className="flex flex-col">
+                              <span className="text-xs md:text-sm font-bold text-gray-900 line-clamp-1">{item.name}</span>
+                              <span className="text-[10px] md:text-xs text-gray-500 line-clamp-1">{item.address}</span>
+                            </div>
                           </div>
                         </td>
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600 font-medium">{item.phone || 'N/A'}</td>
@@ -538,7 +564,8 @@ const PharmacyTab = () => {
                         <td className="px-4 md:px-6 py-4">
                           <ViewDetailsDialog type="independentPharmacy" data={item}>
                             <button
-                              className="p-2 hover:bg-purple-100 text-purple-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-purple-100"
+                              onClick={() => handleMarkAsViewed(item._id)}
+                              className="p-2 hover:bg-purple-100 text-purple-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-purple-100 cursor-pointer"
                               title="View details"
                             >
                               <Image
@@ -632,6 +659,27 @@ const DriverTab = () => {
   const [status, setStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
+
+  // Load viewed IDs from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('viewed_business_driver');
+    if (saved) {
+      try {
+        setViewedIds(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to parse viewed IDs', e);
+      }
+    }
+  }, []);
+
+  const handleMarkAsViewed = (id: string) => {
+    if (!viewedIds.has(id)) {
+      const newViewed = new Set(viewedIds).add(id);
+      setViewedIds(newViewed);
+      localStorage.setItem('viewed_business_driver', JSON.stringify(Array.from(newViewed)));
+    }
+  };
 
   const { data: driverResponse, isLoading } = useGetAllDriverQuery(currentPage, { pollingInterval: 5000 });
 
@@ -715,9 +763,14 @@ const DriverTab = () => {
                           {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
                         </td>
                         <td className="px-4 md:px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="text-xs md:text-sm font-bold text-gray-900">{item.name}</span>
-                            <span className="text-[10px] md:text-xs text-blue-600 font-medium truncate max-w-[120px] md:max-w-none">{item.email}</span>
+                          <div className="flex items-center gap-2">
+                            {!viewedIds.has(item._id) && (
+                              <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse shrink-0" title="New entry" />
+                            )}
+                            <div className="flex flex-col">
+                              <span className="text-xs md:text-sm font-bold text-gray-900">{item.name}</span>
+                              <span className="text-[10px] md:text-xs text-blue-600 font-medium truncate max-w-[120px] md:max-w-none">{item.email}</span>
+                            </div>
                           </div>
                         </td>
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600 capitalize font-medium">{item.vehicleType}</td>
@@ -737,7 +790,8 @@ const DriverTab = () => {
                         <td className="px-4 md:px-6 py-4">
                           <ViewDetailsDialog type="driver" data={item}>
                             <button
-                              className="p-2 hover:bg-blue-100 text-blue-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-blue-100"
+                              onClick={() => handleMarkAsViewed(item._id)}
+                              className="p-2 hover:bg-blue-100 text-blue-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-blue-100 cursor-pointer"
                               title="View details"
                             >
                               <Image
@@ -831,6 +885,27 @@ const InvestorTab = () => {
   const [status, setStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
+
+  // Load viewed IDs from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('viewed_business_investor');
+    if (saved) {
+      try {
+        setViewedIds(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to parse viewed IDs', e);
+      }
+    }
+  }, []);
+
+  const handleMarkAsViewed = (id: string) => {
+    if (!viewedIds.has(id)) {
+      const newViewed = new Set(viewedIds).add(id);
+      setViewedIds(newViewed);
+      localStorage.setItem('viewed_business_investor', JSON.stringify(Array.from(newViewed)));
+    }
+  };
 
   const { data: investorResponse, isLoading } = useGetAllInvestorsQuery(currentPage, { pollingInterval: 5000 });
 
@@ -916,7 +991,12 @@ const InvestorTab = () => {
                           {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
                         </td>
                         <td className="px-4 md:px-6 py-4">
-                          <span className="text-xs md:text-sm font-bold text-gray-900">{item.name}</span>
+                          <div className="flex items-center gap-2">
+                            {!viewedIds.has(item._id) && (
+                              <div className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0" title="New entry" />
+                            )}
+                            <span className="text-xs md:text-sm font-bold text-gray-900">{item.name}</span>
+                          </div>
                         </td>
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600 font-medium">{item.organizationName}</td>
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-emerald-600 font-medium truncate max-w-[150px] md:max-w-none">{item.email}</td>
@@ -931,6 +1011,7 @@ const InvestorTab = () => {
                         <td className="px-4 md:px-6 py-4">
                           <ViewDetailsDialog type="investor" data={item}>
                             <button
+                              onClick={() => handleMarkAsViewed(item._id)}
                               className="p-2 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-emerald-100"
                               title="View details"
                             >
@@ -1019,12 +1100,32 @@ const InvestorTab = () => {
 };
 
 // Other Business Component
-const OtherTab = () => {
+const OtherBussinessTab = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [dateRange, setDateRange] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
+
+  // Load viewed IDs from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('viewed_business_other');
+    if (saved) {
+      try {
+        setViewedIds(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to parse viewed IDs', e);
+      }
+    }
+  }, []);
+
+  const handleMarkAsViewed = (id: string) => {
+    if (!viewedIds.has(id)) {
+      const newViewed = new Set(viewedIds).add(id);
+      setViewedIds(newViewed);
+      localStorage.setItem('viewed_business_other', JSON.stringify(Array.from(newViewed)));
+    }
+  };
 
   const { data: otherBusinessResponse, isLoading } = useGetAllOtherBussinessQuery(currentPage, { pollingInterval: 5000 });
 
@@ -1047,7 +1148,7 @@ const OtherTab = () => {
   return (
     <div className='flex flex-col gap-6'>
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="relative md:col-span-2">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
@@ -1056,18 +1157,6 @@ const OtherTab = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
             className="pl-10 bg-gray-50 border-gray-200 w-full"
           />
-        </div>
-        <div className='w-full'>
-          <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-full bg-gray-50 border-gray-200">
-              <SelectValue placeholder="Date Range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
         <div className='w-full'>
           <Select value={status} onValueChange={setStatus}>
@@ -1109,9 +1198,14 @@ const OtherTab = () => {
                           {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
                         </td>
                         <td className="px-4 md:px-6 py-4">
-                          <div className="flex flex-col text-sm">
-                            <span className="font-bold text-gray-900 line-clamp-1">{item.name}</span>
-                            <span className="text-gray-500 line-clamp-1">{item.organizationName}</span>
+                          <div className="flex items-center gap-2">
+                            {!viewedIds.has(item._id) && (
+                              <div className="w-2 h-2 rounded-full bg-amber-600 animate-pulse shrink-0" title="New entry" />
+                            )}
+                            <div className="flex flex-col text-sm">
+                              <span className="font-bold text-gray-900 line-clamp-1">{item.name}</span>
+                              <span className="text-gray-500 line-clamp-1">{item.organizationName}</span>
+                            </div>
                           </div>
                         </td>
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-600 font-medium">{item.region}</td>
@@ -1126,7 +1220,8 @@ const OtherTab = () => {
                         <td className="px-4 md:px-6 py-4 text-sm text-gray-900">
                           <ViewDetailsDialog type="other Bussiness" data={item}>
                             <button
-                              className="p-2 hover:bg-amber-100 text-amber-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-amber-100"
+                              onClick={() => handleMarkAsViewed(item._id)}
+                              className="p-2 hover:bg-amber-100 text-amber-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-amber-100 cursor-pointer"
                               title="View details"
                             >
                               <Image
@@ -1516,7 +1611,7 @@ export default function App() {
                 <InvestorTab />
               </TabsContent>
               <TabsContent tabValue="other" value={activeTab}>
-                <OtherTab />
+                <OtherBussinessTab />
               </TabsContent>
             </Tabs>
           </div>
