@@ -4,8 +4,8 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const deliveryZoneApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAlldeliveryZone: builder.query({
-      query: () => ({
-        url: "/delivery-zone",
+      query: (page) => ({
+        url: `/delivery-zone?page=${page}`,
         method: "GET",
       }),
       providesTags: ["zone"],

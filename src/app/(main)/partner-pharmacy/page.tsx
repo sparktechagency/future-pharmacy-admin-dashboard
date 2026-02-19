@@ -45,9 +45,10 @@ const PartnerPharmacyTable = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [pharmacyToDelete, setPharmacyToDelete] = useState<Pharmacy | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
 
-  const { data: apiResponse, isLoading, error, refetch } = useGetAllPharmacyQuery({});
+  const { data: apiResponse, isLoading, error, refetch } = useGetAllPharmacyQuery(currentPage, { pollingInterval: 5000 });
   const [createPharmacy] = useCreatePharmacyMutation();
   const [updatePharmacy] = useUpdatePharmacyMutation();
   const [deletePharmacy] = useDeletePharmacyMutation();
@@ -56,6 +57,7 @@ const PartnerPharmacyTable = () => {
   const { downloadExcel } = useDownloadXlShit();
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
 
+  const totalPages = apiResponse?.meta?.totalPage || 1;
 
 
   useEffect(() => {
@@ -144,12 +146,11 @@ const PartnerPharmacyTable = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  // Confirm delete - এখন API কল করবো
+  // Confirm delete
   const confirmDelete = async () => {
     if (pharmacyToDelete) {
       try {
         await deletePharmacy(pharmacyToDelete._id).unwrap();
-        // API সফল হলে লোকালি আপডেট করবো
         setPharmacies(pharmacies.filter(p => p._id !== pharmacyToDelete._id));
         setIsDeleteDialogOpen(false);
         setPharmacyToDelete(null);
@@ -161,7 +162,7 @@ const PartnerPharmacyTable = () => {
     }
   };
 
-  // Handle form submission for add - এখন API কল করবো
+  // Handle form submission for add
   const handleSubmitAdd = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -199,7 +200,7 @@ const PartnerPharmacyTable = () => {
     }
   };
 
-  // Handle form submission for edit - এখন API কল করবো
+  // Handle form submission for edit
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -230,7 +231,6 @@ const PartnerPharmacyTable = () => {
         }).unwrap();
 
         if (response.success && response.data) {
-          // API সফল হলে লোকালি আপডেট করবো
           const updatedPharmacies = pharmacies.map(p =>
             p._id === selectedPharmacy._id ? response.data : p
           );
@@ -305,6 +305,24 @@ const PartnerPharmacyTable = () => {
 
     return matchesSearch && matchesStatus && matchesPharmacy;
   });
+
+  const getPageNumbers = (): (number | string)[] => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 4) {
+        pages.push(1, 2, 3, 4, 5, '...', totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
 
   // Loading state
   if (isLoading) {
@@ -476,170 +494,221 @@ const PartnerPharmacyTable = () => {
         confirmDelete={confirmDelete}
       />
 
-      <div className="">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {/* Filters Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 md:p-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <h1 className="text-lg md:text-xl font-semibold text-gray-900">
-                All Partner Pharmacies
-              </h1>
-              <div className="flex gap-3 md:gap-5 w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
-                  onClick={handleExportCSV}
-                >
-                  <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={24} height={24} className="w-6 h-6" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
-                  onClick={handleExportDocs}
-                >
-                  <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={24} height={24} className="w-6 h-6" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-100 border-gray-200 flex-1 sm:flex-none"
-                  onClick={handleExportPDF}
-                >
-                  <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={24} height={24} className="w-6 h-6" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              <div className="w-full md:w-auto">
-                <Button
-                  variant="outline"
-                  className="h-auto w-full md:w-auto bg-[#9c4a8f] py-2.5 px-4 hover:bg-[#9c4a8f] border-[#9c4a8f] text-white font-medium shadow-sm transition-all active:scale-95"
-                  onClick={handleAddPharmacy}
-                >
-                  Add Partner Pharmacy
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 lg:max-w-4xl">
-                <div className="relative order-1 lg:col-span-1 sm:col-span-2 lg:order-none">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder="Search pharmacies..."
-                    value={searchQuery}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-gray-50 border-gray-200 w-full focus:bg-white transition-colors"
-                  />
-                </div>
-
-                <div className="order-2">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="bg-gray-50 w-full border-gray-200 focus:bg-white transition-colors">
-                      <SelectValue placeholder="Status: All" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Status: All</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="approved">Approved</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="order-3">
-                  <Select value={pharmacyFilter} onValueChange={setPharmacyFilter}>
-                    <SelectTrigger className="bg-gray-50 w-full border-gray-200 focus:bg-white transition-colors">
-                      <SelectValue placeholder="Pharmacy: All" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Pharmacy: All</SelectItem>
-                      {pharmacies.map(pharmacy => (
-                        <SelectItem key={pharmacy._id} value={pharmacy._id}>
-                          {pharmacy.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+        <div className="p-4 md:p-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <h1 className="text-lg md:text-xl font-semibold text-gray-900">
+              All Partner Pharmacies
+            </h1>
+            <div className="flex gap-3 md:gap-5 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-200 border-gray-200 flex-1 sm:flex-none"
+                onClick={handleExportCSV}
+              >
+                <Image src="/icons/refill-prescription/csv.png" alt="Export CSV" width={24} height={24} className="w-6 h-6" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-200 border-gray-200 flex-1 sm:flex-none"
+                onClick={handleExportDocs}
+              >
+                <Image src="/icons/refill-prescription/docs.png" alt="Export Docs" width={24} height={24} className="w-6 h-6" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 md:h-11 md:w-11 bg-gray-100 hover:bg-gray-200 border-gray-200 flex-1 sm:flex-none"
+                onClick={handleExportPDF}
+              >
+                <Image src="/icons/refill-prescription/pdf.png" alt="Export PDF" width={24} height={24} className="w-6 h-6" />
+              </Button>
             </div>
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Pharmacy Name</th>
-                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Address</th>
-                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Contact Person</th>
-                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Zip Code</th>
-                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Phone</th>
-                  <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Action</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {filteredPharmacies.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-500 italic">
-                      No pharmacies found
-                    </td>
-                  </tr>
-                ) : (
-                  filteredPharmacies.map((pharmacy) => (
-                    <tr key={pharmacy._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm font-medium text-gray-900">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="w-full md:w-auto">
+              <Button
+                variant="outline"
+                className="h-auto w-full md:w-auto bg-[#9c4a8f] hover:text-white py-2.5 px-4 hover:bg-[#8e4484] border-[#8e4484] text-white font-medium shadow-sm transition-all active:scale-95"
+                onClick={handleAddPharmacy}
+              >
+                Add Partner Pharmacy
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 lg:max-w-4xl">
+              <div className="relative lg:col-span-1 sm:col-span-2">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="Search pharmacies..."
+                  value={searchQuery}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-gray-50 border-gray-200 w-full focus:bg-white transition-colors"
+                />
+              </div>
+
+              <div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="bg-gray-50 w-full border-gray-200 focus:bg-white transition-colors">
+                    <SelectValue placeholder="Status: All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Status: All</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="approved">Approved</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Select value={pharmacyFilter} onValueChange={setPharmacyFilter}>
+                  <SelectTrigger className="bg-gray-50 w-full border-gray-200 focus:bg-white transition-colors">
+                    <SelectValue placeholder="Pharmacy: All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Pharmacy: All</SelectItem>
+                    {pharmacies.map(pharmacy => (
+                      <SelectItem key={pharmacy._id} value={pharmacy._id}>
                         {pharmacy.name}
-                      </td>
-                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 max-w-[150px] md:max-w-xs truncate">
-                        {pharmacy.address}
-                      </td>
-                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600">
-                        {pharmacy.contactPerson || 'N/A'}
-                      </td>
-                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 whitespace-nowrap">
-                        {pharmacy.zipCode}
-                      </td>
-                      <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 whitespace-nowrap">
-                        {pharmacy.phone}
-                      </td>
-                      <td className="px-3 md:px-6 py-4">
-                        <div className="flex items-center gap-1 md:gap-2">
-                          <button
-                            onClick={() => handleViewDetails(pharmacy)}
-                            className="p-2 hover:bg-purple-50 text-gray-400 hover:text-purple-600 rounded-lg transition-colors"
-                            title="View details"
-                          >
-                            <Eye className="w-4 h-4 md:w-5 md:h-5" />
-                          </button>
-
-                          <button
-                            onClick={() => handleEditPharmacy(pharmacy)}
-                            className="p-2 hover:bg-green-50 text-gray-400 hover:text-green-600 rounded-lg transition-colors"
-                            title="Edit pharmacy"
-                          >
-                            <Pencil className="w-4 h-4 md:w-5 md:h-5" />
-                          </button>
-
-                          <button
-                            onClick={() => handleDeletePharmacy(pharmacy)}
-                            className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-600 rounded-lg transition-colors"
-                            title="Delete pharmacy"
-                          >
-                            <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Pharmacy Name</th>
+                <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Address</th>
+                <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Contact Person</th>
+                <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Zip Code</th>
+                <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Phone</th>
+                <th className="px-3 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Action</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {filteredPharmacies.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-500 italic">
+                    No pharmacies found
+                  </td>
+                </tr>
+              ) : (
+                filteredPharmacies.map((pharmacy) => (
+                  <tr key={pharmacy._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-3 md:px-6 py-4 text-xs md:text-sm font-medium text-gray-900">
+                      {pharmacy.name}
+                    </td>
+                    <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 max-w-[150px] md:max-w-xs truncate">
+                      {pharmacy.address}
+                    </td>
+                    <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600">
+                      {pharmacy.contactPerson || 'N/A'}
+                    </td>
+                    <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 whitespace-nowrap">
+                      {pharmacy.zipCode}
+                    </td>
+                    <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-600 whitespace-nowrap">
+                      {pharmacy.phone}
+                    </td>
+                    <td className="px-3 md:px-6 py-4">
+                      <div className="flex items-center gap-1 md:gap-2">
+                        <button
+                          onClick={() => handleViewDetails(pharmacy)}
+                          className="p-2 cursor-pointer hover:bg-purple-50 text-gray-400 hover:text-purple-600 rounded-lg transition-colors"
+                          title="View details"
+                        >
+                          <Eye className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+
+                        <button
+                          onClick={() => handleEditPharmacy(pharmacy)}
+                          className="p-2 hover:bg-green-50 cursor-pointer text-gray-400 hover:text-green-600 rounded-lg transition-colors"
+                          title="Edit pharmacy"
+                        >
+                          <Pencil className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeletePharmacy(pharmacy)}
+                          className="p-2 hover:bg-red-50 cursor-pointer text-gray-400 hover:text-red-600 rounded-lg transition-colors"
+                          title="Delete pharmacy"
+                        >
+                          <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination Footer */}
+        {totalPages > 1 && (
+          <div className="p-4 md:p-6 bg-gray-50 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-xs md:text-sm text-gray-600 font-medium order-2 md:order-1">
+              Showing page <span className="text-purple-600 font-bold">{currentPage}</span> of <span className="text-purple-600 font-bold">{totalPages}</span>
+            </div>
+
+            <div className="flex items-center gap-2 order-1 md:order-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="h-9 px-3 text-gray-500 hover:bg-white hover:shadow-sm font-bold text-xs uppercase tracking-widest disabled:opacity-30"
+              >
+                Prev
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {getPageNumbers().map((page, index) => (
+                  <React.Fragment key={index}>
+                    {page === '...' ? (
+                      <span className="px-2 py-1 text-gray-300 text-xs">...</span>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                        className={`h-9 w-9 p-0 text-xs font-bold transition-all ${currentPage === page
+                          ? 'bg-[#9c4a8f] hover:text-white py-2.5 px-4 hover:bg-[#8e4484] border-[#8e4484] text-white font-medium shadow-sm transition-all active:scale-95'
+                          : 'text-gray-500 hover:bg-white hover:text-purple-600 hover:shadow-sm'
+                          }`}
+                      >
+                        {String(page).padStart(2, '0')}
+                      </Button>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="h-9 px-3 text-gray-500 hover:bg-white hover:shadow-sm font-bold text-xs uppercase tracking-widest disabled:opacity-30"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

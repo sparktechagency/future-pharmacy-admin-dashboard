@@ -211,7 +211,7 @@ const NotificationSystem = () => {
             variant={currentPage === i ? "default" : "ghost"}
             size="sm"
             onClick={() => setPage(i)}
-            className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === i ? "bg-purple-600 shadow-lg shadow-purple-200" : "text-gray-500 hover:bg-gray-50"}`}
+            className={`h-8 w-8 md:h-9 md:w-9 font-normal text-xs ${currentPage === i ? "bg-[#9c4a8f] hover:bg-[#9c4a8f] hover:text-white text-white font-bold" : "text-gray-500 hover:bg-gray-50"}`}
           >
             {i.toString().padStart(2, '0')}
           </Button>
@@ -278,7 +278,7 @@ const NotificationSystem = () => {
                 <Button
                   onClick={handleBulkActionExecute}
                   disabled={!bulkAction || selectedIds.size === 0}
-                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-10 px-6 rounded-xl transition-all active:scale-95"
+                  className="bg-[#9c4a8f] text-white text-xs h-10 px-6 rounded-xl transition-all active:scale-95"
                 >
                   Apply
                 </Button>
@@ -491,8 +491,8 @@ const NotificationSystem = () => {
             </Button>
           </div>
         </DialogContent>
-      </Dialog >
-    </div >
+      </Dialog>
+    </div>
   );
 };
 

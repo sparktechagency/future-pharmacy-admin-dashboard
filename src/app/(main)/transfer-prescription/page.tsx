@@ -151,7 +151,7 @@ export default function PrescriptionTransferRequests() {
   const [selectedRequest, setSelectedRequest] = useState<TransferRequest | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  const { data, isLoading } = useGetAllTransferQuery({});
+  const { data, isLoading } = useGetAllTransferQuery(currentPage);
   const { downloadExcel } = useDownloadXlShit();
   const { downloadCSV } = useCSVDownload();
   const { downloadPDF } = useDownloadPDF();
@@ -217,10 +217,10 @@ export default function PrescriptionTransferRequests() {
 
 
   // Paginate data
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = data?.meta?.totalPage || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = filteredData.slice(startIndex, endIndex);
+  const currentData = filteredData;
 
   const getPageNumbers = (): (number | string)[] => {
     const pages: (number | string)[] = [];
@@ -647,7 +647,7 @@ export default function PrescriptionTransferRequests() {
                           size="sm"
                           onClick={() => typeof page === 'number' && setCurrentPage(page)}
                           className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
-                            ? 'bg-purple-600 hover:bg-purple-700 text-white font-bold'
+                            ? 'bg-[#9c4a8f] hover:bg-[#9c4a8f] hover:text-white text-white font-bold'
                             : 'text-gray-600 hover:bg-gray-100'
                             }`}
                         >

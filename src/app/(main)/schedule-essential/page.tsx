@@ -16,6 +16,9 @@ import {
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { useGetAllScheduleQuery } from '../../../features/refillTransferScheduleRequiest/refillTransferScheduleRequiest';
+import { useCSVDownload } from '../../../hooks/useCSVDownload';
+import { useDownloadPDF } from '../../../hooks/useDownloadPDF';
+import { useDownloadXlShit } from '../../../hooks/useDownloadXlShit';
 
 // Import Dialog components
 import {
@@ -180,7 +183,11 @@ export default function HealthcareSchedule() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const itemsPerPage = 10;
 
-  const { data, isLoading } = useGetAllScheduleQuery({});
+  const { downloadCSV } = useCSVDownload();
+  const { downloadPDF } = useDownloadPDF();
+  const { downloadExcel } = useDownloadXlShit();
+
+  const { data, isLoading } = useGetAllScheduleQuery(currentPage, { pollingInterval: 5000 });
 
   // Transform API data
   const apiData = useMemo<TransformedScheduleRequest[]>(() => {
@@ -331,10 +338,10 @@ export default function HealthcareSchedule() {
   }, [apiData, searchQuery, statusFilter, dateRange]);
 
   // Paginate data
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = data?.meta?.totalPage || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = filteredData.slice(startIndex, endIndex);
+  const currentData = filteredData;
 
   const getPageNumbers = (): (number | string)[] => {
     const pages: (number | string)[] = [];
@@ -362,18 +369,48 @@ export default function HealthcareSchedule() {
 
   // Handle export functions
   const handleExportCSV = () => {
-    console.log('Export CSV', filteredData);
-    // Implement CSV export logic
+    const dataToExport = filteredData.map(item => ({
+      No: item.no,
+      PatientName: item.patientName,
+      Phone: item.phone,
+      PharmacyName: item.pharmacyName,
+      ServiceType: item.serviceType,
+      ScheduledDate: item.scheduledDate,
+      AvailableTimes: item.availableTimes,
+      RequestDate: item.requestDate,
+      Status: item.status,
+    }));
+    downloadCSV(dataToExport, 'schedule-requests');
   };
 
   const handleExportDocs = () => {
-    console.log('Export Docs', filteredData);
-    // Implement Docs export logic
+    const dataToExport = filteredData.map(item => ({
+      No: item.no,
+      PatientName: item.patientName,
+      Phone: item.phone,
+      PharmacyName: item.pharmacyName,
+      ServiceType: item.serviceType,
+      ScheduledDate: item.scheduledDate,
+      AvailableTimes: item.availableTimes,
+      RequestDate: item.requestDate,
+      Status: item.status,
+    }));
+    downloadExcel(dataToExport, 'schedule-requests');
   };
 
   const handleExportPDF = () => {
-    console.log('Export PDF', filteredData);
-    // Implement PDF export logic
+    const dataToExport = filteredData.map(item => ({
+      No: item.no,
+      PatientName: item.patientName,
+      Phone: item.phone,
+      PharmacyName: item.pharmacyName,
+      ServiceType: item.serviceType,
+      ScheduledDate: item.scheduledDate,
+      AvailableTimes: item.availableTimes,
+      RequestDate: item.requestDate,
+      Status: item.status,
+    }));
+    downloadPDF(dataToExport, 'schedule-requests');
   };
 
   if (isLoading) {
@@ -790,7 +827,7 @@ export default function HealthcareSchedule() {
                         size="sm"
                         onClick={() => typeof page === 'number' && setCurrentPage(page)}
                         className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
-                          ? 'bg-purple-600 hover:bg-purple-700 text-white font-bold'
+                          ? 'bg-[#9c4a8f] hover:bg-[#9c4a8f] hover:text-white text-white font-bold'
                           : 'text-gray-600 hover:bg-gray-100'
                           }`}
                       >

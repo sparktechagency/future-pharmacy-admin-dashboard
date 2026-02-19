@@ -12,8 +12,8 @@ export const blogApi = baseApi.injectEndpoints({
     }),
 
     getAllBlogs: builder.query({
-      query: () => ({
-        url: "/blog",
+      query: (page) => ({
+        url: `/blog?page=${page}`,
         method: "GET",
       }),
       providesTags: ["blog"],

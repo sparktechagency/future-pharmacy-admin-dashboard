@@ -4,8 +4,8 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const otherApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllOtherBussiness: builder.query({
-      query: () => ({
-        url: "/other-business",
+      query: (page) => ({
+        url: `/other-business?page=${page}`,
         method: "GET",
       }),
       providesTags: ["otherBusiness"],

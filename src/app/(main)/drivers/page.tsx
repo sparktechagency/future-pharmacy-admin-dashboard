@@ -59,7 +59,7 @@ export default function AllDriverList() {
   const { downloadExcel } = useDownloadXlShit();
   const { downloadPDF } = useDownloadPDF();
 
-  const { data: apiResponse, isLoading, error } = useGetAllDriverQuery({}, { pollingInterval: 5000 });
+  const { data: apiResponse, isLoading, error } = useGetAllDriverQuery(currentPage, { pollingInterval: 5000 });
 
 
 
@@ -103,10 +103,10 @@ export default function AllDriverList() {
   });
 
   // Paginate data
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = apiResponse?.meta?.totalPage || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = filteredData.slice(startIndex, endIndex);
+  const currentData = filteredData;
 
   const getPageNumbers = (): (number | string)[] => {
     const pages: (number | string)[] = [];
@@ -278,7 +278,7 @@ export default function AllDriverList() {
                       <td className="px-4 md:px-6 py-4 text-right">
                         <button
                           onClick={() => handleViewDetails(driver._id)}
-                          className="p-2 hover:bg-purple-100 text-purple-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-purple-100"
+                          className="p-2 cursor-pointer hover:bg-purple-100 text-purple-600 rounded-lg transition-all active:scale-95 shadow-sm bg-white border border-purple-100"
                           title="View details"
                         >
                           <Image
@@ -329,7 +329,7 @@ export default function AllDriverList() {
                           size="sm"
                           onClick={() => typeof page === 'number' && setCurrentPage(page)}
                           className={`h-8 w-8 min-w-[32px] md:h-9 md:w-9 md:min-w-[36px] p-0 text-xs font-bold transition-all ${currentPage === page
-                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-200 hover:bg-purple-700 active:scale-95'
+                            ? 'bg-[#9c4a8f] hover:bg-[#9c4a8f] hover:text-white text-white font-bold'
                             : 'text-gray-500 hover:bg-white hover:text-purple-600 hover:shadow-sm'
                             }`}
                         >

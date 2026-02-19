@@ -4,8 +4,8 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const paymentApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllPayment: builder.query({
-      query: () => ({
-        url: "/payment",
+      query: (page) => ({
+        url: `/payment?page=${page}`,
         method: "GET",
       }),
       providesTags: ["payment"],

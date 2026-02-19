@@ -606,7 +606,7 @@ const PrescriptionRequestsTable = () => {
                           size="sm"
                           onClick={() => typeof page === 'number' && setCurrentPage(page)}
                           className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
-                            ? "bg-purple-600 text-white hover:bg-purple-700 font-bold"
+                            ? "bg-[#9c4a8f] hover:bg-[#9c4a8f] hover:text-white text-white font-bold"
                             : "text-gray-600 hover:bg-gray-100"
                             }`}
                         >

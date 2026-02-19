@@ -22,7 +22,6 @@ import Image from 'next/image';
 import React, { ReactElement, ReactNode, useState } from 'react';
 import { Button } from '../../../components/ui/button';
 import { useGetAllDriverQuery } from '../../../features/driver/driverApi';
-import { useGetAllPharmacyQuery } from "../../../features/fharmacy/fharmacyApi";
 import { useGetAllIndependentPharmacyQuery } from "../../../features/independentPharmacy/IndependentApi";
 import { useGetAllInvestorsQuery } from "../../../features/investor/investorApi";
 import { useGetAllOtherBussinessQuery } from "../../../features/other/otherAPi";
@@ -445,8 +444,12 @@ const ViewDetailsDialog = ({ type, data, children }: ViewDetailsDialogProps) => 
 const PharmacyTab = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
-  const { data: independentResponse, isLoading } = useGetAllIndependentPharmacyQuery({}, { pollingInterval: 5000 });
+  const { data: independentResponse, isLoading } = useGetAllIndependentPharmacyQuery(currentPage, { pollingInterval: 5000 });
+
+  const totalPages = independentResponse?.meta?.totalPage || 1;
 
   // Filter pharmacy data based on search and status
   const filteredPharmacyData = independentResponse?.data?.filter((pharmacy: IndependentPharmacy) => {
@@ -512,7 +515,9 @@ const PharmacyTab = () => {
                   {filteredPharmacyData.length > 0 ? (
                     filteredPharmacyData.map((item: IndependentPharmacy, index: number) => (
                       <tr key={item._id} className="hover:bg-purple-50/30 transition-colors group">
-                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">{String(index + 1).padStart(2, '0')}</td>
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">
+                          {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
+                        </td>
                         <td className="px-4 md:px-6 py-4">
                           <div className="flex flex-col">
                             <span className="text-xs md:text-sm font-bold text-gray-900 line-clamp-1">{item.name}</span>
@@ -562,7 +567,56 @@ const PharmacyTab = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
             <div className="text-xs md:text-sm text-gray-600 font-medium">
-              Showing <span className="text-purple-600 font-bold">{filteredPharmacyData.length}</span> of <span className="text-purple-600 font-bold">{independentResponse?.meta?.total || 0}</span> pharmacies
+              Showing <span className="text-purple-600 font-bold">{Math.min((currentPage - 1) * itemsPerPage + 1, independentResponse?.meta?.total || 0)}</span> to <span className="text-purple-600 font-bold">{Math.min(currentPage * itemsPerPage, independentResponse?.meta?.total || 0)}</span> of <span className="text-purple-600 font-bold">{independentResponse?.meta?.total || 0}</span> pharmacies
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Prev
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    if (totalPages <= 5) return true;
+                    if (page === 1 || page === totalPages) return true;
+                    return page >= currentPage - 1 && page <= currentPage + 1;
+                  })
+                  .map((page, index, array) => (
+                    <React.Fragment key={page}>
+                      {index > 0 && array[index - 1] !== page - 1 && (
+                        <span className="px-1 text-gray-400">...</span>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
+                          ? ' hover:text-white hover:bg-[#9c4a8f] bg-[#9c4a8f] text-white font-bold'
+                          : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                      >
+                        {String(page).padStart(2, '0')}
+                      </Button>
+                    </React.Fragment>
+                  ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Next
+              </Button>
             </div>
           </div>
         </div>
@@ -576,8 +630,12 @@ const DriverTab = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [dateRange, setDateRange] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
-  const { data: driverResponse, isLoading } = useGetAllDriverQuery({}, { pollingInterval: 5000 });
+  const { data: driverResponse, isLoading } = useGetAllDriverQuery(currentPage, { pollingInterval: 5000 });
+
+  const totalPages = driverResponse?.meta?.totalPage || 1;
 
   // Filter driver data based on search and status
   const filteredDriverData = driverResponse?.data?.filter((driver: Driver) => {
@@ -653,7 +711,9 @@ const DriverTab = () => {
                   {filteredDriverData.length > 0 ? (
                     filteredDriverData.map((item: Driver, index: number) => (
                       <tr key={item._id} className="hover:bg-blue-50/30 transition-colors group">
-                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">{String(index + 1).padStart(2, '0')}</td>
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">
+                          {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
+                        </td>
                         <td className="px-4 md:px-6 py-4">
                           <div className="flex flex-col">
                             <span className="text-xs md:text-sm font-bold text-gray-900">{item.name}</span>
@@ -704,9 +764,58 @@ const DriverTab = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
             <div className="text-xs md:text-sm text-gray-600 font-medium text-center sm:text-left">
-              Showing <span className="text-blue-600 font-bold">{filteredDriverData.length}</span> of <span className="text-blue-600 font-bold">{driverResponse?.meta?.total || 0}</span> drivers
+              Showing <span className="text-blue-600 font-bold">{Math.min((currentPage - 1) * itemsPerPage + 1, driverResponse?.meta?.total || 0)}</span> to <span className="text-blue-600 font-bold">{Math.min(currentPage * itemsPerPage, driverResponse?.meta?.total || 0)}</span> of <span className="text-blue-600 font-bold">{driverResponse?.meta?.total || 0}</span> drivers
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Prev
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    if (totalPages <= 5) return true;
+                    if (page === 1 || page === totalPages) return true;
+                    return page >= currentPage - 1 && page <= currentPage + 1;
+                  })
+                  .map((page, index, array) => (
+                    <React.Fragment key={page}>
+                      {index > 0 && array[index - 1] !== page - 1 && (
+                        <span className="px-1 text-gray-400">...</span>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
+                          ? 'hover:text-white hover:bg-[#9c4a8f] bg-[#9c4a8f] text-white font-bold'
+                          : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                      >
+                        {String(page).padStart(2, '0')}
+                      </Button>
+                    </React.Fragment>
+                  ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Next
+              </Button>
             </div>
           </div>
         </div>
@@ -720,8 +829,12 @@ const InvestorTab = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [dateRange, setDateRange] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
-  const { data: investorResponse, isLoading } = useGetAllInvestorsQuery({}, { pollingInterval: 5000 });
+  const { data: investorResponse, isLoading } = useGetAllInvestorsQuery(currentPage, { pollingInterval: 5000 });
+
+  const totalPages = investorResponse?.meta?.totalPage || 1;
 
   // Filter investor data based on search and status
   const filteredInvestorData = investorResponse?.data?.filter((investor: Investor) => {
@@ -799,7 +912,9 @@ const InvestorTab = () => {
                   {filteredInvestorData.length > 0 ? (
                     filteredInvestorData.map((item: Investor, index: number) => (
                       <tr key={item._id} className="hover:bg-emerald-50/30 transition-colors group">
-                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">{String(index + 1).padStart(2, '0')}</td>
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">
+                          {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
+                        </td>
                         <td className="px-4 md:px-6 py-4">
                           <span className="text-xs md:text-sm font-bold text-gray-900">{item.name}</span>
                         </td>
@@ -843,9 +958,58 @@ const InvestorTab = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
             <div className="text-xs md:text-sm text-gray-600 font-medium text-center sm:text-left">
-              Showing <span className="text-emerald-600 font-bold">{filteredInvestorData.length}</span> of <span className="text-emerald-600 font-bold">{investorResponse?.meta?.total || 0}</span> investors
+              Showing <span className="text-emerald-600 font-bold">{Math.min((currentPage - 1) * itemsPerPage + 1, investorResponse?.meta?.total || 0)}</span> to <span className="text-emerald-600 font-bold">{Math.min(currentPage * itemsPerPage, investorResponse?.meta?.total || 0)}</span> of <span className="text-emerald-600 font-bold">{investorResponse?.meta?.total || 0}</span> investors
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Prev
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    if (totalPages <= 5) return true;
+                    if (page === 1 || page === totalPages) return true;
+                    return page >= currentPage - 1 && page <= currentPage + 1;
+                  })
+                  .map((page, index, array) => (
+                    <React.Fragment key={page}>
+                      {index > 0 && array[index - 1] !== page - 1 && (
+                        <span className="px-1 text-gray-400">...</span>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
+                          ? 'bg-[#9c4a8f] text-white font-bold'
+                          : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                      >
+                        {String(page).padStart(2, '0')}
+                      </Button>
+                    </React.Fragment>
+                  ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Next
+              </Button>
             </div>
           </div>
         </div>
@@ -859,8 +1023,12 @@ const OtherTab = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [dateRange, setDateRange] = useState<string>('');
   const [status, setStatus] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
-  const { data: otherBusinessResponse, isLoading } = useGetAllOtherBussinessQuery({}, { pollingInterval: 5000 });
+  const { data: otherBusinessResponse, isLoading } = useGetAllOtherBussinessQuery(currentPage, { pollingInterval: 5000 });
+
+  const totalPages = otherBusinessResponse?.meta?.totalPage || 1;
 
   // Filter other business data based on search and status
   const filteredOtherBusinessData = otherBusinessResponse?.data?.filter((business: OtherBussiness) => {
@@ -937,7 +1105,9 @@ const OtherTab = () => {
                   {filteredOtherBusinessData.length > 0 ? (
                     filteredOtherBusinessData.map((item: OtherBussiness, index: number) => (
                       <tr key={item._id} className="hover:bg-amber-50/30 transition-colors group">
-                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">{String(index + 1).padStart(2, '0')}</td>
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">
+                          {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
+                        </td>
                         <td className="px-4 md:px-6 py-4">
                           <div className="flex flex-col text-sm">
                             <span className="font-bold text-gray-900 line-clamp-1">{item.name}</span>
@@ -983,9 +1153,58 @@ const OtherTab = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
             <div className="text-xs md:text-sm text-gray-600 font-medium text-center sm:text-left">
-              Showing <span className="text-amber-600 font-bold">{filteredOtherBusinessData.length}</span> of <span className="text-amber-600 font-bold">{otherBusinessResponse?.meta?.total || 0}</span> legal entities
+              Showing <span className="text-amber-600 font-bold">{Math.min((currentPage - 1) * itemsPerPage + 1, otherBusinessResponse?.meta?.total || 0)}</span> to <span className="text-amber-600 font-bold">{Math.min(currentPage * itemsPerPage, otherBusinessResponse?.meta?.total || 0)}</span> of <span className="text-amber-600 font-bold">{otherBusinessResponse?.meta?.total || 0}</span> legal entities
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Prev
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    if (totalPages <= 5) return true;
+                    if (page === 1 || page === totalPages) return true;
+                    return page >= currentPage - 1 && page <= currentPage + 1;
+                  })
+                  .map((page, index, array) => (
+                    <React.Fragment key={page}>
+                      {index > 0 && array[index - 1] !== page - 1 && (
+                        <span className="px-1 text-gray-400">...</span>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
+                          ? 'bg-[#9c4a8f] hover:bg-[#9c4a8f] hover:text-white text-white font-bold'
+                          : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                      >
+                        {String(page).padStart(2, '0')}
+                      </Button>
+                    </React.Fragment>
+                  ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Next
+              </Button>
             </div>
           </div>
         </div>
@@ -997,9 +1216,6 @@ const OtherTab = () => {
 // Main App Component
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('pharmacy');
-
-  // ✅ Call hooks ONCE at component top level
-  const { data: pharmacyResponse } = useGetAllPharmacyQuery({}, { pollingInterval: 5000 });
   const { data: independentResponse } = useGetAllIndependentPharmacyQuery({}, { pollingInterval: 5000 });
   const { data: driverResponse } = useGetAllDriverQuery({}, { pollingInterval: 5000 });
   const { data: investorResponse } = useGetAllInvestorsQuery({}, { pollingInterval: 5000 });
@@ -1256,8 +1472,8 @@ export default function App() {
         <div className="p-4 md:p-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 border-b border-gray-100 pb-6">
             <div className="w-full lg:w-auto overflow-hidden">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList value={activeTab} onValueChange={setActiveTab}>
+              <Tabs value={activeTab} onValueChange={setActiveTab} >
+                <TabsList value={activeTab} onValueChange={setActiveTab} >
                   <TabsTrigger tabValue="pharmacy" value={activeTab} onValueChange={setActiveTab}>
                     Independent Pharmacy
                   </TabsTrigger>

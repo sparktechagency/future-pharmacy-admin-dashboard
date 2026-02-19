@@ -4,24 +4,24 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const refillTransferScheduleRequiestApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllSchedule: builder.query({
-      query: () => ({
-        url: `/refill-transfer-schedule-request?requiestType=schedule`,
+      query: (page) => ({
+        url: `/refill-transfer-schedule-request?requiestType=schedule&page=${page}`,
         method: "GET",
       }),
       providesTags: ["refillTransferScheduleRequiest"],
     }),
 
     getAllTransfer: builder.query({
-      query: () => ({
-        url: `/refill-transfer-schedule-request?requiestType=transfer`,
+      query: (page) => ({
+        url: `/refill-transfer-schedule-request?requiestType=transfer&page=${page}`,
         method: "GET",
       }),
       providesTags: ["refillTransferScheduleRequiest"],
     }),
 
     getAllrefill: builder.query({
-      query: () => ({
-        url: `/refill-transfer-schedule-request?requiestType=refill`,
+      query: (page) => ({
+        url: `/refill-transfer-schedule-request?requiestType=refill&page=${page}`,
         method: "GET",
       }),
       providesTags: ["refillTransferScheduleRequiest"],

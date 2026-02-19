@@ -4,8 +4,8 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const fharmacyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllPharmacy: builder.query({
-      query: () => ({
-        url: "/pharmacies",
+      query: (page) => ({
+        url: `/pharmacies?page=${page}`,
         method: "GET",
       }),
       providesTags: ["pharmacy"],

@@ -4,8 +4,8 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUsers: builder.query({
-      query: () => ({
-        url: "/users/all-users",
+      query: (page) => ({
+        url: `/users/all-users?page=${page}`,
         method: "GET",
       }),
       providesTags: ["users"],

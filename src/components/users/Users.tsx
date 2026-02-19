@@ -84,11 +84,91 @@ const Dialog = ({ open, onOpenChange, children }: DialogProps) => {
 
 const DialogContent = ({ children, className = '' }: DialogContentProps) => {
   return (
-    <div className={`bg-white rounded-lg shadow-xl w-full max-w-2xl p-6 animate-in zoom-in-95 fade-in duration-200 ${className}`}>
+    <div className={`bg-white rounded-lg shadow-xl animate-in zoom-in-95 fade-in duration-200 ${className}`}>
       {children}
     </div>
   );
 };
+
+const UserDetailsSkeleton = () => (
+  <div className="space-y-6 animate-pulse">
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 rounded-full bg-gray-200" />
+      <div className="space-y-2">
+        <div className="h-6 w-48 bg-gray-200 rounded" />
+        <div className="h-4 w-32 bg-gray-200 rounded" />
+      </div>
+      <div className="ml-auto flex gap-2">
+        <div className="h-8 w-16 bg-gray-200 rounded" />
+        <div className="h-8 w-16 bg-gray-200 rounded" />
+      </div>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-8">
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-gray-200 rounded" />
+                <div className="space-y-1">
+                  <div className="h-3 w-20 bg-gray-100 rounded" />
+                  <div className="h-4 w-40 bg-gray-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-gray-200 rounded" />
+                <div className="space-y-1">
+                  <div className="h-3 w-20 bg-gray-100 rounded" />
+                  <div className="h-4 w-32 bg-gray-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-8">
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-gray-200 rounded" />
+                <div className="space-y-1">
+                  <div className="h-3 w-20 bg-gray-100 rounded" />
+                  <div className="h-4 w-40 bg-gray-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
+          <div className="space-y-4">
+            {[1, 2].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-gray-200 rounded" />
+                <div className="space-y-1">
+                  <div className="h-3 w-20 bg-gray-100 rounded" />
+                  <div className="h-4 w-32 bg-gray-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 // Input Component
 const Input = ({ className = '', ...props }: InputProps) => {
@@ -137,14 +217,12 @@ export default function UserManagement() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
 
-  const { data, isLoading, refetch } = useGetAllUsersQuery({});
-
+  const { data, isLoading, refetch } = useGetAllUsersQuery(currentPage);
 
   const { data: userDetailsData, isLoading: userDetailsLoading } = useViewUserDetailsQuery(
     selectedUserId || '',
     { skip: !selectedUserId }
   );
-
 
   const [updateBlockAndUnblock, { isLoading: isUpdating }] = useUpdateBlockAndUnblockMutation();
 
@@ -201,10 +279,10 @@ export default function UserManagement() {
   });
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const totalPages = data?.meta?.totalPage || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentUsers = filteredUsers.slice(startIndex, endIndex);
+  const currentUsers = filteredUsers;
 
   // Generate page numbers
   const getPageNumbers = (): (number | string)[] => {
@@ -459,27 +537,26 @@ export default function UserManagement() {
         )}
       </div>
 
-      {/* User Details Modal */}
       <Dialog open={showUserDetailsModal} onOpenChange={closeUserDetailsModal}>
-        <DialogContent className="max-w-2xl">
-          {userDetailsLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="w-8 h-8 border-4 border-[#8E4484] border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : userDetailsData?.data ? (
-            <>
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">User Details</h2>
-                <button
-                  onClick={closeUserDetailsModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+        <DialogContent className="max-w-2xl w-full h-[600px] flex flex-col p-0 overflow-hidden">
+          {/* Fixed Header */}
+          <div className="flex justify-between items-center p-6 border-b bg-white">
+            <h2 className="text-xl font-semibold text-gray-900">User Details</h2>
+            <button
+              onClick={closeUserDetailsModal}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-6">
+            {userDetailsLoading ? (
+              <UserDetailsSkeleton />
+            ) : userDetailsData?.data ? (
               <div className="space-y-6">
                 {/* User Profile Header */}
                 <div className="flex items-center gap-4">
@@ -513,7 +590,7 @@ export default function UserManagement() {
                 </div>
 
                 {/* User Information Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
                     <div>
                       <Label className="text-gray-500 text-sm">Personal Information</Label>
@@ -646,18 +723,17 @@ export default function UserManagement() {
                   </div>
                 </div>
               </div>
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500">Unable to load user details</p>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500">Unable to load user details</p>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Block/Unblock Confirmation Modal */}
       <Dialog open={showBlockModal} onOpenChange={setShowBlockModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md w-full p-6">
           <div className="text-center">
             <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <Ban size={32} className="text-red-600" />

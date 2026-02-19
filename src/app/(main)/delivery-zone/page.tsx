@@ -29,6 +29,8 @@ interface RTKError {
 }
 
 const DeliveryZoneTable = () => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedZone, setSelectedZone] = useState<DeliveryZone | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState<boolean>(false);
@@ -52,7 +54,9 @@ const DeliveryZoneTable = () => {
     isLoading,
     isError,
     refetch
-  } = useGetAlldeliveryZoneQuery(undefined);
+  } = useGetAlldeliveryZoneQuery(currentPage);
+
+  const totalPages = apiResponse?.meta?.totalPage || 1;
 
   const [createZone, { isLoading: isCreating }] = useCreatedeliveryZoneMutation();
   const [deleteZone, { isLoading: isDeleting }] = useDeletedeliveryZoneMutation();
@@ -246,6 +250,7 @@ const DeliveryZoneTable = () => {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">No</th>
                     <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Email Address</th>
                     <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Zip Code</th>
                     <th className="px-4 md:px-6 py-4 text-left text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">Created</th>
@@ -255,13 +260,16 @@ const DeliveryZoneTable = () => {
                 <tbody className="divide-y divide-gray-100 bg-white">
                   {filteredZones.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500 italic">
+                      <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-500 italic">
                         {searchQuery ? 'No delivery zones found matching your search' : 'No delivery zones available'}
                       </td>
                     </tr>
                   ) : (
-                    filteredZones.map((zone) => (
+                    filteredZones.map((zone, index) => (
                       <tr key={zone._id} className="hover:bg-purple-50/30 transition-colors group">
+                        <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-500 font-mono">
+                          {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, '0')}
+                        </td>
                         <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-medium break-all max-w-[150px] md:max-w-none">
                           {zone.email}
                         </td>
@@ -275,7 +283,7 @@ const DeliveryZoneTable = () => {
                           <div className="flex items-center justify-end gap-1 md:gap-2">
                             <button
                               onClick={() => handleViewDetails(zone)}
-                              className="p-2 hover:bg-purple-100 text-gray-400 hover:text-purple-600 rounded-lg transition-all"
+                              className="p-2 cursor-pointer hover:bg-purple-100 text-gray-400 hover:text-purple-600 rounded-lg transition-all"
                               title="View details"
                             >
                               <Eye className="w-4 h-4 md:w-5 md:h-5" />
@@ -283,7 +291,7 @@ const DeliveryZoneTable = () => {
 
                             <button
                               onClick={() => handleDeleteZone(zone)}
-                              className="p-2 hover:bg-red-100 text-gray-400 hover:text-red-600 rounded-lg transition-all"
+                              className="p-2 cursor-pointer hover:bg-red-100 text-gray-400 hover:text-red-600 rounded-lg transition-all"
                               title="Delete zone"
                               disabled={isDeleting}
                             >
@@ -299,6 +307,64 @@ const DeliveryZoneTable = () => {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {!isLoading && !isError && filteredZones.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 md:p-6 bg-gray-50 rounded-b-lg border-t border-gray-200">
+            <div className="text-xs md:text-sm text-gray-600 font-medium">
+              Showing <span className="text-purple-600 font-bold">{Math.min((currentPage - 1) * itemsPerPage + 1, apiResponse?.meta?.total || 0)}</span> to <span className="text-purple-600 font-bold">{Math.min(currentPage * itemsPerPage, apiResponse?.meta?.total || 0)}</span> of <span className="text-purple-600 font-bold">{apiResponse?.meta?.total || 0}</span> zones
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Prev
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    if (totalPages <= 5) return true;
+                    if (page === 1 || page === totalPages) return true;
+                    return page >= currentPage - 1 && page <= currentPage + 1;
+                  })
+                  .map((page, index, array) => (
+                    <React.Fragment key={page}>
+                      {index > 0 && array[index - 1] !== page - 1 && (
+                        <span className="px-1 text-gray-400 italic">...</span>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className={`h-8 w-8 md:h-10 md:w-10 p-0 text-xs md:text-sm ${currentPage === page
+                          ? 'bg-[#9c4a8f] hover:bg-[#9c4a8f] hover:text-white text-white font-bold'
+                          : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                      >
+                        {String(page).padStart(2, '0')}
+                      </Button>
+                    </React.Fragment>
+                  ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="text-gray-600 hover:bg-gray-100 h-8 px-2 md:h-10 md:px-4"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Delivery Zone Modal */}
@@ -401,7 +467,7 @@ const DeliveryZoneTable = () => {
                 Delete Zone?
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Are you sure you want to delete the zone for <span className="font-bold text-gray-700">{zoneToDelete.email}</span> ({zoneToDelete.zipCode})? This cannot be undone.
+                Are you sure you want to delete the zone for <span className="font-bold text-gray-700">{zoneToDelete?.email}</span> ({zoneToDelete?.zipCode})? This cannot be undone.
               </p>
             </div>
 
@@ -457,32 +523,32 @@ const DeliveryZoneTable = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white transition-all group">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400">Email Address</p>
-                  <p className="text-sm md:text-base font-semibold text-gray-900 break-all">{selectedZone.email}</p>
+                  <p className="text-sm md:text-base font-semibold text-gray-900 break-all">{selectedZone?.email}</p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white transition-all group">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400">Zip Code</p>
-                  <p className="text-sm md:text-base font-semibold text-gray-900 font-mono italic">{selectedZone.zipCode}</p>
+                  <p className="text-sm md:text-base font-semibold text-gray-900 font-mono italic">{selectedZone?.zipCode}</p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white transition-all group">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400">Created At</p>
                   <p className="text-sm md:text-base font-semibold text-gray-900">
-                    {selectedZone.createdAt ? formatDate(selectedZone.createdAt) : 'N/A'}
+                    {selectedZone?.createdAt ? formatDate(selectedZone.createdAt as string) : 'N/A'}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-white transition-all group">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400">Updated At</p>
                   <p className="text-sm md:text-base font-semibold text-gray-900">
-                    {selectedZone.updatedAt ? formatDate(selectedZone.updatedAt) : 'N/A'}
+                    {selectedZone?.updatedAt ? formatDate(selectedZone.updatedAt as string) : 'N/A'}
                   </p>
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-gray-50/50 border border-gray-100 shadow-inner">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Zone ID Reference</p>
-                <p className="text-[11px] md:text-xs font-mono text-gray-500 break-all leading-relaxed">{selectedZone._id}</p>
+                <p className="text-[11px] md:text-xs font-mono text-gray-500 break-all leading-relaxed">{selectedZone?._id}</p>
               </div>
             </div>
 

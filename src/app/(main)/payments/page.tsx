@@ -68,7 +68,7 @@ export default function TransactionsList() {
   const { downloadPDF } = useDownloadPDF();
   const { downloadCSV } = useCSVDownload();
 
-  const { data: apiResponse, isLoading, error } = useGetAllPaymentQuery({}, { pollingInterval: 5000 });
+  const { data: apiResponse, isLoading, error } = useGetAllPaymentQuery(currentPage, { pollingInterval: 5000 });
 
   const payments = useMemo<Payment[]>(() => {
     return apiResponse?.data?.result || [];
@@ -112,10 +112,10 @@ export default function TransactionsList() {
     });
   }, [payments, searchQuery, statusFilter, dateRange]);
 
-  const totalPages = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
+  const totalPages = apiResponse?.meta?.totalPage || 1;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentPayments = filteredPayments.slice(startIndex, endIndex);
+  const currentPayments = filteredPayments;
 
   const getStatusStyles = (status: string): string => {
     const uiStatus = statusMap[status] || 'Failed';
@@ -341,7 +341,7 @@ export default function TransactionsList() {
                       size="sm"
                       onClick={() => typeof page === 'number' && setCurrentPage(page)}
                       className={`h-8 w-8 min-w-[32px] md:h-9 md:w-9 md:min-w-[36px] p-0 text-xs font-bold transition-all ${currentPage === page
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95'
+                        ? 'bg-[#9c4a8f] hover:bg-[#9c4a8f] hover:text-white text-white font-bold'
                         : 'text-gray-500 hover:bg-white hover:text-blue-600 hover:shadow-sm'
                         }`}
                     >

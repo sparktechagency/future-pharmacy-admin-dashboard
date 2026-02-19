@@ -4,15 +4,15 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const driverApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllDriver: builder.query({
-      query: () => ({
-        url: "/driver",
+      query: (page) => ({
+        url: `/driver?page=${page}`,
         method: "GET",
       }),
       providesTags: ["Driver"],
     }),
 
 
-    
+
     getSingleDriver: builder.query({
       query: (id) => ({
         url: `/driver/${id}`,
