@@ -60,6 +60,20 @@ const PrescriptionRequestsTable = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedRequest, setSelectedRequest] = useState<PrescriptionRequest | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
+
+  // Load viewed IDs from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('viewed_prescription_requests');
+    if (saved) {
+      try {
+        setViewedIds(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to parse viewed IDs', e);
+      }
+    }
+  }, []);
+
   const { downloadCSV } = useCSVDownload();
   const { downloadPDF } = useDownloadPDF();
   const { downloadExcel } = useDownloadXlShit();
@@ -149,6 +163,13 @@ const PrescriptionRequestsTable = () => {
   const handleViewDetails = (request: PrescriptionRequest) => {
     setSelectedRequest(request);
     setIsDialogOpen(true);
+
+    // Mark as viewed
+    if (!viewedIds.has(request.order._id)) {
+      const newViewed = new Set(viewedIds).add(request.order._id);
+      setViewedIds(newViewed);
+      localStorage.setItem('viewed_prescription_requests', JSON.stringify(Array.from(newViewed)));
+    }
   };
 
   // Handle export functions
@@ -515,9 +536,14 @@ const PrescriptionRequestsTable = () => {
                         #{request.id}
                       </td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
-                        <div>
-                          <div className="font-medium">{request.patientName}</div>
-                          <div className="text-[10px] md:text-xs text-gray-500 line-clamp-1">{request.order.email}</div>
+                        <div className="flex items-center gap-2">
+                          {!viewedIds.has(request.order._id) && (
+                            <div className="w-2 h-2 rounded-full bg-[#9c4a8f] animate-pulse shrink-0" title="New request" />
+                          )}
+                          <div>
+                            <div className="font-medium">{request.patientName}</div>
+                            <div className="text-[10px] md:text-xs text-gray-500 line-clamp-1">{request.order.email}</div>
+                          </div>
                         </div>
                       </td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">

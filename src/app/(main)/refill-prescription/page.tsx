@@ -132,6 +132,19 @@ export default function RefillPrescriptionRequests() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedRequest, setSelectedRequest] = useState<PrescriptionRequest | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
+
+  // Load viewed IDs from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('viewed_refill_requests');
+    if (saved) {
+      try {
+        setViewedIds(new Set(JSON.parse(saved)));
+      } catch (e) {
+        console.error('Failed to parse viewed IDs', e);
+      }
+    }
+  }, []);
   const itemsPerPage = 10;
 
   const { data, isLoading } = useGetAllrefillQuery(currentPage);
@@ -244,6 +257,13 @@ export default function RefillPrescriptionRequests() {
   const handleViewDetails = (request: PrescriptionRequest) => {
     setSelectedRequest(request);
     setIsDialogOpen(true);
+
+    // Mark as viewed
+    if (!viewedIds.has(request._id)) {
+      const newViewed = new Set(viewedIds).add(request._id);
+      setViewedIds(newViewed);
+      localStorage.setItem('viewed_refill_requests', JSON.stringify(Array.from(newViewed)));
+    }
   };
 
   // Handle export functions (placeholder - implement based on your needs)
@@ -543,11 +563,18 @@ export default function RefillPrescriptionRequests() {
                 currentData.map((item: TransformedRequest) => (
                   <tr key={item._id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-mono">{item.refId}</td>
-                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">{item.patientName}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
+                      <div className="flex items-center gap-2">
+                        {!viewedIds.has(item._id) && (
+                          <div className="w-2 h-2 rounded-full bg-[#9c4a8f] animate-pulse shrink-0" title="New request" />
+                        )}
+                        <span>{item.patientName}</span>
+                      </div>
+                    </td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 max-w-[150px] md:max-w-xs truncate">{item.prescription}</td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 truncate">{item.pharmacyName}</td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">{item.date}</td>
-                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 border-none">
                       <Badge
                         variant="secondary"
                         className={`${getStatusBadgeClass(item.originalStatus)} border-none text-[10px] md:text-xs font-medium px-2 py-0.5 whitespace-nowrap`}
