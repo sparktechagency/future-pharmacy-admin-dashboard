@@ -79,7 +79,7 @@ const PrescriptionRequestsTable = () => {
   const { downloadExcel } = useDownloadXlShit();
 
   // Fetch data from API
-  const { data: apiResponse, isLoading } = useGetAllPrescriptionQuery({});
+  const { data: apiResponse, isLoading } = useGetAllPrescriptionQuery(currentPage);
 
   // Transform API data to match frontend format
   const transformedData: PrescriptionRequest[] = useMemo(() => {
@@ -121,9 +121,9 @@ const PrescriptionRequestsTable = () => {
 
   // Pagination
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  const totalPages = apiResponse?.meta?.totalPage || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedRequests = filteredRequests.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedRequests = filteredRequests;
 
   const getPageNumbers = (): (number | string)[] => {
     const pages: (number | string)[] = [];
@@ -395,12 +395,7 @@ const PrescriptionRequestsTable = () => {
                                 {selectedRequest.order.userId || 'Guest User'}
                               </span>
                             </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
-                              <span className="font-medium text-gray-700 sm:min-w-32">Deleted:</span>
-                              <span className="text-gray-900">
-                                {selectedRequest.order.isDeleted ? 'Yes' : 'No'}
-                              </span>
-                            </div>
+
                           </div>
                         </div>
                       </div>
@@ -514,7 +509,7 @@ const PrescriptionRequestsTable = () => {
                     Pharmacy Name
                   </th>
                   <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
-                    Type(man)
+                    User Type
                   </th>
 
                   <th className="px-2 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-600">
@@ -549,14 +544,12 @@ const PrescriptionRequestsTable = () => {
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                         <div>
                           <div className="line-clamp-1">{request.pharmacyName}</div>
-                          <div className="text-[10px] md:text-xs text-gray-500">
-                            {request.order.typeUser === 'registered' ? 'Registered' : 'Guest'}
-                          </div>
+
                         </div>
                       </td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                         <div>
-                          <div>{request.order.typeUser ? "Yes" : "No"}</div>
+                          {request.order.typeUser === 'registered' ? 'Member' : 'Guest'}
                         </div>
                       </td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
@@ -608,7 +601,7 @@ const PrescriptionRequestsTable = () => {
           {filteredRequests.length > 0 && (
             <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-xs md:text-sm text-gray-600 order-2 sm:order-1 text-center sm:text-left">
-                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredRequests.length)} of {filteredRequests.length} entries
+                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, apiResponse?.meta?.total || filteredRequests.length)} of {apiResponse?.meta?.total || filteredRequests.length} entries
               </div>
               <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
                 <Button
