@@ -395,7 +395,12 @@ const PrescriptionRequestsTable = () => {
                                 {selectedRequest.order.userId || 'Guest User'}
                               </span>
                             </div>
-
+                            {/* <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                              <span className="font-medium text-gray-700 sm:min-w-32">Deleted:</span>
+                              <span className="text-gray-900">
+                                {selectedRequest.order.isDeleted ? 'Yes' : 'No'}
+                              </span>
+                            </div> */}
                           </div>
                         </div>
                       </div>
@@ -544,15 +549,9 @@ const PrescriptionRequestsTable = () => {
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                         <div>
                           <div className="line-clamp-1">{request.pharmacyName}</div>
-                          <div className="text-[10px] md:text-xs text-gray-500">
-                            {request.order.typeUser === 'registered' ? 'Registered' : 'Guest'}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
-                        <div>
-                          <div className="line-clamp-1">{request.pharmacyName}</div>
-
+                          {/* <div className="text-[10px] md:text-xs text-gray-500">
+                            {request.order.typeUser === 'registered' ? 'Member' : 'Guest'}
+                          </div> */}
                         </div>
                       </td>
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
