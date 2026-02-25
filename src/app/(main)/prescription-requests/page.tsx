@@ -544,6 +544,14 @@ const PrescriptionRequestsTable = () => {
                       <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                         <div>
                           <div className="line-clamp-1">{request.pharmacyName}</div>
+                          <div className="text-[10px] md:text-xs text-gray-500">
+                            {request.order.typeUser === 'registered' ? 'Registered' : 'Guest'}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
+                        <div>
+                          <div className="line-clamp-1">{request.pharmacyName}</div>
 
                         </div>
                       </td>
