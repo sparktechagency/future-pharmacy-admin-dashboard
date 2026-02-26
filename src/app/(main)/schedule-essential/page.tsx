@@ -147,7 +147,7 @@ const getScheduledDate = (pharmacyInfo: PharmacyInfo): string => {
 
 // Helper function to get assigned driver (placeholder - replace with actual logic)
 const getAssignedDriver = (request: ScheduleRequest): string => {
-  console.log(request);
+
   // This is a placeholder - you'll need to implement actual driver assignment logic
   // For now, return a placeholder or leave empty
   return 'Not assigned';
@@ -262,12 +262,10 @@ export default function HealthcareSchedule() {
 
 
     const incomingRequests = apiData.length;
-    const pendingRequests = apiData.filter((req: TransformedScheduleRequest) => req.status === 'pending').length;
-    console.log(pendingRequests);
-    const completedRequests = apiData.filter((req: TransformedScheduleRequest) =>
-      req.status === 'completed' || req.status === 'approved'
-    ).length;
-    console.log(completedRequests);
+    // const pendingRequests = apiData.filter((req: TransformedScheduleRequest) => req.status === 'pending').length;
+    // const completedRequests = apiData.filter((req: TransformedScheduleRequest) =>
+    //   req.status === 'completed' || req.status === 'approved'
+    // ).length;
 
 
     // These would need to come from separate API calls
@@ -440,7 +438,7 @@ export default function HealthcareSchedule() {
     );
   }
 
-  console.log(stats)
+
   return (
     <div className="flex flex-col gap-5">
       {/* Statistics Section */}
@@ -782,8 +780,7 @@ export default function HealthcareSchedule() {
                     </td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <div className="flex flex-col">
-                        <span className="font-medium">{item.scheduledDate}</span>
-                        <span className="text-[10px] md:text-xs text-gray-500">Requested: {item.requestDate}</span>
+                        <span className="font-medium">{item.requestDate}</span>
                       </div>
                     </td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">

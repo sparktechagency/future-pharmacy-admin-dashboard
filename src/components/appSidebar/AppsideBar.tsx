@@ -60,7 +60,7 @@ const sidebars: SidebarItem[] = [
   { name: "Zip Code", path: "/zip-code", icon: SquareChartGantt },
   { name: "Delivery Zone", path: "/delivery-zone", icon: MapPin },
   { name: "Drivers", path: "/drivers", icon: Car },
-  { name: "Contact", path: "/contact", icon: Phone },
+  { name: "Contact Us", path: "/contact", icon: Phone },
   { name: "Blog", path: "/blogs", icon: Newspaper },
   { name: "Payments", path: "/payments", icon: DollarSign },
   { name: "Notifications", path: "/notifications", icon: Bell },
