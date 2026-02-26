@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,7 +14,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
-import { useGetAllrefillQuery } from '../../../features/refillTransferScheduleRequiest/refillTransferScheduleRequiest';
+import { useGetAllContactQuery } from '../../../features/contact/contactApi';
 
 // Import Dialog components
 import {
@@ -31,89 +30,35 @@ import { useDownloadPDF } from '../../../hooks/useDownloadPDF';
 import { useDownloadXlShit } from '../../../hooks/useDownloadXlShit';
 
 // Define interfaces based on API response
-interface PersonalInfo {
-  first_name?: string;
-  last_name?: string;
-  fullName?: string;
-  phone: string;
-  dateOfBirth: string;
+interface Contact {
   _id: string;
-}
-
-// Replace these lines in the PharmacyInfo interface:
-interface PharmacyInfo {
-  name: string;
-  phone?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  availableDate?: string[];  // Changed from any[]
-  availableTime?: string[];  // Changed from any[]
-  _id: string;
-  availableDateTime?: string[];  // Changed from any[]
-}
-
-interface DeliveryInfo {
-  address: string;
-  aptUnit: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  _id: string;
-}
-
-interface Medication {
-  medicationName: string;
-  rxNumber: string;
-  _id: string;
-}
-
-interface PrescriptionRequest {
-  _id: string;
-  requiestType: string;
-  personalInfo: PersonalInfo;
-  pharmacyInfo: PharmacyInfo;
-  deliveryInfo: DeliveryInfo;
-  medicationList: Medication[];
-  additionalNotes: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  subject: string;
+  message: string;
   status: string;
   createdAt: string;
   updatedAt: string;
 }
 
-// নতুন interface যোগ করুন: Transformed data এর জন্য
-interface TransformedRequest {
+interface TransformedContact {
   _id: string;
   refId: string;
-  patientName: string;
-  prescription: string;
-  pharmacyName: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  subject: string;
   date: string;
   status: string;
   originalStatus: string;
-  originalData: PrescriptionRequest;
+  originalData: Contact;
 }
 
 // Helper function to format date
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
-};
-
-// Helper function to get patient name
-const getPatientName = (personalInfo: PersonalInfo): string => {
-  if (personalInfo.fullName) {
-    return personalInfo.fullName;
-  }
-  if (personalInfo.first_name && personalInfo.last_name) {
-    return `${personalInfo.first_name} ${personalInfo.last_name}`;
-  }
-  return 'Unknown Patient';
-};
-
-// Helper function to get medication names
-const getMedicationNames = (medicationList: Medication[]): string => {
-  return medicationList.map(med => med.medicationName).join(', ');
 };
 
 // Helper function to format date with time
@@ -125,18 +70,18 @@ const formatDateTime = (dateString: string): string => {
   });
 };
 
-export default function RefillPrescriptionRequests() {
+export default function ContactPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [dateRange] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [selectedRequest, setSelectedRequest] = useState<PrescriptionRequest | null>(null);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
 
   // Load viewed IDs from localStorage
   React.useEffect(() => {
-    const saved = localStorage.getItem('viewed_refill_requests');
+    const saved = localStorage.getItem('viewed_contact_requests');
     if (saved) {
       try {
         setViewedIds(new Set(JSON.parse(saved)));
@@ -147,22 +92,23 @@ export default function RefillPrescriptionRequests() {
   }, []);
   const itemsPerPage = 10;
 
-  const { data, isLoading } = useGetAllrefillQuery(currentPage, { refetchOnMountOrArgChange: true, pollingInterval: 2000 });
+  const { data, isLoading } = useGetAllContactQuery(currentPage, { refetchOnMountOrArgChange: true, pollingInterval: 1000 });
 
   const { downloadExcel } = useDownloadXlShit();
   const { downloadPDF } = useDownloadPDF();
   const { downloadCSV } = useCSVDownload();
 
   // Transform API data
-  const apiData = useMemo<TransformedRequest[]>(() => {
+  const apiData = useMemo<TransformedContact[]>(() => {
     if (!data || !data.data) return [];
 
-    return data.data.map((item: PrescriptionRequest) => ({
+    return data.data.map((item: Contact) => ({
       _id: item._id,
-      refId: `REF-${item._id.slice(-4).toUpperCase()}`, // Use last 4 chars of _id as ref
-      patientName: getPatientName(item.personalInfo),
-      prescription: getMedicationNames(item.medicationList),
-      pharmacyName: item.pharmacyInfo.name,
+      refId: `CON-${item._id.slice(-4).toUpperCase()}`, // Use last 4 chars of _id as ref
+      fullName: item.fullName,
+      email: item.email,
+      phoneNumber: item.phoneNumber,
+      subject: item.subject,
       date: formatDate(item.createdAt),
       status: item.status.charAt(0).toUpperCase() + item.status.slice(1), // Capitalize first letter
       originalStatus: item.status,
@@ -171,10 +117,10 @@ export default function RefillPrescriptionRequests() {
   }, [data]);
 
   // Filter data
-  const filteredData = useMemo<TransformedRequest[]>(() => {
+  const filteredData = useMemo<TransformedContact[]>(() => {
     if (!apiData.length) return [];
 
-    return apiData.filter((item: TransformedRequest) => {
+    return apiData.filter((item: TransformedContact) => {
       // Search filter
       const matchesSearch = searchQuery === '' ||
         Object.values(item).some(val =>
@@ -254,59 +200,56 @@ export default function RefillPrescriptionRequests() {
   };
 
   // Handle view details
-  const handleViewDetails = (request: PrescriptionRequest) => {
-    setSelectedRequest(request);
+  const handleViewDetails = (contact: Contact) => {
+    setSelectedContact(contact);
     setIsDialogOpen(true);
 
     // Mark as viewed
-    if (!viewedIds.has(request._id)) {
-      const newViewed = new Set(viewedIds).add(request._id);
+    if (!viewedIds.has(contact._id)) {
+      const newViewed = new Set(viewedIds).add(contact._id);
       setViewedIds(newViewed);
-      localStorage.setItem('viewed_refill_requests', JSON.stringify(Array.from(newViewed)));
+      localStorage.setItem('viewed_contact_requests', JSON.stringify(Array.from(newViewed)));
     }
   };
 
-  // Handle export functions (placeholder - implement based on your needs)
+  // Handle export functions
   const handleExportCSV = () => {
-    const dataToExport = filteredData.map(request => ({
-      RefID: request.refId,
-      PatientName: request.patientName,
-      Prescription: request.prescription,
-      PharmacyName: request.pharmacyName,
-      Date: request.date,
-      Status: request.status,
-      OriginalStatus: request.originalStatus
+    const dataToExport = filteredData.map(item => ({
+      RefID: item.refId,
+      FullName: item.fullName,
+      Email: item.email,
+      Phone: item.phoneNumber,
+      Subject: item.subject,
+      Date: item.date,
+      Status: item.status
     }));
     downloadCSV(dataToExport);
-    // Implement CSV export logic
   };
 
   const handleExportDocs = () => {
-    const dataToExport = filteredData.map(request => ({
-      RefID: request.refId,
-      PatientName: request.patientName,
-      Prescription: request.prescription,
-      PharmacyName: request.pharmacyName,
-      Date: request.date,
-      Status: request.status,
-      OriginalStatus: request.originalStatus
+    const dataToExport = filteredData.map(item => ({
+      RefID: item.refId,
+      FullName: item.fullName,
+      Email: item.email,
+      Phone: item.phoneNumber,
+      Subject: item.subject,
+      Date: item.date,
+      Status: item.status
     }));
     downloadExcel(dataToExport);
-    // Implement Docs export logic
   };
 
   const handleExportPDF = () => {
-    const dataToExport = filteredData.map(request => ({
-      RefID: request.refId,
-      PatientName: request.patientName,
-      Prescription: request.prescription,
-      PharmacyName: request.pharmacyName,
-      Date: request.date,
-      Status: request.status,
-      OriginalStatus: request.originalStatus
+    const dataToExport = filteredData.map(item => ({
+      RefID: item.refId,
+      FullName: item.fullName,
+      Email: item.email,
+      Phone: item.phoneNumber,
+      Subject: item.subject,
+      Date: item.date,
+      Status: item.status
     }));
     downloadPDF(dataToExport);
-    // Implement PDF export logic
   };
 
   if (isLoading) {
@@ -319,20 +262,15 @@ export default function RefillPrescriptionRequests() {
     <div className="flex flex-col gap-5">
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-          {selectedRequest && (
+          {selectedContact && (
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center justify-between">
-                  <span>Refill Request Details</span>
-                  <Badge
-                    variant="secondary"
-                    className={getStatusBadgeClass(selectedRequest.status)}
-                  >
-                    {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
-                  </Badge>
+                  <span>Contact Request Details</span>
+
                 </DialogTitle>
                 <DialogDescription>
-                  Request ID: REF-{selectedRequest._id.slice(-4).toUpperCase()}
+                  Request ID: CON-{selectedContact._id.slice(-4).toUpperCase()}
                 </DialogDescription>
               </DialogHeader>
 
@@ -344,16 +282,16 @@ export default function RefillPrescriptionRequests() {
                   </div>
                   <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Request Type</p>
-                      <p className="text-sm md:text-base text-gray-900 capitalize font-medium">{selectedRequest.requiestType}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Subject</p>
+                      <p className="text-sm md:text-base text-gray-900 capitalize font-medium">{selectedContact.subject}</p>
                     </div>
                     <div>
                       <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Created At</p>
-                      <p className="text-sm md:text-base text-gray-900">{formatDateTime(selectedRequest.createdAt)}</p>
+                      <p className="text-sm md:text-base text-gray-900">{formatDateTime(selectedContact.createdAt)}</p>
                     </div>
                     <div>
                       <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Last Updated</p>
-                      <p className="text-sm md:text-base text-gray-900">{formatDateTime(selectedRequest.updatedAt)}</p>
+                      <p className="text-sm md:text-base text-gray-900">{formatDateTime(selectedContact.updatedAt)}</p>
                     </div>
                   </div>
                 </div>
@@ -365,118 +303,29 @@ export default function RefillPrescriptionRequests() {
                   </div>
                   <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Patient Name</p>
-                      <p className="text-sm md:text-base text-gray-900 font-medium break-words">{getPatientName(selectedRequest.personalInfo)}</p>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Full Name</p>
+                      <p className="text-sm md:text-base text-gray-900 font-medium break-words">{selectedContact.fullName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Email</p>
+                      <p className="text-sm md:text-base text-gray-900 break-words">{selectedContact.email}</p>
                     </div>
                     <div>
                       <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Phone</p>
-                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.personalInfo.phone}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Date of Birth</p>
-                      <p className="text-sm md:text-base text-gray-900">{formatDate(selectedRequest.personalInfo.dateOfBirth)}</p>
+                      <p className="text-sm md:text-base text-gray-900">{selectedContact.phoneNumber}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Pharmacy Information */}
+                {/* Message */}
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                   <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
-                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Pharmacy Information</h3>
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Message Content</h3>
                   </div>
-                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                    <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Pharmacy Name</p>
-                      <p className="text-sm md:text-base text-gray-900 font-medium break-words">{selectedRequest.pharmacyInfo.name}</p>
-                    </div>
-                    {selectedRequest.pharmacyInfo.phone && (
-                      <div>
-                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Pharmacy Phone</p>
-                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.phone}</p>
-                      </div>
-                    )}
-                    {selectedRequest.pharmacyInfo.city && (
-                      <div>
-                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">City</p>
-                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.city}</p>
-                      </div>
-                    )}
-                    {selectedRequest.pharmacyInfo.state && (
-                      <div>
-                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">State</p>
-                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.state}</p>
-                      </div>
-                    )}
-                    {selectedRequest.pharmacyInfo.zipCode && (
-                      <div>
-                        <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">ZIP Code</p>
-                        <p className="text-sm md:text-base text-gray-900">{selectedRequest.pharmacyInfo.zipCode}</p>
-                      </div>
-                    )}
+                  <div className="p-4 md:p-6 bg-gray-50/50">
+                    <p className="text-sm md:text-base text-gray-900 whitespace-pre-wrap">{selectedContact.message}</p>
                   </div>
                 </div>
-
-                {/* Delivery Information */}
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
-                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Delivery Information</h3>
-                  </div>
-                  <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                    <div className="sm:col-span-2 md:col-span-3">
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Address</p>
-                      <p className="text-sm md:text-base text-gray-900 break-words">{selectedRequest.deliveryInfo.address}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">Apt/Unit</p>
-                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.deliveryInfo.aptUnit || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">City</p>
-                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.deliveryInfo.city}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">State</p>
-                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.deliveryInfo.state}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">ZIP Code</p>
-                      <p className="text-sm md:text-base text-gray-900">{selectedRequest.deliveryInfo.zipCode}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Medication List */}
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
-                    <h3 className="text-base md:text-lg font-semibold text-gray-900">Medication List</h3>
-                  </div>
-                  <div className="p-4 md:p-6 space-y-3">
-                    {selectedRequest.medicationList.map((medication, index) => (
-                      <div key={medication._id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-gray-50 rounded-lg gap-2">
-                        <div>
-                          <p className="text-xs md:text-sm font-semibold text-purple-600 uppercase tracking-wider">Medication {index + 1}</p>
-                          <p className="text-sm md:text-base text-gray-900 font-medium">{medication.medicationName}</p>
-                        </div>
-                        <div className="sm:text-right">
-                          <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider">RX Number</p>
-                          <p className="text-sm md:text-base text-gray-900 font-mono font-medium">{medication.rxNumber}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Additional Notes */}
-                {selectedRequest.additionalNotes && (
-                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                    <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50/50">
-                      <h3 className="text-base md:text-lg font-semibold text-gray-900">Additional Notes</h3>
-                    </div>
-                    <div className="p-4 md:p-6 bg-gray-50/50">
-                      <p className="text-sm md:text-base text-gray-900 whitespace-pre-wrap">{selectedRequest.additionalNotes}</p>
-                    </div>
-                  </div>
-                )}
               </div>
             </>
           )}
@@ -488,7 +337,7 @@ export default function RefillPrescriptionRequests() {
         <div className="p-4 md:p-6 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <h1 className="text-lg md:text-xl font-semibold text-gray-900">
-              Refill Prescription Requests
+              Contact Requests
             </h1>
             <div className="flex gap-3 md:gap-5 w-full sm:w-auto">
               <Button
@@ -523,7 +372,7 @@ export default function RefillPrescriptionRequests() {
             <div className="relative md:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search by patient name, pharmacy, medication..."
+                placeholder="Search by name, email, subject..."
                 value={searchQuery}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-gray-50 border-gray-200 w-full"
@@ -549,39 +398,31 @@ export default function RefillPrescriptionRequests() {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Ref ID</th>
-                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Patient Name</th>
-                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Prescription</th>
-                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Pharmacy Name</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Full Name</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Email</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Phone</th>
+                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Subject</th>
                 <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Date</th>
-                <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Status</th>
                 <th className="px-2 md:px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-500">Action</th>
               </tr>
             </thead>
             <tbody>
               {currentData.length > 0 ? (
-                currentData.map((item: TransformedRequest) => (
+                currentData.map((item: TransformedContact, index: number) => (
                   <tr key={item._id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 font-mono">{item.refId}</td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <div className="flex items-center gap-2">
                         {!viewedIds.has(item._id) && (
                           <div className="w-2 h-2 rounded-full bg-[#9c4a8f] animate-pulse shrink-0" title="New request" />
                         )}
-                        <span>{item.patientName}</span>
+                        <span>{item.fullName}</span>
                       </div>
                     </td>
-                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 max-w-[150px] md:max-w-xs truncate">{item.prescription}</td>
-                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 truncate">{item.pharmacyName}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 max-w-[150px] md:max-w-xs truncate">{item.email}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">{item.phoneNumber}</td>
+                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 capitalize">{item.subject}</td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">{item.date}</td>
-                    <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900 border-none">
-                      <Badge
-                        variant="secondary"
-                        className={`${getStatusBadgeClass(item.originalStatus)} border-none text-[10px] md:text-xs font-medium px-2 py-0.5 whitespace-nowrap`}
-                      >
-                        {item.status}
-                      </Badge>
-                    </td>
+
                     <td className="px-2 md:px-6 py-4">
                       <button
                         className="p-2 cursor-pointer hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-center shrink-0"
@@ -601,8 +442,8 @@ export default function RefillPrescriptionRequests() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                    {apiData.length === 0 ? 'No prescription requests found' : 'No matching requests found'}
+                  <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                    {apiData.length === 0 ? 'No contact requests found' : 'No matching requests found'}
                   </td>
                 </tr>
               )}

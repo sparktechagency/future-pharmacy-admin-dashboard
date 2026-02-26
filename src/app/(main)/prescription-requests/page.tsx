@@ -39,6 +39,7 @@ interface PrescriptionOrder {
   legalName: string;
   dateOfBirth: string;
   amount: number;
+  deliveryInstruction: string;
   status: string;
   isDeleted: boolean;
   createdAt: string;
@@ -336,6 +337,10 @@ const PrescriptionRequestsTable = () => {
                           <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
                             <span className="font-medium text-gray-700 sm:min-w-24">Amount:</span>
                             <span className="text-gray-900 font-semibold">${selectedRequest.order.amount.toFixed(2)}</span>
+                          </div>
+                          <div className="flex flex-col sm:flex-row sm:items-start text-sm md:text-base">
+                            <span className="font-medium text-gray-700 sm:min-w-24">Delivery Instruction: </span>
+                            <span className="text-gray-900 font-semibold"> {selectedRequest.order.deliveryInstruction || 'N/A'}</span>
                           </div>
                         </div>
                       </div>

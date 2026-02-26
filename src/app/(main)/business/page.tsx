@@ -240,8 +240,8 @@ const ViewDetailsDialog = ({ type, data, children }: ViewDetailsDialogProps) => 
                   { label: "Title", value: (data as IndependentPharmacy).title },
                   { label: "Phone", value: (data as IndependentPharmacy).phone },
                   { label: "Year of Business", value: (data as IndependentPharmacy).yearofBusiness },
-                  { label: "Created At", value: new Date(data.createdAt).toLocaleDateString() },
-                  { label: "Updated At", value: new Date(data.updatedAt).toLocaleDateString() },
+
+
                 ].map((item, idx) => (
                   <div key={idx} className="p-4 rounded-xl bg-gray-50 border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-md group">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-purple-400 transition-colors">{item.label}</p>

@@ -68,7 +68,7 @@ export default function TransactionsList() {
   const { downloadPDF } = useDownloadPDF();
   const { downloadCSV } = useCSVDownload();
 
-  const { data: apiResponse, isLoading, error } = useGetAllPaymentQuery(currentPage, { pollingInterval: 5000 });
+  const { data: apiResponse, isLoading, error } = useGetAllPaymentQuery(currentPage, { pollingInterval: 2000 });
 
   const payments = useMemo<Payment[]>(() => {
     return apiResponse?.data?.result || [];

@@ -54,7 +54,7 @@ const DeliveryZoneTable = () => {
     isLoading,
     isError,
     refetch
-  } = useGetAlldeliveryZoneQuery(currentPage);
+  } = useGetAlldeliveryZoneQuery(currentPage, { refetchOnMountOrArgChange: true, pollingInterval: 2000 });
 
   const totalPages = apiResponse?.meta?.totalPage || 1;
 

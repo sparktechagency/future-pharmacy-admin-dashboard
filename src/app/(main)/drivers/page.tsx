@@ -66,7 +66,7 @@ export default function AllDriverList() {
   // Fetch single driver data when a driver is selected
   const { data: singleDriverResponse, isLoading: singleDriverLoading } = useGetSingleDriverQuery(
     selectedDriverId!,
-    { skip: !selectedDriverId }
+    { skip: !selectedDriverId, refetchOnMountOrArgChange: true, pollingInterval: 2000 }
   );
 
   // Type guard to check if we have valid data
@@ -254,8 +254,8 @@ export default function AllDriverList() {
                     <tr key={driver._id} className="hover:bg-purple-50/30 transition-colors group">
                       <td className="px-4 md:px-6 py-4">
                         <div className="flex flex-col">
-                          <span className="text-xs md:text-sm font-bold text-gray-900 line-clamp-1">{driver.name}</span>
-                          <span className="text-[10px] md:text-xs text-gray-400 font-mono font-medium">{getDriverId(driver._id)}</span>
+                          <span className="text-xs md:text-sm font-semibold text-gray-700">{driver.name}</span>
+                          {/* <span className="text-[10px] md:text-xs text-gray-400 font-mono font-medium">{getDriverId(driver._id)}</span> */}
                         </div>
                       </td>
                       <td className="px-4 md:px-6 py-4">

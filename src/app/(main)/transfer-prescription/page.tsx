@@ -164,7 +164,7 @@ export default function PrescriptionTransferRequests() {
     }
   }, []);
 
-  const { data, isLoading } = useGetAllTransferQuery(currentPage);
+  const { data, isLoading } = useGetAllTransferQuery(currentPage, { refetchOnMountOrArgChange: true, pollingInterval: 2000 });
   const { downloadExcel } = useDownloadXlShit();
   const { downloadCSV } = useCSVDownload();
   const { downloadPDF } = useDownloadPDF();
