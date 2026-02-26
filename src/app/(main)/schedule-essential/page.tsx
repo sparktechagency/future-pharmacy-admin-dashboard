@@ -773,9 +773,6 @@ export default function HealthcareSchedule() {
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <div className="flex flex-col">
                         <span className="font-medium">{item.serviceType}</span>
-                        {item.availableTimes && item.availableTimes !== 'No times specified' && (
-                          <span className="text-[10px] md:text-xs text-gray-500 truncate max-w-[150px]">Times: {item.availableTimes}</span>
-                        )}
                       </div>
                     </td>
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
