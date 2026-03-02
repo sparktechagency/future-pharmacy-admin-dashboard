@@ -3,7 +3,6 @@
 import AreaChart from "./AreaChart";
 import DashboardStats from './DashboardStats';
 import DeliveriesDonutChart from './DeliveriesDonutChart';
-import RxDeliveryTable from './RxDeliveryTable';
 
 
 function AnalyticsLayout() {
@@ -19,9 +18,9 @@ function AnalyticsLayout() {
         </div>
       </div>
 
-      <div className="">
+      {/* <div className="">
         <RxDeliveryTable />
-      </div>
+      </div> */}
     </div>
   );
 }
