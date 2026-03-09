@@ -724,7 +724,7 @@ export default function UserProfilePage() {
                 onChange={(e) => setOtp(e.target.value)}
                 placeholder="Enter OTP"
                 className="h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl text-center tracking-[0.5em] text-lg font-bold"
-                maxLength={6}
+                maxLength={4}
               />
             </div>
             <div className="space-y-2 pt-2">
