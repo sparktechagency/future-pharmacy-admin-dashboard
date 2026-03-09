@@ -186,18 +186,7 @@ export default function ContactPage() {
     return pages;
   };
 
-  const getStatusBadgeClass = (status: string): string => {
-    switch (status.toLowerCase()) {
-      case 'approved':
-        return 'bg-green-100 text-green-700 hover:bg-green-100';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100';
-      case 'rejected':
-        return 'bg-red-100 text-red-700 hover:bg-red-100';
-      default:
-        return 'bg-gray-100 text-gray-700 hover:bg-gray-100';
-    }
-  };
+
 
   // Handle view details
   const handleViewDetails = (contact: Contact) => {
@@ -408,7 +397,7 @@ export default function ContactPage() {
             </thead>
             <tbody>
               {currentData.length > 0 ? (
-                currentData.map((item: TransformedContact, index: number) => (
+                currentData.map((item: TransformedContact) => (
                   <tr key={item._id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="px-2 md:px-6 py-4 text-xs md:text-sm text-gray-900">
                       <div className="flex items-center gap-2">

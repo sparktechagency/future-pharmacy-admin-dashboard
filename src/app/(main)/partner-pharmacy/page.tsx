@@ -166,6 +166,11 @@ const PartnerPharmacyTable = () => {
   const handleSubmitAdd = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.message.trim()) {
+      toast.error('Message field is required');
+      return;
+    }
+
     const validData = new FormData();
     validData.append('name', formData.name);
     validData.append('address', formData.address);
@@ -203,6 +208,11 @@ const PartnerPharmacyTable = () => {
   // Handle form submission for edit
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.message.trim()) {
+      toast.error('Message field is required');
+      return;
+    }
 
     const validData = new FormData();
     validData.append('name', formData.name);

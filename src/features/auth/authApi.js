@@ -12,6 +12,18 @@ export const authApi = baseApi.injectEndpoints({
       }),
     }),
 
+    TwoStepVerification: builder.mutation({
+      query: (credentials) => ({
+        url: "/auth/2step-verification",
+        method: "POST",
+        body: credentials,
+        headers: {
+          token: `${credentials.token}`,
+          "Content-Type": "application/json"
+        }
+      }),
+    }),
+
     forgotEmail: builder.mutation({
       query: (forgotEmail) => ({
         url: "/auth/forgot-password-otp",
@@ -67,5 +79,6 @@ export const {
   useForgotEmailMutation,
   useForgotEmailOTPCheckMutation,
   useResetPasswordMutation,
-  useResendPasswordMutation
+  useResendPasswordMutation,
+  useTwoStepVerificationMutation
 } = authApi;

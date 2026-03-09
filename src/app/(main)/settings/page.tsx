@@ -17,7 +17,7 @@ import { CalendarIcon, Clock, Shield, User } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useGetMyProfileQuery, useResetPasswordProfileMutation, useTwoStepVerificationMutation, useUpdateProfileMutation } from "../../../features/profile/profileApi";
+import { useChangePasswordMutation, useGetMyProfileQuery, useResetPasswordProfileMutation, useTwoStepVerificationMutation, useUpdateProfileMutation } from "../../../features/profile/profileApi";
 import { baseURL } from '../../../utils/BaseURL';
 
 // Helper function to format relative time
@@ -35,6 +35,8 @@ const getRelativeTime = (timestamp: string) => {
 
 export default function UserProfilePage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [otp, setOtp] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -45,6 +47,7 @@ export default function UserProfilePage() {
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
   const [resetPassword, { isLoading: isResettingPassword }] = useResetPasswordProfileMutation();
   const [twoFactor, { isLoading: isEnabling2FA }] = useTwoStepVerificationMutation();
+  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
 
   const profileData = profileResponse?.data;
 
@@ -194,25 +197,61 @@ export default function UserProfilePage() {
     return isValid;
   };
 
-  const handlePasswordChange = async () => {
-    if (!validatePasswordFields()) {
-      return;
+  const handleInitiatePasswordChange = async () => {
+    if (profileData?.twoStepVerification) {
+      try {
+        const result = await resetPassword({}).unwrap();
+        if (result.success) {
+          toast.success(result.message || 'OTP sent to your email');
+          setOldPassword('');
+          setNewPassword('');
+          setOtp('');
+          setPasswordErrors({ oldPassword: '', newPassword: '' });
+          setIsOtpModalOpen(true);
+        }
+      } catch (error: unknown) {
+        if (error && typeof error === 'object' && 'data' in error) {
+          const err = error as { data?: { message?: string } };
+          toast.error(err.data?.message || 'Failed to send OTP');
+        } else {
+          toast.error('Failed to send OTP');
+        }
+      }
+    } else {
+      if (!validatePasswordFields()) {
+        return;
+      }
+      executeChangePassword();
+    }
+  };
+
+  const executeChangePassword = async () => {
+    if (profileData?.twoStepVerification) {
+      if (!otp.trim()) {
+        toast.error('OTP is required');
+        return;
+      }
+      if (!validatePasswordFields()) {
+        return;
+      }
     }
 
     try {
-      const result = await resetPassword({
-        oldPassword,
-        newPassword
-      }).unwrap();
+      const payload: Record<string, string> = { oldPassword, newPassword };
+      if (profileData?.twoStepVerification) {
+        payload.otp = otp;
+      }
 
-      console.log("result Password", result)
+      const result = await changePassword(payload).unwrap();
 
       if (result.success) {
         toast.success(result.message || 'Password changed successfully');
         addActivityLog('Security Settings Updated', 'Password was changed', Shield);
         setOldPassword('');
         setNewPassword('');
+        setOtp('');
         setPasswordErrors({ oldPassword: '', newPassword: '' });
+        setIsOtpModalOpen(false);
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'data' in error) {
@@ -225,13 +264,15 @@ export default function UserProfilePage() {
     }
   };
 
-  const handle2FAToggle = async (checked: boolean) => {
+  const handle2FAToggle = async (_checked: boolean) => {
     try {
       const result = await twoFactor({}).unwrap();
 
       if (result.success) {
-        toast.success(result.message || '2FA settings updated successfully');
-        const action = checked ? 'Enabled' : 'Disabled';
+        const isEnabled = result.data?.twoStepVerification;
+        const msg = isEnabled ? 'Enabled Two Step Verification successfully' : 'Disabled Two Step Verification successfully';
+        toast.success(result.message || msg);
+        const action = isEnabled ? 'Enabled' : 'Disabled';
         addActivityLog('Security Settings Updated', `${action} Two-Factor Authentication`, Shield);
         refetch();
       }
@@ -388,43 +429,50 @@ export default function UserProfilePage() {
         <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 mb-6 mt-6">
           <div className="flex flex-col gap-8">
             <div className="flex flex-col lg:flex-row items-end gap-6 w-full">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full flex-1">
-                <div className="space-y-2">
-                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Current Password</div>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.oldPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                  />
-                  {passwordErrors.oldPassword && (
-                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.oldPassword}</p>
-                  )}
+              {!profileData?.twoStepVerification ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full flex-1">
+                  <div className="space-y-2">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Current Password</div>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.oldPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                    />
+                    {passwordErrors.oldPassword && (
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.oldPassword}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">New Secure Password</div>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.newPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                    {passwordErrors.newPassword && (
+                      <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.newPassword}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">New Secure Password</div>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.newPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                  />
-                  {passwordErrors.newPassword && (
-                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.newPassword}</p>
-                  )}
+              ) : (
+                <div className="w-full flex-1 text-sm font-medium text-gray-600 bg-purple-50/50 p-4 rounded-xl border border-purple-100/50">
+                  <span className="font-bold text-purple-700">Two-Factor Authentication is enabled.</span><br />
+                  Click the button to receive an OTP and proceed with changing your password.
                 </div>
-              </div>
+              )}
               <Button
                 className="w-full lg:w-auto bg-[#9c4a8f] border-none hover:bg-[#9c4a8f]/80 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-[#9c4a8f]/20 transition-all active:scale-95 shrink-0"
-                onClick={handlePasswordChange}
-                disabled={isResettingPassword}
+                onClick={handleInitiatePasswordChange}
+                disabled={isResettingPassword || isChangingPassword}
               >
-                {isResettingPassword ? (
+                {isResettingPassword || isChangingPassword ? (
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Changing...</span>
+                    <span>Processing...</span>
                   </div>
                 ) : 'Update Password'}
               </Button>
@@ -655,6 +703,79 @@ export default function UserProfilePage() {
                   <span>Saving...</span>
                 </div>
               ) : 'Commit Changes'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* OTP Dialog */}
+      <Dialog open={isOtpModalOpen} onOpenChange={setIsOtpModalOpen}>
+        <DialogContent className="sm:max-w-md p-6 bg-white border-none shadow-2xl rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-900 border-l-4 border-purple-600 pl-4">Input OTP</DialogTitle>
+            <p className="text-sm font-medium text-gray-500 mt-2 pl-5">Please enter the security verification code sent to your email.</p>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="otp" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Verification Code</Label>
+              <Input
+                id="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+                className="h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl text-center tracking-[0.5em] text-lg font-bold"
+                maxLength={6}
+              />
+            </div>
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="modalOldPassword" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Current Password</Label>
+              <Input
+                id="modalOldPassword"
+                type="password"
+                placeholder="••••••••"
+                className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.oldPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
+              {passwordErrors.oldPassword && (
+                <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.oldPassword}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="modalNewPassword" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">New Secure Password</Label>
+              <Input
+                id="modalNewPassword"
+                type="password"
+                placeholder="••••••••"
+                className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.newPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              {passwordErrors.newPassword && (
+                <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.newPassword}</p>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button
+              variant="ghost"
+              onClick={() => setIsOtpModalOpen(false)}
+              className="px-6 font-bold text-gray-500 h-11"
+              disabled={isChangingPassword}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={executeChangePassword}
+              className="px-6 bg-[#9c4a8f] hover:bg-[#9c4a8f]/80 text-white font-bold h-11 shadow-lg shadow-[#9c4a8f]/20 transition-all"
+              disabled={isChangingPassword || !otp.trim()}
+            >
+              {isChangingPassword ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Verifying...</span>
+                </div>
+              ) : 'Verify & Submit'}
             </Button>
           </div>
         </DialogContent>

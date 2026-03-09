@@ -181,7 +181,7 @@ const PharmacyForm = ({ formData, handleInputChange, handleFileChange, isEdit }:
     </div>
 
     <div className="space-y-2 md:col-span-2">
-      <Label htmlFor="message">Message</Label>
+      <Label htmlFor="message">Message *</Label>
       <Textarea
         id="message"
         name="message"
@@ -189,6 +189,7 @@ const PharmacyForm = ({ formData, handleInputChange, handleFileChange, isEdit }:
         onChange={handleInputChange}
         placeholder="Enter message"
         rows={3}
+        required
       />
     </div>
 

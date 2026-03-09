@@ -62,7 +62,7 @@ const NotificationSystem = () => {
       socket.connect();
     }
 
-    const handleNotification = (eventName: string, data: unknown) => {
+    const handleNotification = (eventName: string, _data: unknown) => {
       if (eventName.startsWith("notification")) {
         refetch();
       }

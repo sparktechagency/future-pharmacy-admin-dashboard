@@ -36,8 +36,16 @@ export const profileApi = baseApi.injectEndpoints({
         url: "/auth/change-password",
         method: "POST",
       }),
+      invalidatesTags: ["profile"],
     }),
-    invalidatesTags: ["profile"],
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/change-password-verification",
+        method: "PATCH",
+        body: data
+      }),
+      invalidatesTags: ["profile"],
+    }),
   }),
 });
 
@@ -45,5 +53,6 @@ export const {
   useGetMyProfileQuery,
   useUpdateProfileMutation,
   useTwoStepVerificationMutation,
-  useResetPasswordProfileMutation
+  useResetPasswordProfileMutation,
+  useChangePasswordMutation
 } = profileApi;

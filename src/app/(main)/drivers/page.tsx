@@ -149,10 +149,7 @@ export default function AllDriverList() {
   //   return status.charAt(0).toUpperCase() + status.slice(1);
   // };
 
-  // Get driver ID from _id (use last 6 characters or whole ID)
-  const getDriverId = (id: string): string => {
-    return `#${id.slice(-6).toUpperCase()}`;
-  };
+
 
   // Handle view details button click
   const handleViewDetails = (driverId: string) => {

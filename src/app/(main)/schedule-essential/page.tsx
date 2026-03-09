@@ -146,7 +146,7 @@ const getScheduledDate = (pharmacyInfo: PharmacyInfo): string => {
 };
 
 // Helper function to get assigned driver (placeholder - replace with actual logic)
-const getAssignedDriver = (request: ScheduleRequest): string => {
+const getAssignedDriver = (_request: ScheduleRequest): string => {
 
   // This is a placeholder - you'll need to implement actual driver assignment logic
   // For now, return a placeholder or leave empty

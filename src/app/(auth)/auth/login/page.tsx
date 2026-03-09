@@ -1,5 +1,9 @@
 "use client";
 
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,7 +11,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../../../contexts/AuthContext';
-import { useLoginMutation } from '../../../../features/auth/authApi';
+import { useLoginMutation, useTwoStepVerificationMutation } from '../../../../features/auth/authApi';
 
 interface ApiError {
   data?: {
@@ -16,10 +20,11 @@ interface ApiError {
 }
 
 interface LoginResponse {
+  success?: boolean;
   message?: string;
   data?: {
     accessToken: string;
-  };
+  } | string;
 }
 
 interface LoginCredentials {
@@ -38,8 +43,14 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [Login, { isLoading }] = useLoginMutation();
+  const [verifyOtp, { isLoading: isVerifyingOtp }] = useTwoStepVerificationMutation();
   const { login } = useAuth();
   const redirectUrl = searchParams.get('redirect') || '/';
+
+  // State for OTP Modal
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [tempToken, setTempToken] = useState<string | null>(null);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -73,17 +84,21 @@ function LoginForm() {
           password: password
         };
 
-        
-
         const response = await Login(credentials).unwrap() as LoginResponse;
-        
 
-        // Save token to storage via AuthContext
-        if (response.data) {
-          login(response.data?.accessToken);
+        // Check if 2FA is required
+        if (response.success && response.message === "2-FA verification is required" && typeof response.data === 'string') {
+          // Store the JWT token temporarily
+          setTempToken(response.data);
+          setIsOtpModalOpen(true);
+          toast.success("Please enter the OTP sent to your email");
+          return;
+        }
+
+        // Standard Login (No 2FA)
+        if (typeof response.data === 'object' && response.data?.accessToken) {
+          login(response.data.accessToken);
           toast.success(response.message || 'Login successful!');
-
-          // Redirect to requested page or home
           router.push(redirectUrl);
         } else {
           toast.error('No access token received');
@@ -92,6 +107,39 @@ function LoginForm() {
         const apiError = error as ApiError;
         toast.error(apiError?.data?.message || 'Login failed! Please check your credentials.');
       }
+    }
+  };
+
+  const handleOtpSubmit = async () => {
+    if (!otp.trim()) {
+      toast.error('OTP is required');
+      return;
+    }
+
+    if (!tempToken) {
+      toast.error('Authentication token missing. Please login again.');
+      setIsOtpModalOpen(false);
+      return;
+    }
+
+    try {
+      const response = await verifyOtp({
+        token: tempToken,
+        otp: otp
+      }).unwrap() as LoginResponse;
+
+      if (response.success && typeof response.data === 'object' && response.data?.accessToken) {
+        login(response.data.accessToken);
+        toast.success(response.message || 'Verification successful!');
+        setIsOtpModalOpen(false);
+        setOtp('');
+        router.push(redirectUrl);
+      } else {
+        toast.error('Verification failed');
+      }
+    } catch (error) {
+      const apiError = error as ApiError;
+      toast.error(apiError?.data?.message || 'Verification failed. Please check your OTP.');
     }
   };
 
@@ -212,6 +260,51 @@ function LoginForm() {
           </form>
         </div>
       </div>
+
+      {/* OTP Verification Modal */}
+      <Dialog open={isOtpModalOpen} onOpenChange={setIsOtpModalOpen}>
+        <DialogContent className="sm:max-w-md p-6 bg-white border-none shadow-2xl rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-900 border-l-4 border-purple-600 pl-4">Require 2FA</DialogTitle>
+            <p className="text-sm font-medium text-gray-500 mt-2 pl-5">Please enter the security verification code sent to your email to continue.</p>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="otp" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Verification Code</Label>
+              <Input
+                id="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+                className="h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl text-center tracking-[0.5em] text-lg font-bold"
+                maxLength={6}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button
+              variant="ghost"
+              onClick={() => setIsOtpModalOpen(false)}
+              className="px-6 font-bold text-gray-500 h-11"
+              disabled={isVerifyingOtp}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleOtpSubmit}
+              className="px-6 bg-[#9c4a8f] hover:bg-[#9c4a8f]/80 text-white font-bold h-11 shadow-lg shadow-[#9c4a8f]/20 transition-all"
+              disabled={isVerifyingOtp || !otp.trim()}
+            >
+              {isVerifyingOtp ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Verifying...</span>
+                </div>
+              ) : 'Verify & Login'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
