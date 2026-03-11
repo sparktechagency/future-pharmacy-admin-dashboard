@@ -13,7 +13,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { CalendarIcon, Clock, Shield, User } from 'lucide-react';
+import { CalendarIcon, Clock, Eye, EyeOff, Shield, User } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -41,6 +41,12 @@ export default function UserProfilePage() {
   const [newPassword, setNewPassword] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [passwordErrors, setPasswordErrors] = useState({ oldPassword: '', newPassword: '' });
+
+  // Password visibility toggles
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showModalOldPassword, setShowModalOldPassword] = useState(false);
+  const [showModalNewPassword, setShowModalNewPassword] = useState(false);
 
   // API hooks
   const { data: profileResponse, isLoading, refetch } = useGetMyProfileQuery({});
@@ -191,6 +197,9 @@ export default function UserProfilePage() {
     } else if (newPassword.length < 6) {
       errors.newPassword = 'Password must be at least 6 characters';
       isValid = false;
+    } else if (oldPassword.trim() && oldPassword === newPassword) {
+      errors.newPassword = 'New password cannot be the same as current password';
+      isValid = false;
     }
 
     setPasswordErrors(errors);
@@ -245,7 +254,10 @@ export default function UserProfilePage() {
       const result = await changePassword(payload).unwrap();
 
       if (result.success) {
-        toast.success(result.message || 'Password changed successfully');
+        const successMsg = profileData?.twoStepVerification
+          ? 'Update password successfully'
+          : 'Password changed successfully';
+        toast.success(successMsg);
         addActivityLog('Security Settings Updated', 'Password was changed', Shield);
         setOldPassword('');
         setNewPassword('');
@@ -332,18 +344,18 @@ export default function UserProfilePage() {
     };
   }, [previewImage]);
 
-  // Clear password errors when user starts typing
+  // Clear password errors when user starts typing (only depend on the value, not the error state)
   useEffect(() => {
-    if (oldPassword && passwordErrors.oldPassword) {
+    if (oldPassword) {
       setPasswordErrors(prev => ({ ...prev, oldPassword: '' }));
     }
-  }, [oldPassword, passwordErrors.oldPassword]);
+  }, [oldPassword]);
 
   useEffect(() => {
-    if (newPassword && passwordErrors.newPassword) {
+    if (newPassword) {
       setPasswordErrors(prev => ({ ...prev, newPassword: '' }));
     }
-  }, [newPassword, passwordErrors.newPassword]);
+  }, [newPassword]);
 
   if (isLoading) {
     return (
@@ -433,26 +445,46 @@ export default function UserProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full flex-1">
                   <div className="space-y-2">
                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Current Password</div>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.oldPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
-                      value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showOldPassword ? 'text' : 'password'}
+                        placeholder="Enter Current Password"
+                        className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl pr-11 ${passwordErrors.oldPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowOldPassword(!showOldPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                        tabIndex={-1}
+                      >
+                        {showOldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                     {passwordErrors.oldPassword && (
                       <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.oldPassword}</p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">New Secure Password</div>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.newPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showNewPassword ? 'text' : 'password'}
+                        placeholder="Enter New Password"
+                        className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl pr-11 ${passwordErrors.newPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                        tabIndex={-1}
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                     {passwordErrors.newPassword && (
                       <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.newPassword}</p>
                     )}
@@ -496,7 +528,7 @@ export default function UserProfilePage() {
               checked={profileData?.twoStepVerification}
               onCheckedChange={handle2FAToggle}
               disabled={isEnabling2FA}
-              className="data-[state=checked]:bg-purple-600 shadow-sm outline-none border-none shrink-0"
+              className="data-[state=checked]:bg-purple-600 cursor-pointer shadow-sm outline-none border-none shrink-0"
             />
           </div>
         </div>
@@ -729,28 +761,48 @@ export default function UserProfilePage() {
             </div>
             <div className="space-y-2 pt-2">
               <Label htmlFor="modalOldPassword" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Current Password</Label>
-              <Input
-                id="modalOldPassword"
-                type="password"
-                placeholder="••••••••"
-                className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.oldPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="modalOldPassword"
+                  type={showModalOldPassword ? 'text' : 'password'}
+                  placeholder="Enter Current Password"
+                  className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl pr-11 ${passwordErrors.oldPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowModalOldPassword(!showModalOldPassword)}
+                  className="absolute right-3 top-1/2 cursor-pointer -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                  tabIndex={-1}
+                >
+                  {showModalOldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               {passwordErrors.oldPassword && (
                 <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.oldPassword}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="modalNewPassword" className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">New Secure Password</Label>
-              <Input
-                id="modalNewPassword"
-                type="password"
-                placeholder="••••••••"
-                className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl ${passwordErrors.newPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="modalNewPassword"
+                  type={showModalNewPassword ? 'text' : 'password'}
+                  placeholder="Enter New Password"
+                  className={`w-full h-11 bg-gray-50 border-gray-100 focus:bg-white transition-all rounded-xl pr-11 ${passwordErrors.newPassword ? 'border-red-500 focus:ring-red-500 bg-red-50' : ''}`}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowModalNewPassword(!showModalNewPassword)}
+                  className="absolute right-3 top-1/2 cursor-pointer -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                  tabIndex={-1}
+                >
+                  {showModalNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               {passwordErrors.newPassword && (
                 <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider pl-1">{passwordErrors.newPassword}</p>
               )}
